@@ -54,7 +54,11 @@ help, so check both first.
   pool's Pace Display port.
 - **Vision:** a USB camera above the pool sees the swimmer.
 
-<!-- Bill: a photo of the finished station and the interface board here -->
+![The finished station beside the pool](images/PoolWind_Station_running.jpg)
+
+*The finished station beside the pool, PoolWind running: pace, average
+pace and distance on the portrait monitor, with the waterproof keyboard
+and mouse in front.*
 
 ## 2. Parts and tools
 
@@ -100,8 +104,11 @@ board alone. A kit includes the pieces that are easy to get wrong:
   micro-HDMI size; the monitor takes ordinary HDMI.
 - **A microSD card**, often with Raspberry Pi OS already on it.
 
-<!-- Bill: a photo of the Pi in its case with the ribbon cable plugged in
-would help here. -->
+![The station opened up](images/PoolWind_Station_spread_out.jpg)
+
+*The station opened up: the Pi in its starter-kit case (right), the
+ribbon cable to the interface board (left), the case fan, and the
+heatsink's flat side on the back wall of the waterproof case.*
 
 ### The SD card
 
@@ -454,7 +461,18 @@ The keyboard is rarely used and is not needed at the pool edge. It is used for c
   and its flat side inside. The Raspberry Pi is placed so it draws its air
   from near the heatsink.
 
-<!-- Bill: photo of the heatsink, inside and outside. -->
+![Everything tucked into the case](images/PoolWind_Station_inside.jpg)
+
+*Everything tucked in. The Pi sits behind the interface board, against
+the heatsink's inside face; the fan at the back of the Pi's case draws air
+from right beside the heatsink and blows it over the chips. Cables are
+kept away from the Pi case's air vents. The monitor is mounted in the
+clear front door, and the sock is full of desiccant packs.*
+
+![The heatsink fins outside the case](images/PoolWind_Station_heatsink.jpg)
+
+*The closed case from behind: the heatsink's fins outside, sealed into
+the case wall.*
 
 - **Power:** a proper power supply for the Raspberry Pi and one for the
   monitor, plugged into a **GFCI-protected outlet** away from splashing
