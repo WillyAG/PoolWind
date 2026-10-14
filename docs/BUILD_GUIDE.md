@@ -151,7 +151,11 @@ Upload [`hardware/gerbers/PoolWind_PCB_gerbers.zip`](../hardware/gerbers/PoolWin
 to any PCB maker. It's a standard two-layer board, 117 × 88 mm (4.59 × 3.46 in);
 the maker's default settings are fine. The ZIP holds everything the maker
 needs, including the **drill file** (`_drill.txt`, every hole's position and
-size), so there's nothing to send separately. The design itself is in
+size), so there's nothing to send separately. Check the maker's preview
+before ordering: if the board shows no holes, the maker didn't recognize
+the drill file. Rename it to end in `.drl` (for example
+`PoolWindPCB20SentOutForFabCorrected_drill.drl`), zip the files again and
+upload. The design itself is in
 [`hardware/schematics/PoolWind_interface_board.fzz`](../hardware/schematics/PoolWind_interface_board.fzz);
 open it in the free [Fritzing](https://fritzing.org) program to see the
 layout.
