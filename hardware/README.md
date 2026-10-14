@@ -35,5 +35,5 @@ The program never energizes Up and Down at the same time. Before pressing
 On/Off, it releases Up and Down.
 
 The Raspberry Pi pin numbers and the RJ45 jack pins are in the build guide,
-section 3. I2C must be turned on (the install script does this; see the
+section 4. I2C must be turned on (the install script does this; see the
 setup guide).

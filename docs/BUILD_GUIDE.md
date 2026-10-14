@@ -18,7 +18,7 @@ help, so check both first.
 1. **Your remote.** PoolWind works by wiring relays across the buttons of
    the pool's remote. The author's remote is an Endless Pools **EP1**, and
    finding contact points on its circuit board that work took a lot of
-   trial and error (see [section 4](#4-the-remote)). The interface board
+   trial and error (see [section 5](#5-the-remote)). The interface board
    is designed for remotes whose three buttons can be pressed through
    **one shared wire plus one wire per button**. A remote with the same
    circuit board should work the same way; other remotes may not, or may
@@ -26,7 +26,7 @@ help, so check both first.
    buying parts.
 2. **The Pace Display port voltage.** PoolWind reads the jet speed as a
    voltage on the pool's Pace Display port ranging from about 1.2v to 3.3v (see
-   [section 5](#5-the-pace-display-port)). Measure it with a multimeter: it
+   [section 6](#6-the-pace-display-port)). Measure it with a multimeter: it
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. Poolwind would have to be modified.
 
@@ -34,12 +34,13 @@ help, so check both first.
 
 1. [How it fits together](#1-how-it-fits-together)
 2. [Parts and tools](#2-parts-and-tools)
-3. [The interface board](#3-the-interface-board)
-4. [The remote](#4-the-remote)
-5. [The Pace Display port](#5-the-pace-display-port)
-6. [The camera](#6-the-camera)
-7. [The poolside station](#7-the-poolside-station)
-8. [First power-up checks](#8-first-power-up-checks)
+3. [The Raspberry Pi](#3-the-raspberry-pi)
+4. [The interface board](#4-the-interface-board)
+5. [The remote](#5-the-remote)
+6. [The Pace Display port](#6-the-pace-display-port)
+7. [The camera](#7-the-camera)
+8. [The poolside station](#8-the-poolside-station)
+9. [First power-up checks](#9-first-power-up-checks)
 
 ---
 
@@ -66,7 +67,81 @@ splitter).
 
 <!-- Bill: anything else you needed? -->
 
-## 3. The interface board
+## 3. The Raspberry Pi
+
+The Raspberry Pi is a small, inexpensive computer, about the size of a deck
+of cards. It runs PoolWind, and everything else connects to it:
+
+- the **camera** (USB): PoolWind watches the swimmer through it;
+- the **interface board** (through the GPIO pins, below): PoolWind presses
+  the remote's buttons with the relays, and reads the jet speed from the
+  INA260 sensor;
+- the **monitor** (HDMI): the pool screen, readable from the water;
+- the **keyboard, mouse and swimmer's USB stick** (USB).
+
+PoolWind is tested on a **Raspberry Pi 5 with 8 GB** of memory. (The
+original 2021 build used a Raspberry Pi 4; the current version hasn't been
+tested on one.)
+
+### A starter kit is the easy way
+
+Buy a Raspberry Pi 5 **starter kit** (parts list, row 1) rather than the
+board alone. A kit includes the pieces that are easy to get wrong:
+
+- **The official 27 W USB-C power supply.** The Pi 5 needs it. With a
+  weaker supply it limits the power to its USB ports, and the camera or the
+  USB stick can misbehave.
+- **An active cooler** (a small fan and heatsink). The Pi sits in a closed
+  waterproof case, so it needs one (see also the heat notes in
+  [section 8](#8-the-poolside-station)).
+- **A case** for the Pi itself, which goes inside the waterproof case. Its
+  lid must leave the 40 **GPIO pins** reachable for the ribbon cable to the
+  interface board.
+- **A micro-HDMI to HDMI cable.** The Pi 5's video ports are the small
+  micro-HDMI size; the monitor takes ordinary HDMI.
+- **A microSD card**, often with Raspberry Pi OS already on it.
+
+<!-- Bill: does your kit's case leave the GPIO pins open, or did you take
+the lid off? A photo of the Pi with the ribbon cable plugged in would help. -->
+
+### The SD card
+
+The microSD card is the Pi's "hard drive": it holds the operating system
+(Raspberry Pi OS), PoolWind and its settings. Use **32 GB or larger**; a
+"high endurance" card lasts longest. Swims and videos normally go on each
+swimmer's own USB stick, not the card.
+
+Keep a spare card, or a backup copy of the card, once PoolWind is set up:
+if the card ever fails, you can be swimming again in minutes.
+
+Preparing the card and installing PoolWind are covered step by step in the
+[setup guide, sections 2 and 3](SETUP_GUIDE.md#2-preparing-the-sd-card).
+
+### The GPIO pins
+
+Along one edge of the Pi is a row of **40 pins**, the GPIO header ("general
+purpose input/output"). Programs can switch these pins on and off, or use
+them to talk to sensors. PoolWind uses a few of them:
+
+- **three pins switch the relays** that press the remote's Up, Down and
+  On/Off buttons;
+- **two pins talk to the INA260** sensor (a connection called I2C);
+- **power pins** (3.3 V and 5 V) supply the sensor, the relays and the
+  remote.
+
+A 40-pin ribbon cable connects the header to the interface board. The exact
+pins are listed in [section 4](#4-the-interface-board), under "Connecting
+to the Raspberry Pi". **Pin 1 must meet pin 1:** a cable plugged in the
+wrong way round can damage the Pi.
+
+### Ports
+
+The Pi 5 has **four USB ports**, exactly enough for the camera, the
+keyboard, the mouse and the USB extension for the swimmer's stick. Any
+device works in any port. Its **network** (Wi-Fi or cable) is needed for
+installing PoolWind and for [working from home](SETUP_GUIDE.md#9-working-from-home).
+
+## 4. The interface board
 
 The interface board connects the Raspberry Pi to the relays, the INA260
 sensor and the two RJ45 connectors.
@@ -198,7 +273,7 @@ A cable plugged on the wrong way round can damage the Pi.
 | | 1 | 5 V: powers the remote (it has no battery) |
 | | 8 | Ground for the remote's power |
 
-## 4. The remote
+## 5. The remote
 
 PoolWind presses the buttons of an Endless Pools **EP1** water-resistant
 remote. Two come with the pool: modify one and **keep the other unmodified**
@@ -275,7 +350,7 @@ When the Raspberry Pi powers up, the remote resets and finds the pool's
 controller board by itself. The modified remote only works while PoolWind's
 hardware is powered; the unmodified remote is for manual control.
 
-## 5. The Pace Display port
+## 6. The Pace Display port
 
 The pool's control box has a port for the optional Endless Pools Pace
 Display. It carries a voltage that represents the jet speed, probably the voltage controlling the hydraulic valve. PoolWind reads it
@@ -302,7 +377,7 @@ check it with a multimeter before connecting it to the pool.
 <!-- Bill: where the port is, what plug it takes, which pins carry the
 voltage, the cable you used, and that nothing else on the pool is touched. -->
 
-## 6. The camera
+## 7. The camera
 
 The camera selected for this is wide angle with a 120 degree view, chosen so it can see the entire swim area of the pool without being mounted too high.
 
@@ -317,7 +392,7 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
 
 - **Lighting:** see the README's notes on lighting and outdoor pools.
 
-## 7. The poolside station
+## 8. The poolside station
 
 The Raspberry Pi, the control interface board, and the monitor sit together in a waterproof case with a clear door, beside the pool. The case used worked perfectly although a little small, see "Monitor" below. The clear door came with an injection molding spot right in the middle that was not polished down. Polishing with a Dremel tool worked but was tedious and the plastic tried to melt. 
 
@@ -347,7 +422,7 @@ The keyboard is rarely used and is not needed at the pool edge. It is used for c
 - **Cabling:** many cables run out of the case: two low voltage power cables (Raspberry Pi and monitor), keyboard, mouse, camera, remote control, pool voltage feedback, and USB (for the user's USB stick) cables. Bundle them, and seal them where they leave the case with waterproof cable glands. Let each cable sag in a drip loop below the case, so water runs off instead of following the cable in. The USB extension lets the swimmer plug in their USB stick outside the closed case.
 
 
-## 8. First power-up checks
+## 9. First power-up checks
 
 Before connecting anything to the pool:
 

@@ -193,7 +193,7 @@ Check that:
   PoolWind: it winds the jet back down.
   <!-- Bill: does Hold step the jet with nobody in the pool, or does the
   inactivity wind-down take over? This is the same question as the build
-  guide's relay test (section 8, step 4); settle both at the pool session. -->
+  guide's relay test (section 9, step 4); settle both at the pool session. -->
 
 ## 5. Calibrating for your pool
 
