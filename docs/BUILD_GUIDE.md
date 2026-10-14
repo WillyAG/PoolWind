@@ -336,30 +336,35 @@ Inside, the author's EP1 is a Martec Access Products "3 Button
 Transmitter" circuit board (model BT-433M, 433.92 MHz). Another remote with
 the same board should work the same way.
 
-1. Open the remote and **remove the battery.**
+1. Open the remote (four small screws) and **remove the battery.**
 2. **Fit an RJ45 jack to the back of the remote.** The author used a small
    8-pin "RJ45 breakout" board, from the same kit as the board's jacks: drill a hole through the case for each of
    its pins and push the pins through from outside. The holes break the
-   remote's water resistance, so keep the remote **in a watertight box**
-   with the cable sealed where it enters, as the author does.
+   remote's water resistance, so the remote goes **in a watertight box**
+   (step 6).
 3. **Inside, solder a wire from each pin to its contact** on the remote's
-   circuit board:
+   circuit board. The author used short lengths of the thin wires from a
+   cut Cat6 cable. Positions are with the circuit board turned so that its
+   "3 BUTTON TRANSMITTER" label reads along the top:
 
-   | RJ45 pin | Contact |
-   |---|---|
-   | 1 | Battery + terminal (5 V) |
-   | 3 | Up (faster) button |
-   | 4 | Down (slower) button |
-   | 5 | On/Off button |
-   | 6 | Up (faster) button, other side: the shared point for all three buttons |
-   | 8 | Battery ground terminal |
+   | RJ45 pin | Wire color (author's) | Contact | Where |
+   |---|---|---|---|
+   | 1 | orange | Battery + terminal (5 V) | left edge, halfway down |
+   | 3 | white/green | Up (faster) button | bottom-left button, right side |
+   | 4 | blue | Down (slower) button | bottom-right button, left side |
+   | 5 | white/blue | On/Off button | center button, left side |
+   | 6 | green | Up button, other side: the shared point for all three buttons | bottom-left button, other side |
+   | 8 | brown | Battery ground terminal | lowest solder point on the right |
 
-   **About pin 6.** The three buttons don't really share a common contact:
-   the author measured about 7 MΩ between this point and the other two
-   buttons. But connecting each of the three buttons to this point through
-   its relay works, and it fits in the RJ45 cable's eight wires (two wires
-   per button would need more). The author found this combination by trial
-   and error.
+   **About pin 6.** The interface board is designed around this one shared
+   point: each relay connects it to one button's contact. The author found
+   this combination by trial and error, and it has worked reliably.
+
+   **Another way to wire it:** two wires per button, each relay shorting its
+   own button's two sides. Three buttons with two wires each, plus two for
+   power, also fit in the cable's eight wires, and it doesn't depend on a
+   shared point. The current interface board doesn't support it: its
+   schematic and board layout would need some changes.
 
    The pin numbers match the interface board's Remote jack (UP-DN), so an ordinary
    **straight-through network cable** (Cat5e or Cat6) connects the two
@@ -369,9 +374,16 @@ the same board should work the same way.
    interface board, which has one shared wire for all three buttons, may
    not suit it. Ask in the project's Discussions before buying parts.
 4. **Make sure a battery can't be put back in**, for example by covering or
-   blocking the battery compartment. A battery and the 5 V supply together
+   blocking the battery compartment (the author used two small blocks of
+   foam mounting tape). A battery and the 5 V supply together
    could damage the remote or the Raspberry Pi.
 5. Close the remote.
+6. **Put it in a watertight box.** The author uses a spare clear plastic
+   box: a hole drilled in the top, just large enough for the cable's plug,
+   sealed with putty around the cable, and electrical tape all around the
+   seam between the box's two halves.
+
+<!-- Bill: photo of the remote in its box. -->
 
 ![Inside the modified remote](images/PoolWind_Remote_inside.jpg)
 
@@ -391,9 +403,12 @@ swimming). A remote modified for PoolWind doesn't need them.*
 *The breakout's eight pins, numbered 1 to 8, pushed through holes drilled
 in the case.*
 
-When the Raspberry Pi powers up, the remote resets and finds the pool's
-controller board by itself. The modified remote only works while PoolWind's
-hardware is powered; the unmodified remote is for manual control.
+When the Raspberry Pi powers up, the remote's light flashes a few times.
+If the remote doesn't control the pool, pair it with the pool's controller
+as the pool's own manual describes (on the author's pool, that takes
+pressing a small button on the pool controller). The modified remote only
+works while PoolWind's hardware is powered; the unmodified remote is for
+manual control.
 
 ## 6. The Pace Display port
 
