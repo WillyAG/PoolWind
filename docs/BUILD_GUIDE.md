@@ -245,8 +245,17 @@ the current Gerber files**: they already have that connection.*
 A standard **40-pin GPIO ribbon cable** (female plugs at both ends) plugs
 onto all 40 of the Raspberry Pi's GPIO pins.
 
-**Hint:** Looking at the Raspberry board with the GPIO header strip (close to the edge of the board) toward you, Pin 1 is on the right side top. You may see small text directly next to it: J8.
-If you place the Interface board edge to edge where the two GPIO sets are closest to each other, you'll see the two GPIO sets line up pin for pin on the lower 24 of the 40 pins. Connect the ribbon cable there making sure Pin 1 on each header is connected to each other. The higher Pin numbers of the connector just hover over the empty space on the Interface board.
+**Mind the orientation:** pin 1 on the board must meet pin 1 on the Pi.
+A cable plugged on the wrong way round can damage the Pi.
+
+**Hint:** Looking at the Raspberry board with the GPIO header strip (close
+to the edge of the board) toward you, Pin 1 is on the right side top. You
+may see small text directly next to it: J8. If you place the Interface
+board edge to edge where the two GPIO sets are closest to each other,
+you'll see the two GPIO sets line up pin for pin on the lower 24 of the 40
+pins. Connect the ribbon cable there making sure Pin 1 on each header is
+connected to each other. The higher Pin numbers of the connector just hover
+over the empty space on the Interface board.
 
 The pins PoolWind uses:
 
@@ -262,9 +271,6 @@ The pins PoolWind uses:
 | 13 (GPIO 27) | Relay: pump On/Off |
 | 16 (GPIO 23) | Pump-detection circuit (R3/R6), not used |
 | 20 (ground) | Relay modules' ground |
-
-**Mind the orientation:** pin 1 on the board must meet pin 1 on the Pi.
-A cable plugged on the wrong way round can damage the Pi.
 
 ### The RJ45 jacks
 
