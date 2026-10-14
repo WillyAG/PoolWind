@@ -191,8 +191,6 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
   (normally open) contact goes to its button's pin: 3 = Up, 4 = Down,
   5 = On/Off. The **NC** contacts aren't used.
 
-<!-- Bill: photo of the relay modules' wires to JP1-JP4. -->
-
 ### Assembling it
 
 There's no special soldering order: the only delicate part, the INA260
@@ -228,8 +226,24 @@ sensor, plugs in afterward.
    the header pins and clamp their other ends in the relay modules' screw
    terminals.
 
-<!-- Bill: a close-up photo of the cut VB jumper would help. Check the
-wording against your breakout. -->
+![The INA260's VB jumper, cut](images/PoolWind_INA260_VB_cut.jpg)
+
+*The INA260 breakout's **VB** jumper, cut: the two gold pads in the box
+marked "VB" are separated by a scratch across the thin trace between
+them. Cut it with a sharp craft knife and check with a multimeter that
+V+ and VBUS are no longer connected.*
+
+![Relay control wiring, JP1 and JP2](images/PoolWind_Relay_control_JP1_JP2.jpg)
+
+*The control side: short, stiff wires from the JP1 and JP2 header pins
+to each relay module's GND, IN1, IN2 and VCC pins. They also hold the
+modules in place. The blue JD-VCC jumpers stay fitted.*
+
+![Relay contact wiring, JP3 and JP4](images/PoolWind_Relay_output_JP3_JP4.jpg)
+
+*The contact side: wires from the JP3 and JP4 header pins, clamped in the
+relays' screw terminals (COM and NO of each relay used). The relays are
+marked by hand: Up, DN and On/Off. The second module's K2 is the spare.*
 
 ![The finished interface board](images/PoolWind_Interface.jpg)
 
