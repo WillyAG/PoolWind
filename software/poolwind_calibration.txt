@@ -1,0 +1,61 @@
+# PoolWind calibration -- SAFETY-CRITICAL, technician changes only.
+# Written by the program (Set Swim Area) and the calibration tool.
+# pace_voltage: (pace min/100 yd, Pace Display volts) measured on this
+# pool. SafetyVoltageLimits: the jet is never driven outside these volts.
+# swimAreaPoints: the swim area's corners in the camera picture (Set
+# Swim Area). poolLength: inches, front to back. middleSwimZone %: the
+# center lane's width, side to side, as a percent of the swim area.
+# recordRawVideo: record the camera's full, uncorrected video (large
+# files) -- developer tool, used only when developerMode is on.
+# Read at program start.
+#
+# THIS FILE HOLDS THE AUTHOR'S POOL, AS AN EXAMPLE. The pace table should
+# suit a standard Endless Pool; set the swim area for your own camera
+# (Set Swim Area) and check the safety limits. See the setup guide, section 5.
+{
+'pace_voltage': [
+    (7.0, 1.185),
+    (6.85, 1.186),
+    (6.7, 1.249),
+    (6.4, 1.288),
+    (6.1167, 1.324),
+    (5.8167, 1.366),
+    (5.4, 1.4),
+    (4.9833, 1.442),
+    (4.5667, 1.489),
+    (4.15, 1.524),
+    (3.825, 1.562),
+    (3.5, 1.6),
+    (3.25, 1.643),
+    (3.0, 1.677),
+    (2.75, 1.73),
+    (2.5, 1.76),
+    (2.4333, 1.796),
+    (2.3, 1.826),
+    (2.2667, 1.876),
+    (2.1667, 1.915),
+    (2.1167, 1.953),
+    (2.0333, 1.994),
+    (1.9833, 2.037),
+    (1.9167, 2.078),
+    (1.8667, 2.115),
+    (1.8167, 2.149),
+    (1.7667, 2.188),
+    (1.7417, 2.233),
+    (1.7167, 2.274),
+    (1.6667, 2.304),
+    (1.46, 2.43),
+    (1, 2.5)
+]
+
+,'SafetyVoltageLimits': (1.46, 2.15)
+
+,'swimAreaPoints': [(153, 148), (479, 151), (384, 601), (184, 583)]
+
+,'poolLength': 180
+
+,'middleSwimZone %': 35
+
+,'recordRawVideo': False
+
+}

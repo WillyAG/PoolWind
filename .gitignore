@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.csv
+*.avi
+*.mp4
+CSV Vault/
+pace_trace_*
+TODO.md
+CONVERSATIONS.md
