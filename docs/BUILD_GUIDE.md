@@ -95,12 +95,7 @@ board alone. A kit includes the pieces that are easy to get wrong:
   busy, and at the poolside it's usually shut inside the station's closed
   box, so it needs one (see also the heat notes in
   [section 8](#8-the-poolside-station)).
-- **A case** for the Pi itself: an ordinary case, not a waterproof one. The
-  waterproofing comes from the poolside station's box
-  ([section 8](#8-the-poolside-station)), which the Pi sits in. The case's
-  lid must leave the 40 **GPIO pins** reachable for the ribbon cable to the
-  interface board. The author's kit case has its fan built in, and the
-  ribbon cable fits through an opening in the lid, so the lid stays on.
+- **A case** for the Pi itself: designed for air flow and ribbon cable pass through.
 - **A micro-HDMI to HDMI cable.** The Pi 5's video ports are the small
   micro-HDMI size; the monitor takes ordinary HDMI.
 - **A microSD card**, often with Raspberry Pi OS already on it.
@@ -111,12 +106,12 @@ would help here. -->
 ### The SD card
 
 The microSD card is the Pi's "hard drive": it holds the operating system
-(Raspberry Pi OS), PoolWind and its settings. Use **32 GB or larger**; a
-"high endurance" card lasts longest. Swims and videos normally go on each
-swimmer's own USB stick, not the card.
+(Raspberry Pi OS), PoolWind and its settings. Ideally, use **32 GB or larger**; a
+"high endurance" card lasts longest. However, the card that comes with a "kit" should be good enough.
+Swims and videos normally go on each swimmer's own USB stick, not the card.
 
 Keep a spare card, or a backup copy of the card, once PoolWind is set up:
-if the card ever fails, you can be swimming again in minutes.
+if the card ever fails, you can be swimming again in minutes. Use the Raspberry Pi's own Accessories: SD Card Copier. Put a check mark on "New Partition UUIDs".
 
 Preparing the card and installing PoolWind are covered step by step in the
 [setup guide, sections 2 and 3](SETUP_GUIDE.md#2-preparing-the-sd-card).
