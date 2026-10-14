@@ -149,7 +149,9 @@ sensor and the two RJ45 connectors.
 
 Upload [`hardware/gerbers/PoolWind_PCB_gerbers.zip`](../hardware/gerbers/PoolWind_PCB_gerbers.zip)
 to any PCB maker. It's a standard two-layer board, 117 × 88 mm (4.59 × 3.46 in);
-the maker's default settings are fine. The design itself is in
+the maker's default settings are fine. The ZIP holds everything the maker
+needs, including the **drill file** (`_drill.txt`, every hole's position and
+size), so there's nothing to send separately. The design itself is in
 [`hardware/schematics/PoolWind_interface_board.fzz`](../hardware/schematics/PoolWind_interface_board.fzz);
 open it in the free [Fritzing](https://fritzing.org) program to see the
 layout.
