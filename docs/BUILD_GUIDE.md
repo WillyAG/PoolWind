@@ -96,13 +96,14 @@ board alone. A kit includes the pieces that are easy to get wrong:
   [section 8](#8-the-poolside-station)).
 - **A case** for the Pi itself, which goes inside the waterproof case. Its
   lid must leave the 40 **GPIO pins** reachable for the ribbon cable to the
-  interface board.
+  interface board. The author's kit case has its fan built in, and the
+  ribbon cable fits through an opening in the lid, so the lid stays on.
 - **A micro-HDMI to HDMI cable.** The Pi 5's video ports are the small
   micro-HDMI size; the monitor takes ordinary HDMI.
 - **A microSD card**, often with Raspberry Pi OS already on it.
 
-<!-- Bill: does your kit's case leave the GPIO pins open, or did you take
-the lid off? A photo of the Pi with the ribbon cable plugged in would help. -->
+<!-- Bill: a photo of the Pi in its case with the ribbon cable plugged in
+would help here. -->
 
 ### The SD card
 
