@@ -91,10 +91,13 @@ board alone. A kit includes the pieces that are easy to get wrong:
 - **The official 27 W USB-C power supply.** The Pi 5 needs it. With a
   weaker supply it limits the power to its USB ports, and the camera or the
   USB stick can misbehave.
-- **An active cooler** (a small fan and heatsink). The Pi sits in a closed
-  waterproof case, so it needs one (see also the heat notes in
+- **An active cooler** (a small fan and heatsink). PoolWind keeps the Pi
+  busy, and at the poolside it's usually shut inside the station's closed
+  box, so it needs one (see also the heat notes in
   [section 8](#8-the-poolside-station)).
-- **A case** for the Pi itself, which goes inside the waterproof case. Its
+- **A case** for the Pi itself: an ordinary case, not a waterproof one. The
+  waterproofing comes from the poolside station's box
+  ([section 8](#8-the-poolside-station)), which the Pi sits in. The case's
   lid must leave the 40 **GPIO pins** reachable for the ribbon cable to the
   interface board. The author's kit case has its fan built in, and the
   ribbon cable fits through an opening in the lid, so the lid stays on.
