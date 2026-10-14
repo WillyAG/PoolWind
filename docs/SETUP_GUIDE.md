@@ -128,10 +128,9 @@ pool's jet. Do them with nobody in the pool.
 Open a terminal on the Pi (or connect with SSH) and type:
 
 ```
-git clone https://github.com/<your-username>/PoolWind.git ~/PoolWind-download
+git clone https://github.com/WillyAG/PoolWind.git ~/PoolWind-download
 bash ~/PoolWind-download/install.sh
 ```
-<!-- Bill: fill in the real GitHub address once the repository exists -->
 
 The first line downloads PoolWind into a `PoolWind-download` folder. The
 second runs the install script, which:
