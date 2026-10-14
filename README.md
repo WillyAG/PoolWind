@@ -20,6 +20,16 @@ pattern and his speed improved noticeably as a result.
 
 **Please read [SAFETY.md](SAFETY.md) before building or using PoolWind.**
 
+## Getting started
+
+1. **Read [SAFETY.md](SAFETY.md).**
+2. **Check your pool first:** [two checks to make before buying anything](docs/BUILD_GUIDE.md#before-you-buy-anything-two-checks).
+   They take a few minutes and tell you whether PoolWind can work with your pool.
+3. **Gather the parts:** the [parts list](hardware/PARTS_LIST.md), about $480 in all.
+4. **Build it:** the [build guide](docs/BUILD_GUIDE.md).
+5. **Install the software and fit it to your pool:** the [setup and calibration guide](docs/SETUP_GUIDE.md).
+6. **Swim:** the [user manual](docs/USER_MANUAL.md).
+
 
 ## How it works
 
