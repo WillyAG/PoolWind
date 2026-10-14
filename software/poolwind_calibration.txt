@@ -1,6 +1,6 @@
 # PoolWind calibration -- SAFETY-CRITICAL, technician changes only.
 # Written by the program (Set Swim Area) and the calibration tool.
-# pace_voltage: (pace min/100 yd, Pace Display volts) measured on this
+# pace_voltage: (pace min/100 yd, Pace Display port volts) measured on this
 # pool. SafetyVoltageLimits: the jet is never driven outside these volts.
 # swimAreaPoints: the swim area's corners in the camera picture (Set
 # Swim Area). poolLength: inches, front to back. middleSwimZone %: the
@@ -10,7 +10,7 @@
 # Read at program start.
 #
 # THIS FILE HOLDS THE AUTHOR'S POOL, AS AN EXAMPLE. The pace table should
-# suit a standard Endless Pool; set the swim area for your own camera
+# be close for a pool of the same model; set the swim area for your own camera
 # (Set Swim Area) and check the safety limits. See the setup guide, section 5.
 {
 'pace_voltage': [

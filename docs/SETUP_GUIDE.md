@@ -172,8 +172,8 @@ Before the first start:
   <!-- Bill: check the exact names in Control Centre (tab and rotate
   option) on your Pi; older Raspberry Pi OS called it Screen Configuration. -->
 - **Calibration:** the `poolwind_calibration.txt` that comes with PoolWind
-  holds the author's pool. Its pace table should suit any Endless Pool with
-  the standard Pace Display port (section 5.2), but **set the swim area for
+  holds the author's pool. Its pace table should be close for a pool of
+  the same model (section 5.2), but **set the swim area for
   your own camera** (section 5.1) and check the safety limits (section 5.3)
   before the first swim.
 
@@ -221,16 +221,15 @@ Do this again if the camera is ever moved.
 
 ### 5.2 The pace table (`pace_voltage`)
 
-The optional Endless Pools Pace Display works like a voltmeter that reads
-out in pace: the pool sends it a voltage for each jet speed, and the display
-shows that voltage as a pace. PoolWind reads the same voltage through the
-Pace Display port. It needs a table of pairs: the pace, and the voltage at
-that pace.
+PoolWind reads the jet speed as a voltage on the pool's Pace Display port.
+The voltage changes steadily with the jet speed: the same jet speed always
+gives the same voltage. To turn a voltage into a pace, PoolWind needs a
+table of pairs: the pace, and the voltage at that pace.
 
-**If your pool has the standard Endless Pools Pace Display port, the table
-that comes with PoolWind should work as it is.** Endless Pools sold only one
-type of Pace Display, so the voltage for each pace should be the same on
-other pools. Measuring your own table is optional, and can be done later.
+**The table that comes with PoolWind was measured on the author's pool, a
+Standard Endless Pool.** On a pool of the same model it should be close
+enough to start with, but it hasn't been checked on any other pool.
+Measuring your own table is optional, and can be done later.
 
 **To measure your own table,** use the PoolWind calibration program
 (planned). It will build the table automatically, reading each voltage

@@ -12,12 +12,12 @@ Display port. *(You will have to open the control box once to plug in the Pace D
 ## Before you buy anything: two checks
 
 PoolWind depends on two things about your pool that the author could only
-check on his own Endless Pool. If either fails, the rest of this guide won't
+check on his own pool. If either fails, the rest of this guide won't
 help, so check both first.
 
 1. **Your remote.** PoolWind works by wiring relays across the buttons of
-   the pool's remote. The author's remote is an Endless Pools **EP1**, and
-   finding contact points on its circuit board that work took a lot of
+   the pool's remote. The author's remote is an Endless Pools **EP1** (inside, a
+   Martec BT-433M circuit board), and finding contact points on its circuit board that work took a lot of
    trial and error (see [section 5](#5-the-remote)). The interface board
    is designed for remotes whose three buttons can be pressed through
    **one shared wire plus one wire per button**. A remote with the same
@@ -186,8 +186,6 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
 - The relay modules' **JD-VCC jumper** stays fitted, so each module runs
   entirely from the Pi's 5 V.
 
-- **Ribbon cable hint:** Looking at the Raspberry board with the GPIO header strip    (close to the edge of the board) toward you, Pin 1 is right side top. You may see small text directly next to it: J8.  On the interface PC board, GPIO header strip (close to the edge of the board) toward you, Pin 1 is left side bottom. When you flip the Interface Board over and above the Raspberry Pi, the ribbon cable will connect straight between the two sets of pins Pin 1 to Pin 1 on the right with many pins on the left just hovering over the empty space on the Interface board.
-- 
 <!-- Bill: photo of the relay modules' jumper wires to JP1-JP4; the external connections -- which wires of the Pace jack
 go to the INA260, and which relay contact (COM / NO) goes to which pin of
 the Remote jack -- as a hand drawing or labeled photos. -->
@@ -245,9 +243,11 @@ the current Gerber files**: they already have that connection.*
 ### Connecting to the Raspberry Pi
 
 A standard **40-pin GPIO ribbon cable** (female plugs at both ends) plugs
-onto all 40 of the Raspberry Pi's GPIO pins. At the other end, its plug
-fits over the board's 24-pin header (pins 1–24, the end with the 3.3 V and
-5 V pins), and the rest of the plug hangs past the end of the header.
+onto all 40 of the Raspberry Pi's GPIO pins.
+
+**Hint:** Looking at the Raspberry board with the GPIO header strip (close to the edge of the board) toward you, Pin 1 is on the right side top. You may see small text directly next to it: J8.
+If you place the Interface board edge to edge where the two GPIO sets are closest to each other, you'll see the two GPIO sets line up pin for pin on the lower 24 of the 40 pins. Connect the ribbon cable there making sure Pin 1 on each header is connected to each other. The higher Pin numbers of the connector just hover over the empty space on the Interface board.
+
 The pins PoolWind uses:
 
 | Pin | Use |
@@ -359,8 +359,11 @@ hardware is powered; the unmodified remote is for manual control.
 
 ## 6. The Pace Display port
 
-The pool's control box has a port for the optional Endless Pools Pace
-Display. It carries a voltage that represents the jet speed, probably the voltage controlling the hydraulic valve. PoolWind reads it
+The pool's control box has a port for the manufacturer's optional Pace
+Display. Its voltage changes steadily with the jet speed: the same jet
+speed always gives the same voltage. (It is probably the voltage that
+controls the hydraulic valve. How the Pace Display itself uses it isn't
+known.) PoolWind reads it
 through the board's Pace jack (Pace Volt In) and the INA260 sensor.
 
 Connect it with a standard **phone cable**, long enough to reach from the

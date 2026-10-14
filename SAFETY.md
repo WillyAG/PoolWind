@@ -12,8 +12,12 @@ for the full disclaimer.
   sensor and monitor must be powered from a proper low-voltage power supply,
   mounted away from splashing water. The keyboard and mouse must be waterproof.
 - **Plug the power supply into a GFCI-protected outlet.**
-- **Do not open or modify the pool's own control box, pump or wiring.**
+- **Do not modify the pool's own control box, pump or wiring.**
   PoolWind only connects to a handheld remote and to the Pace Display port.
+  If the port is inside the control box, turn the pool's power off before
+  opening it to plug in the cable.
+- **Connecting PoolWind may affect your pool's warranty.** Check your
+  warranty before you build. That decision, and its risk, are yours.
 - **If you are not confident with electronics near water, have a qualified
   electrician check your installation.**
 
