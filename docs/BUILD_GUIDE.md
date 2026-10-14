@@ -200,8 +200,11 @@ sensor, plugs in afterward.
 
 1. **Resistors R3 and R6: leave them out.** They were meant for detecting
    whether the pump was on, which PoolWind never needed.
-2. **Headers:** a socket strip for the INA260 breakout, and **male header
-   pins** (2 × 12) for the ribbon cable, whose plug is female.
+2. **Headers:**
+   - Ribbon cable to the Pi: **male header pins, 2 × 12** (the cable's plug
+     is female).
+   - Relay headers JP1-JP4: **male header pins, 1 × 12** each (see item 5).
+   - INA260: a **1 × 8 socket strip**, so the breakout plugs in and out.
 3. **The two RJ45 jacks:** the Pace jack (Pace Volt In), from the pool's
    Pace Display port, and the Remote jack (UP-DN), to the remote. The
    author used jacks from an RJ45 breakout kit (parts list, row 8),
@@ -232,7 +235,8 @@ wording against your breakout. -->
 
 *The author's finished interface board. Top: the INA260 sensor, with the
 empty places for R3 and R6 to its left, and the two RJ45 jacks, labeled
-"Pace" and "Remote" on this board. Below: the two relay modules (Up and Down on the first,
+"Pace" and "Remote" on this first-batch board (boards made from the
+current Gerber files print "Pace Volt In" and "UP-DN"). Below: the two relay modules (Up and Down on the first,
 On/Off on the second) wired to the board's headers, and the Raspberry Pi
 header on the left.*
 
