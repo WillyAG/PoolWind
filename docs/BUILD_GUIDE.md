@@ -186,11 +186,17 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
 - The relay modules' **JD-VCC jumper** stays fitted, so each module runs
   entirely from the Pi's 5 V.
 
-<!-- Bill: photo of the relay modules' jumper wires to JP1-JP4; the external connections -- which wires of the Pace jack
-go to the INA260, and which relay contact (COM / NO) goes to which pin of
-the Remote jack -- as a hand drawing or labeled photos. -->
+- **Relay contacts:** each relay's **COM** contact goes to the Remote
+  jack's pin 6, the point common to all three buttons. Each relay's **NO**
+  (normally open) contact goes to its button's pin: 3 = Up, 4 = Down,
+  5 = On/Off. The **NC** contacts aren't used.
+
+<!-- Bill: photo of the relay modules' wires to JP1-JP4. -->
 
 ### Assembling it
+
+There's no special soldering order: the only delicate part, the INA260
+sensor, plugs in afterward.
 
 1. **Resistors R3 and R6: leave them out.** They were meant for detecting
    whether the pump was on, which PoolWind never needed.
@@ -212,8 +218,12 @@ the Remote jack -- as a hand drawing or labeled photos. -->
 
 5. **The relay boards:** two 2-channel relay modules with 5 V relays (for
    example JQC-3FF-S-Z or SRD-05VDC-SL-C), powered from the Raspberry Pi's
-   5 V through the board. They sit on top of the interface board, wired to
-   its headers JP1-JP4 with short wires.
+   5 V through the board. Solder **male pin headers** into JP1-JP4. On the
+   control side (JP1, JP2), solder short, stiff wires from the header pins
+   to the relay modules' input pins: these wires also hold the modules in
+   place on the board. On the contact side (JP3, JP4), solder the wires to
+   the header pins and clamp their other ends in the relay modules' screw
+   terminals.
 
 <!-- Bill: a close-up photo of the cut VB jumper would help. Check the
 wording against your breakout. -->
@@ -236,9 +246,6 @@ Fritzing design, so boards made from them need no corrections.*
 *The back of the same board. The **orange wire** is the hand-soldered fix for
 the first batch's missing connection. **Don't add it to a board made from
 the current Gerber files**: they already have that connection.*
-
-<!-- Bill: the order you'd solder things in, and which headers go where
-(JP1-JP4). -->
 
 ### Connecting to the Raspberry Pi
 
