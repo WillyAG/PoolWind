@@ -186,6 +186,8 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
 - The relay modules' **JD-VCC jumper** stays fitted, so each module runs
   entirely from the Pi's 5 V.
 
+- **Ribbon cable hint:** Looking at the Raspberry board with the GPIO header strip    (close to the edge of the board) toward you, Pin 1 is right side top. You may see small text directly next to it: J8.  On the interface PC board, GPIO header strip (close to the edge of the board) toward you, Pin 1 is left side bottom. When you flip the Interface Board over and above the Raspberry Pi, the ribbon cable will connect straight between the two sets of pins Pin 1 to Pin 1 on the right with many pins on the left just hovering over the empty space on the Interface board.
+- 
 <!-- Bill: photo of the relay modules' jumper wires to JP1-JP4; the external connections -- which wires of the Pace jack
 go to the INA260, and which relay contact (COM / NO) goes to which pin of
 the Remote jack -- as a hand drawing or labeled photos. -->
