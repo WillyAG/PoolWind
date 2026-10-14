@@ -349,11 +349,11 @@ the same board should work the same way.
 
    | RJ45 pin | Wire color (author's) | Contact | Where |
    |---|---|---|---|
-   | 1 | orange | Battery + terminal (5 V) | left edge, halfway down |
+   | 1 | orange | Battery + terminal (5 V) | right edge, halfway down |
    | 3 | white/green | Up (faster) button | bottom-left button, right side |
    | 4 | blue | Down (slower) button | bottom-right button, left side |
    | 5 | white/blue | On/Off button | center button, left side |
-   | 6 | green | Up button, other side: the shared point for all three buttons | bottom-left button, other side |
+   | 6 | green | Up button, other side: the shared point for all three buttons | bottom-left button, left side |
    | 8 | brown | Battery ground terminal | lowest solder point on the right |
 
    **About pin 6.** The interface board is designed around this one shared
@@ -385,10 +385,13 @@ the same board should work the same way.
 
 <!-- Bill: photo of the remote in its box. -->
 
-![Inside the modified remote](images/PoolWind_Remote_inside.jpg)
+![Inside the modified remote, with each wire's RJ45 pin number](images/PoolWind_Remote_inside_pins.jpg)
 
 *Inside the author's modified EP1 remote. The wires run from the RJ45
-breakout's pins (top) to the contacts on the circuit board.*
+breakout's pins (top) to the contacts on the circuit board; each solder
+point is marked with its RJ45 pin number, as in the table above. The Up
+button (bottom left) is wired differently from the others: pin 6, the
+shared point, is on its left side and pin 3 on its right.*
 
 
 ![The RJ45 jack on the back of the remote](images/PoolWind_Remote_jack.jpg)
