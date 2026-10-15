@@ -8,34 +8,23 @@ How to build it: see the [build guide](../docs/BUILD_GUIDE.md).
 
 - [Parts list](PARTS_LIST.md), with approximate 2026 prices. [DRAFT]
 - `schematics/` — the interface board design as a [Fritzing](https://fritzing.org)
-  project (`.fzz`, made with Fritzing 0.9.10). Open it in Fritzing to see the
+  project (`PoolWind_interface_board.fzz`). Open it in Fritzing to see the
   breadboard, schematic and PCB views, or to change the design.
-  `PoolWind_interface_board_bb.png` and `PoolWind_interface_board_pcb.png` are
-  pictures of the wiring (breadboard view) and the board layout (PCB view).
+  `PoolWind_interface_board_bb.png`, `PoolWind_interface_board_pcb.png` and
+  `PoolWind_interface_board_pcb_bottom.png` are pictures of the wiring
+  (breadboard view) and the board layout from above and below (PCB view).
 - `gerbers/` — the interface board's manufacturing files.
   **`PoolWind_PCB_gerbers.zip`** is ready to upload to any PCB maker:
   two-layer board, 117 × 88 mm (4.59 × 3.46 in). The same files are also
-  there unzipped, with a pick-and-place list (`_pnp.txt`).
+  there unzipped, with a pick-and-place list (`_pnp.xy`).
 - `PoolWind_PCB_preview.png` — a picture of the board drawn from the Gerber
-  files (top copper yellow, bottom copper orange, silkscreen white). Checked
-  2026-10-10: the Gerber files' copper connections match the Fritzing design
-  exactly.
+  files (top copper yellow, bottom copper orange, silkscreen white).
 
-### 8-wire version
-
-A second version of the board gives each relay its own two wires to the
-remote, instead of one shared point (see the build guide, section 5). Remote
-jack pins: 1 = 5 V, 3 and 6 = Up, 4 and 2 = Down, 5 and 7 = On/Off,
-8 = ground.
-
-- `schematics/PoolWind_interface_board_8wire.fzz` — the Fritzing design.
-- `gerbers_8wire/PoolWind_PCB_8wire_gerbers.zip` — ready to upload to a PCB
-  maker; same size and parts as the original board.
-- `PoolWind_PCB_8wire_preview.png` — a picture of the board drawn from its
-  Gerber files.
-
-Checked 2026-10-15: the copper connects exactly the pins above, and every
-other connection is the same as on the original board. Not yet built.
+Each relay has its own two wires to the remote (the "8-wire" design,
+2026-10-15). Remote jack pins: 1 = 5 V, 3 and 6 = Up, 4 and 2 = Down,
+5 and 7 = On/Off, 8 = ground. Checked 2026-10-15: the Gerber files' copper
+connects exactly these pins, and the schematic, breadboard and PCB views
+agree.
 
 ## Connections used by the software
 
