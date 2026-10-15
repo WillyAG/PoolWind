@@ -371,12 +371,19 @@ the same board should work the same way.
    foam mounting tape). A battery and the 5 V supply together
    could damage the remote or the Raspberry Pi.
 5. Close the remote.
-6. **Put it in a watertight box.** The author uses a spare clear plastic
-   box: a hole drilled in the top, just large enough for the cable's plug,
-   sealed with putty around the cable, and electrical tape all around the
-   seam between the box's two halves.
+6. **Put it in a watertight box.** Any small clear plastic box will do;
+   the author's is a spare one: a hole drilled in one end, just large
+   enough for the cable's plug, sealed around the cable with silicone
+   putty, and electrical tape all around the seam between the box and its
+   lid. Two small bags of desiccant inside keep it dry. With the cable
+   coming out of the bottom, water runs off instead of collecting at the
+   hole.
 
-<!-- Bill: photo of the remote in its box. -->
+![The remote in its watertight box](images/PoolWind_Remote_boxed.jpg)
+
+*The author's remote in its box, mounted where it can reach the pool:
+electrical tape around the lid, putty where the cable comes in at the
+bottom, and a bag of desiccant beside the remote.*
 
 ![Inside the modified remote, with each wire's RJ45 pin number](images/PoolWind_Remote_inside_pins.jpg)
 
