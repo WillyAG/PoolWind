@@ -32,6 +32,7 @@ License: see [LICENSE.md](../LICENSE.md).
 | 19 | Phone cable(s), standard 6-wire (6P6C) | | $5–10 | From the pool controller's Pace Display port to the interface board's Pace jack (a phone plug fits the RJ45 jack). Length to suit your pool. **If a Pace Display is already installed:** a short cable from the port to the Y splitter, and a longer one from the splitter to the interface board |
 | 20 | Y splitter for the Pace Display cable (only if you have a Pace Display) | | | Must connect every wire straight through to both outlets. Many phone splitters are "L1/L2" types that split the wires between the outlets: these won't work. A "6P6C (RJ12) straight-through" splitter carries all six wires. See the build guide, section 6 |
 | 21 | Heatsink, about 3 × 4 in (only if the Raspberry Pi will run for hours at a time) | | | Mounted in a sealed hole in the case wall, fins outside. See the build guide, section 8 |
+| 22 | For the remote's watertight box: a small clear plastic box, silicone putty, electrical tape, small desiccant packs | | $5–15 | Any spare box that fits the remote will do. See the build guide, section 5 |
 | | **Total (without the remote)** | | **about $480** | Mostly depends on the case and the monitor |
 
 <!-- Bill: open questions

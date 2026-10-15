@@ -335,10 +335,10 @@ the same board should work the same way.
 
 1. Open the remote (four small screws) and **remove the battery.**
 2. **Fit an RJ45 jack to the back of the remote.** The author used a small
-   8-pin "RJ45 breakout" board, from the same kit as the board's jacks: drill a hole through the case for each of
-   its pins and push the pins through from outside. The holes break the
-   remote's water resistance, so the remote goes **in a watertight box**
-   (step 6).
+   8-pin "RJ45 breakout" board, from the same kit as the board's jacks:
+   drill a hole through the case for each of its pins and push the pins
+   through from outside. The holes break the remote's water resistance,
+   so the remote goes **in a watertight box** (step 6).
 3. **Inside, solder a wire from each pin to its contact** on the remote's
    circuit board. The author used short lengths of the thin wires from a
    cut Cat6 cable. Positions are with the circuit board turned so that its
@@ -368,8 +368,8 @@ the same board should work the same way.
    if you're unsure.
 4. **Make sure a battery can't be put back in**, for example by covering or
    blocking the battery compartment (the author used two small blocks of
-   foam mounting tape). A battery and the 5 V supply together
-   could damage the remote or the Raspberry Pi.
+   foam mounting tape). A battery and the 5 V supply together could
+   damage the remote or the Raspberry Pi.
 5. Close the remote.
 6. **Put it in a watertight box.** Any small clear plastic box will do;
    the author's is a spare one: a hole drilled in one end, just large
@@ -377,20 +377,8 @@ the same board should work the same way.
    putty, and electrical tape all around the seam between the box and its
    lid. Two small bags of desiccant inside keep it dry. With the cable
    coming out of the bottom, water runs off instead of collecting at the
-   hole.
-
-![The remote in its watertight box](images/PoolWind_Remote_boxed.jpg)
-
-*The author's remote in its box, mounted where it can reach the pool:
-electrical tape around the lid, putty where the cable comes in at the
-bottom, and a bag of desiccant beside the remote.*
-
-![Inside the modified remote, with each wire's RJ45 pin number](images/PoolWind_Remote_inside_pins.jpg)
-
-*Inside the author's modified EP1 remote. The wires run from the RJ45
-breakout's pins (top) to the contacts on the circuit board; each solder
-point is marked with its RJ45 pin number, as in the table above.*
-
+   hole. Mount the box within radio range of the pool's controller; the
+   author's is about 15 ft (4.5 m) away.
 
 ![The RJ45 jack on the back of the remote](images/PoolWind_Remote_jack.jpg)
 
@@ -403,6 +391,18 @@ swimming). A remote modified for PoolWind doesn't need them.*
 
 *The breakout's eight pins, numbered 1 to 8, pushed through holes drilled
 in the case.*
+
+![Inside the modified remote, with each wire's RJ45 pin number](images/PoolWind_Remote_inside_pins.jpg)
+
+*Inside the author's modified EP1 remote. The wires run from the RJ45
+breakout's pins (top) to the contacts on the circuit board; each solder
+point is marked with its RJ45 pin number, as in the table above.*
+
+![The remote in its watertight box](images/PoolWind_Remote_boxed.jpg)
+
+*The author's remote in its box, about 15 ft from the pool's controller:
+electrical tape around the lid, putty where the cable comes in at the
+bottom, and a bag of desiccant beside the remote.*
 
 When the Raspberry Pi powers up, the remote's light flashes a few times.
 If the remote doesn't control the pool, pair it with the pool's controller
