@@ -21,6 +21,22 @@ How to build it: see the [build guide](../docs/BUILD_GUIDE.md).
   2026-10-10: the Gerber files' copper connections match the Fritzing design
   exactly.
 
+### 8-wire version
+
+A second version of the board gives each relay its own two wires to the
+remote, instead of one shared point (see the build guide, section 5). Remote
+jack pins: 1 = 5 V, 3 and 6 = Up, 4 and 2 = Down, 5 and 7 = On/Off,
+8 = ground.
+
+- `schematics/PoolWind_interface_board_8wire.fzz` — the Fritzing design.
+- `gerbers_8wire/PoolWind_PCB_8wire_gerbers.zip` — ready to upload to a PCB
+  maker; same size and parts as the original board.
+- `PoolWind_PCB_8wire_preview.png` — a picture of the board drawn from its
+  Gerber files.
+
+Checked 2026-10-15: the copper connects exactly the pins above, and every
+other connection is the same as on the original board. Not yet built.
+
 ## Connections used by the software
 
 | Function | Connection |

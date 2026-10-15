@@ -1,0 +1,34 @@
+# Pick And Place List
+# Company=
+# Author=
+# eMail=
+#
+# Project=PoolWind_interface_board_8wire
+# Date=11:58:28
+# CreatedBy=Fritzing 1.0.1rc.2025-04-04.debian/1.0.1-1+b4
+#
+#
+# Coordinates in mils, always center of component
+# Origin 0/0=Lower left corner of PCB
+# Rotation in degree (0-360, math. pos.)
+#
+RefDes,Description,Package,X,Y,Rotation,Side,Mount
+Description: resistance;capacitance;inductance;voltage;current;power;mpn;mn;
+Via3,";;;;;;;;","",755.999,1533.88,0,Top,MANUAL
+Via6,";;;;;;;;","",2188.88,3039.35,0,Top,MANUAL
+UP-DN,";;;;;;;;","rj45-8",1080.59,2829.46,180,Top,SMT
+R3,"220;;;;;0.25;;;","THT",368.934,399.635,0,Top,THT
+1-23 Raspberry,";;;;;;;;","1x12_machine-pin-header_lock.004",2255.59,363.257,0,Top,SMT
+VoltMeter,";;;;;;;;","",690.711,1512.25,0,Top,MANUAL
+Via7,";;;;;;;;","",955.548,2972.68,0,Top,MANUAL
+Via4,";;;;;;;;","",2316,549.883,0,Top,MANUAL
+R6,"220;;;;;0.25;;;","THT",935.28,394.868,0,Top,THT
+ 2-24  Raspberry,";;;;;;;;","1x12_machine-pin-header_lock.004",2255.59,463.257,0,Top,SMT
+JP1,";;;;;;;;","1x12_machine-pin-header_lock.004",3805.59,1071.26,0,Top,SMT
+Pace Volt In,";;;;;;;;","rj45-8",430.586,2829.46,180,Top,SMT
+JP3,";;;;;;;;","1x12_machine-pin-header_lock.004",3805.59,3271.26,0,Top,SMT
+Via2,";;;;;;;;","",2268,837.883,0,Top,MANUAL
+Via5,";;;;;;;;","",972.004,1077.88,0,Top,MANUAL
+JP4,";;;;;;;;","1x12_machine-pin-header_lock.004",2292.21,3283.73,0,Top,SMT
+Via1,";;;;;;;;","",1092,1245.88,0,Top,MANUAL
+JP2,";;;;;;;;","1x12_machine-pin-header_lock.004",2305.59,1071.26,0,Top,SMT
