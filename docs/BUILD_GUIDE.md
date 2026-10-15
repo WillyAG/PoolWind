@@ -17,13 +17,12 @@ help, so check both first.
 
 1. **Your remote.** PoolWind works by wiring relays across the buttons of
    the pool's remote. The author's remote is an Endless Pools **EP1** (inside, a
-   Martec BT-433M circuit board), and finding contact points on its circuit board that work took a lot of
-   trial and error (see [section 5](#5-the-remote)). The interface board
-   is designed for remotes whose three buttons can be pressed through
-   **one shared wire plus one wire per button**. A remote with the same
-   circuit board should work the same way; other remotes may not, or may
-   need different wiring. Open yours and compare it with the photos before
-   buying parts.
+   Martec BT-433M circuit board; see [section 5](#5-the-remote)). The
+   interface board gives each of the three buttons (Up, Down, On/Off) **its
+   own two wires**, and a relay connects them like a finger pressing the
+   button. So a remote should work if you can reach both contacts of each
+   button and it can run on about 5 V. Open yours and compare it with the
+   photos before buying parts.
 2. **The Pace Display port voltage.** PoolWind reads the jet speed as a
    voltage on the pool's Pace Display port ranging from about 1.2v to 3.3v (see
    [section 6](#6-the-pace-display-port)). Measure it with a multimeter: it
@@ -161,7 +160,7 @@ needs, including the **drill file** (`_drill.txt`, every hole's position and
 size), so there's nothing to send separately. Check the maker's preview
 before ordering: if the board shows no holes, the maker didn't recognize
 the drill file. Rename it to end in `.drl` (for example
-`PoolWindPCB20SentOutForFabCorrected_drill.drl`), zip the files again and
+`PoolWind_interface_board_drill.drl`), zip the files again and
 upload. The design itself is in
 [`hardware/schematics/PoolWind_interface_board.fzz`](../hardware/schematics/PoolWind_interface_board.fzz);
 open it in the free [Fritzing](https://fritzing.org) program to see the
@@ -193,10 +192,11 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
 - The relay modules' **JD-VCC jumper** stays fitted, so each module runs
   entirely from the Pi's 5 V.
 
-- **Relay contacts:** each relay's **COM** contact goes to the Remote
-  jack's pin 6, the point common to all three buttons. Each relay's **NO**
-  (normally open) contact goes to its button's pin: 3 = Up, 4 = Down,
-  5 = On/Off. The **NC** contacts aren't used.
+- **Relay contacts:** each relay has its own two wires to the remote, and
+  closing the relay connects them, just like pressing the button. Up:
+  NO to pin 3, COM to pin 6. Down: NO to pin 4, COM to pin 2. On/Off: NO
+  to pin 5, COM to pin 7 (pins of the Remote jack). The **NC** contacts
+  aren't used.
 
 ### Assembling it
 
@@ -261,16 +261,16 @@ current Gerber files print "Pace Volt In" and "UP-DN"). Below: the two relay mod
 On/Off on the second) wired to the board's headers, and the Raspberry Pi
 header on the left.*
 
-*This board is from the author's first batch, which had two mistakes: the
-Raspberry Pi header is labeled "1-25 / 2-26" instead of "1-23 / 2-24", and
-one connection was missing. Both are fixed in the Gerber files and the
-Fritzing design, so boards made from them need no corrections.*
+*This is the author's own board, from an early batch that was corrected
+and updated by hand. Boards made from the current Gerber files need no
+changes.*
 
-![The back of the author's first-batch board](images/PoolWind_Interface_rear.jpg)
+<!-- Bill: new photo of the interface board top after the change to 8 wires. -->
 
-*The back of the same board. The **orange wire** is the hand-soldered fix for
-the first batch's missing connection. **Don't add it to a board made from
-the current Gerber files**: they already have that connection.*
+![The board's bottom copper, seen from below](../hardware/schematics/PoolWind_interface_board_pcb_bottom.png)
+
+*The board seen from below (Fritzing PCB view): the bottom layer's copper
+is drawn bright, the top layer's faded.*
 
 ### Connecting to the Raspberry Pi
 
@@ -311,10 +311,9 @@ The pins PoolWind uses:
 | Pace jack (Pace Volt In) | 5 | Jet-speed voltage from the Pace Display port, to the INA260's VBUS input |
 | | 3 | Ground |
 | | 6 | Pump-detection circuit (R6), not used |
-| Remote jack (UP-DN) | 6 | Common side of all three relays |
-| | 3 | Up button |
-| | 4 | Down button |
-| | 5 | On/Off button |
+| Remote jack (UP-DN) | 3 and 6 | Up button (Up relay's NO and COM) |
+| | 4 and 2 | Down button (Down relay's NO and COM) |
+| | 5 and 7 | On/Off button (On/Off relay's NO and COM) |
 | | 1 | 5 V: powers the remote (it has no battery) |
 | | 8 | Ground for the remote's power |
 
@@ -350,29 +349,27 @@ the same board should work the same way.
    | RJ45 pin | Wire color (author's) | Contact | Where |
    |---|---|---|---|
    | 1 | orange | Battery + terminal (5 V) | right edge, halfway down |
-   | 3 | white/green | Up (faster) button | bottom-left button, right side |
-   | 4 | blue | Down (slower) button | bottom-right button, left side |
-   | 5 | white/blue | On/Off button | center button, left side |
-   | 6 | green | Up button, other side: the shared point for all three buttons | bottom-left button, left side |
+   | 3 | white/green | Up (faster) button, one side | bottom-left button, right side |
+   | 6 | green | Up button, other side | bottom-left button, left side |
+   | 4 | blue | Down (slower) button, one side | bottom-right button, left side |
+   | 2 | | Down button, other side | bottom-right button, right side |
+   | 5 | white/blue | On/Off button, one side | center button, left side |
+   | 7 | | On/Off button, other side | center button, right side |
    | 8 | brown | Battery ground terminal | lowest solder point on the right |
 
-   **About pin 6.** The interface board is designed around this one shared
-   point: each relay connects it to one button's contact. The author found
-   this combination by trial and error, and it has worked reliably.
+   <!-- Bill: wire colors for pins 2 and 7, and confirm their positions. -->
 
-   **Another way to wire it:** two wires per button, each relay shorting its
-   own button's two sides. Three buttons with two wires each, plus two for
-   power, also fit in the cable's eight wires, and it doesn't depend on a
-   shared point. The current interface board doesn't support it: its
-   schematic and board layout would need some changes.
+   Each button gets its own two wires, and its relay connects them, just
+   like pressing the button.
 
    The pin numbers match the interface board's Remote jack (UP-DN), so an ordinary
    **straight-through network cable** (Cat5e or Cat6) connects the two
    jacks. No special cable or crimping is needed.
 
-   **If your remote is different,** these contacts may not work, and the
-   interface board, which has one shared wire for all three buttons, may
-   not suit it. Ask in the project's Discussions before buying parts.
+   **If your remote is different,** find each of its three buttons' two
+   contacts (a multimeter shows them connected while the button is held
+   down) and wire them to the same pins. Ask in the project's Discussions
+   if you're unsure.
 4. **Make sure a battery can't be put back in**, for example by covering or
    blocking the battery compartment (the author used two small blocks of
    foam mounting tape). A battery and the 5 V supply together
@@ -389,9 +386,11 @@ the same board should work the same way.
 
 *Inside the author's modified EP1 remote. The wires run from the RJ45
 breakout's pins (top) to the contacts on the circuit board; each solder
-point is marked with its RJ45 pin number, as in the table above. The Up
-button (bottom left) is wired differently from the others: pin 6, the
-shared point, is on its left side and pin 3 on its right.*
+point is marked with its RJ45 pin number, as in the table above. (Taken
+before the change to 8 wires: pins 2 and 7 aren't fitted yet.)*
+
+<!-- Bill: new photo of the remote's inside after adding pins 2 and 7;
+Claude will label it with pin numbers. -->
 
 
 ![The RJ45 jack on the back of the remote](images/PoolWind_Remote_jack.jpg)
