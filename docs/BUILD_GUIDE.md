@@ -414,19 +414,51 @@ manual control.
 ## 6. The Pace Display port
 
 The pool's control box has a port for the manufacturer's optional Pace
-Display. Its voltage changes steadily with the jet speed: the same jet
-speed always gives the same voltage. (It is probably the voltage that
-controls the hydraulic valve. How the Pace Display itself uses it isn't
-known.) PoolWind reads it
-through the board's Pace jack (Pace Volt In) and the INA260 sensor.
+Display. It carries power, ground, and one line whose voltage changes
+steadily with the jet speed: the same jet speed always gives the same
+voltage. (It is probably the voltage that controls the hydraulic valve.)
+PoolWind reads it through the board's Pace jack (Pace Volt In) and the
+INA260 sensor.
 
-Connect it with a standard **phone cable**, long enough to reach from the
-pool's controller to the interface board. Its plug isn't RJ45, but it plugs
-into the board's RJ45 jack and works.
+On the author's pool controller there is only one port a phone plug fits
+into: that's the one.
 
-If you have a Pace Display, connect PoolWind through a **Y splitter** so
-both stay plugged in: a short phone cable from the port to the splitter,
-then the Pace Display and a longer phone cable to the interface board.
+Connect it with a standard 6-wire **phone cable** (6P6C plugs, sometimes
+sold as RJ12 or RJ25), long enough to reach from the pool's controller to
+the interface board. A phone plug isn't RJ45, but it fits the board's
+8-pin RJ45 jack and works: its six contacts land on the middle six pins of
+the jack.
+
+The board uses two of the wires:
+
+| Phone plug contact | Board's Pace jack pin | Use |
+|---|---|---|
+| 2 | 3 | Ground (the Raspberry Pi's ground) |
+| 4 | 5 | The jet speed voltage, to the INA260's VBUS pin |
+| 5 | 6 | Not used (went to R6, which is left out) |
+
+The other contacts aren't connected on the board.
+
+**Check the cable.** Phone cables come in two kinds: straight-through
+cables connect each contact to the same contact at the other end, and
+"reversed" cables (common for telephones) swap them end for end (1 to 6,
+2 to 5, 3 to 4). Which kind you need depends on how the port's pins are
+wired. The cable the author uses works. Check yours with a multimeter
+before you rely on it: with the cable plugged into the port and the
+board, and the pool running, measure between the Pace jack's pins 5 and 3
+on the back of the board. The voltage should change as the jet speed
+changes.
+
+<!-- Bill: which kind of cable you use (straight-through or reversed), and
+which of the port's own contacts carry the voltage and ground. Also: where
+the port is on the control box. -->
+
+### If you have a Pace Display
+
+If you have a working Pace Display, connect PoolWind through a **Y
+splitter** so both stay plugged in: a short phone cable from the port to
+the splitter, then the Pace Display and a longer phone cable to the
+interface board.
 
 **Choose the splitter carefully.** Many cheap splitters divide the wires
 between the two legs instead of sending every wire to both (RJ45 "Ethernet
@@ -436,10 +468,10 @@ voltage but no ground (the author found this out the hard way). Use a
 splitter that connects **every wire straight through to both legs**, and
 check it with a multimeter before connecting it to the pool.
 
-<!-- Bill: the Y splitter you use (type, example link) once verified. -->
-
-<!-- Bill: where the port is, what plug it takes, which pins carry the
-voltage, the cable you used, and that nothing else on the pool is touched. -->
+**Seal the splitter** in a case with desiccant bags. The author's own Pace
+Display corroded inside and stopped working, so the author now runs
+PoolWind without a splitter. You might want to find a way to seal the
+Pace Display as well.
 
 ## 7. The camera
 
