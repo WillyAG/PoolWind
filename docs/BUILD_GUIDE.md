@@ -262,10 +262,8 @@ On/Off on the second) wired to the board's headers, and the Raspberry Pi
 header on the left.*
 
 *This is the author's own board, from an early batch that was corrected
-and updated by hand. Boards made from the current Gerber files need no
-changes.*
-
-<!-- Bill: new photo of the interface board top after the change to 8 wires. -->
+and updated by hand. The photo shows an earlier version of the board.
+Boards made from the current Gerber files need no changes.*
 
 ![The board's bottom copper, seen from below](../hardware/schematics/PoolWind_interface_board_pcb_bottom.png)
 
@@ -352,12 +350,10 @@ the same board should work the same way.
    | 3 | white/green | Up (faster) button, one side | bottom-left button, right side |
    | 6 | green | Up button, other side | bottom-left button, left side |
    | 4 | blue | Down (slower) button, one side | bottom-right button, left side |
-   | 2 | | Down button, other side | bottom-right button, right side |
+   | 2 | white/brown | Down button, other side | bottom-right button, right side |
    | 5 | white/blue | On/Off button, one side | center button, left side |
-   | 7 | | On/Off button, other side | center button, right side |
+   | 7 | white/orange | On/Off button, other side | center button, right side |
    | 8 | brown | Battery ground terminal | lowest solder point on the right |
-
-   <!-- Bill: wire colors for pins 2 and 7, and confirm their positions. -->
 
    Each button gets its own two wires, and its relay connects them, just
    like pressing the button.
@@ -386,11 +382,7 @@ the same board should work the same way.
 
 *Inside the author's modified EP1 remote. The wires run from the RJ45
 breakout's pins (top) to the contacts on the circuit board; each solder
-point is marked with its RJ45 pin number, as in the table above. (Taken
-before the change to 8 wires: pins 2 and 7 aren't fitted yet.)*
-
-<!-- Bill: new photo of the remote's inside after adding pins 2 and 7;
-Claude will label it with pin numbers. -->
+point is marked with its RJ45 pin number, as in the table above.*
 
 
 ![The RJ45 jack on the back of the remote](images/PoolWind_Remote_jack.jpg)
