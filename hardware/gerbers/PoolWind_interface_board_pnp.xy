@@ -17,9 +17,9 @@ Description: resistance;capacitance;inductance;voltage;current;power;mpn;mn;
 Via4,";;;;;;;;","",2316,549.883,0,Top,MANUAL
  2-24  Raspberry,";;;;;;;;","1x12_machine-pin-header_lock.004",2255.59,463.257,0,Top,SMT
 1-23 Raspberry,";;;;;;;;","1x12_machine-pin-header_lock.004",2255.59,363.257,0,Top,SMT
-R6,"220;;;;;0.25;;;","THT",935.28,394.868,0,Top,THT
+R6,"100k;;;;;0.25;;;","THT",935.28,394.868,0,Top,THT
 Via5,";;;;;;;;","",972.004,1077.88,0,Top,MANUAL
-R3,"220;;;;;0.25;;;","THT",368.934,399.635,0,Top,THT
+R3,"7.5k;;;;;0.25;;;","THT",368.934,399.635,0,Top,THT
 JP3,";;;;;;;;","1x12_machine-pin-header_lock.004",3805.59,3271.26,0,Top,SMT
 Via6,";;;;;;;;","",2188.88,3039.35,0,Top,MANUAL
 Via1,";;;;;;;;","",1092,1245.88,0,Top,MANUAL
