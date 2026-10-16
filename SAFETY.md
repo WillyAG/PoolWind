@@ -11,7 +11,22 @@ for the full disclaimer.
 - **Keep all electronics low-voltage and dry.** The Raspberry Pi, relay board,
   sensor and monitor must be powered from a proper low-voltage power supply,
   mounted away from splashing water. The keyboard and mouse must be waterproof.
-- **Plug the power supply into a GFCI-protected outlet.**
+- **Use certified power supplies only** (for example UL-listed), and never
+  bring mains wiring into the station's case beyond the supplies' own plugs.
+  Their low-voltage outputs are isolated from the mains, which is what makes
+  touching the keyboard or mouse safe while standing in the pool.
+- **Plug the power supplies into a GFCI-protected outlet,** placed as your
+  local electrical code requires for outlets near a pool. In the US that is
+  NEC Article 680: outlets at least 6 ft (1.8 m) from the water, and
+  GFCI-protected within 20 ft (6 m). Rules vary by place and code edition,
+  so follow your local code. The GFCI is the main protection: if a power
+  supply ever fails and mains current leaks out through a person, it cuts
+  the power in a fraction of a second.
+- **The Pace Display cable's ground is not a safety ground.** It is one thin
+  phone wire that gives the sensor a reference for its reading. It is not
+  meant to carry fault current. Without it, PoolWind's low-voltage side
+  simply floats, like a laptop on its charger: the jet speed reading stops
+  working, but that adds no electrical risk.
 - **Do not modify the pool's own control box, pump or wiring.**
   PoolWind only connects to a handheld remote and to the Pace Display port.
   If the port is inside the control box, turn the pool's power off before
