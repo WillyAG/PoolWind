@@ -357,12 +357,18 @@ narrow to work in comfortably, and VNC shows you the same picture. Double-click
 
 > **Always turn the monitor back to portrait before anyone swims.**
 
-The toggle is set up for the author's monitor (the Eyoyo 10-inch on the
-parts list): portrait at 800×600, landscape at 1280×800, on the output
-called `HDMI-1`. With a different monitor, open
-`~/.local/bin/toggle_monitor.sh` in a text editor and change the three
-settings at its top. To see your monitor's output name and sizes, type
-`xrandr` in a terminal.
+**Another monitor.** The toggle is set up for the author's monitor (the
+Eyoyo 10-inch on the parts list): portrait at 800×600, landscape at
+1280×800, on the output called `HDMI-1`. Another monitor usually works
+without changes: if `HDMI-1` has no monitor, the toggle uses whichever
+monitor is connected, and if the monitor doesn't offer one of those sizes,
+it uses the monitor's own preferred size. PoolWind adapts its screen to
+whatever size it finds.
+
+To choose the sizes yourself, open `~/.local/bin/toggle_monitor.sh` in a
+text editor and change the three settings at its top. To see your
+monitor's output name and the sizes it offers, type `xrandr` in a
+terminal. Updating PoolWind keeps these settings.
 
 ## 10. Updating PoolWind
 
