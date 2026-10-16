@@ -1,6 +1,6 @@
 # Hardware
 
-License: see [LICENSE.md](../LICENSE.md). Commercial use: see [COMMERCIAL.md](../COMMERCIAL.md).
+License: see [LICENSE.md](../LICENSE.md).
 
 How to build it: see the [build guide](../docs/BUILD_GUIDE.md).
 

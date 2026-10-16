@@ -525,9 +525,8 @@ if True:  # keep this here as an  easy way to skip over all this
     Copyright (c) William A. Gorlitz. Copyright Reg # TXu 2-304-621.
     Licensed under the PolyForm Noncommercial License 1.0.0
     (https://polyformproject.org/licenses/noncommercial/1.0.0): free for
-    personal, hobby and other noncommercial use. Any commercial use
-    (selling kits, built systems, or services) requires a separate
-    license from the author.
+    personal, hobby and other noncommercial use. Commercial use is not
+    permitted.
 
     This program would not have been possible had I not borrowed heavily
     from routines and methods found on the Internet. The imported packages

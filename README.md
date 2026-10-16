@@ -104,7 +104,7 @@ Full details are in [`hardware/`](hardware/) and the build guide in [`docs/`](do
 
 ## License
 
-PoolWind is free for personal, hobby and other noncommercial use. The licenses are described in [LICENSE.md](LICENSE.md). Commercial use, including selling kits, installation or paid coaching, requires a separate license: see [COMMERCIAL.md](COMMERCIAL.md).
+PoolWind is a shared hobby project, free for personal, hobby and other noncommercial use under the licenses described in [LICENSE.md](LICENSE.md). It isn't for sale, and commercial use isn't permitted.
 
 Copyright © William A. Gorlitz. U.S. Copyright Registration TXu 2-304-621.
 
