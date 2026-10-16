@@ -172,7 +172,7 @@ layout.
 
 *The interface board's wiring, from the Fritzing design (breadboard view).
 Left: the two RJ45 jacks, the Remote jack (UP-DN) and the Pace jack (Pace Volt In),
-the INA260 sensor, the two 220 Ω resistors (not needed, see below) and,
+the INA260 sensor, the two resistors R3 and R6 (not needed, see below) and,
 along the bottom, the header for the ribbon cable to the Raspberry Pi.
 Right: the two 2-channel relay modules on headers JP1-JP4.*
 
@@ -203,8 +203,11 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
 There's no special soldering order: the only delicate part, the INA260
 sensor, plugs in afterward.
 
-1. **Resistors R3 and R6: leave them out.** They were meant for detecting
-   whether the pump was on, which PoolWind never needed.
+1. **Resistors R3 and R6: leave them out.** They form a voltage divider
+   for detecting whether the pool is on, from the Pace Display port's
+   38 V power line, which PoolWind doesn't use. If you ever fit them,
+   use **R6 = 100 kΩ and R3 = 7.5 kΩ** (about 2.7 V at GPIO 23). Lower
+   values would destroy the Raspberry Pi's GPIO pin.
 2. **Headers:**
    - Ribbon cable to the Pi: **male header pins, 2 × 12** (the cable's plug
      is female).
@@ -299,7 +302,7 @@ The pins PoolWind uses:
 | 11 (GPIO 17) | Relay: jet speed Up |
 | 12 (GPIO 18) | Relay: jet speed Down |
 | 13 (GPIO 27) | Relay: pump On/Off |
-| 16 (GPIO 23) | Pump-detection circuit (R3/R6), not used |
+| 16 (GPIO 23) | Pool-on detection (R3/R6 divider), not used |
 | 20 (ground) | Relay modules' ground |
 
 ### The RJ45 jacks
@@ -308,7 +311,7 @@ The pins PoolWind uses:
 |---|---|---|
 | Pace jack (Pace Volt In) | 5 | Jet-speed voltage from the Pace Display port, to the INA260's VBUS input |
 | | 3 | Ground |
-| | 6 | Pump-detection circuit (R6), not used |
+| | 6 | Pace Display power, 38 V, to the pool-on detection (R6), not used |
 | Remote jack (UP-DN) | 3 and 6 | Up button (Up relay's NO and COM) |
 | | 4 and 2 | Down button (Down relay's NO and COM) |
 | | 5 and 7 | On/Off button (On/Off relay's NO and COM) |
@@ -414,7 +417,7 @@ manual control.
 ## 6. The Pace Display port
 
 The pool's control box has a port for the manufacturer's optional Pace
-Display. It carries 24v power, ground, and one line whose voltage changes
+Display. It carries 38 V power, ground, and one line whose voltage changes
 steadily with the jet speed: the same jet speed always gives the same
 voltage. It is probably the voltage that controls the hydraulic valve.
 PoolWind reads it through the board's Pace jack (Pace Volt In) and the
@@ -423,32 +426,42 @@ INA260 sensor.
 On the author's pool controller there is only one port a phone plug fits
 into: that's the one.
 
-Connect it with a standard 6-wire **phone cable** (RJ-14), long enough to reach from the pool's controller to
-the interface board. The phone plug is smaller but fits the board's 8-pin RJ-45 jack. Its six contacts land on the middle six pins of the RJ-45 jack.
+Connect it with a standard 6-wire **phone cable** (6P6C plugs, sometimes
+sold as RJ25 or RJ12), long enough to reach from the pool's controller to
+the interface board. The phone plug is smaller but fits the board's 8-pin
+RJ45 jack: its six contacts land on the middle six pins of the jack.
 
-The board uses two of the wires, pool ground and jet speed voltage.
-**note: ** This is the only ground connection between the pool and the Interface Board. It is not a safety ground and is used only to reference the jet speed voltage. 
+The board uses two of the wires: the pool's ground and the jet speed
+voltage.
 
-| Phone plug contact | Interface Board's Pace jack pin | Use |
+**Note:** this is the only ground connection between the pool and the
+interface board. It is not a safety ground (see [SAFETY.md](../SAFETY.md));
+it is used only as the reference for the jet speed voltage.
+
+| Phone plug contact | Interface board's Pace jack pin | Use |
 |---|---|---|
 | 2 | 3 | Ground (the Raspberry Pi's ground) |
-| 4 | 5 | The jet speed voltage, used by INA260's VBUS pin. ~1.2v -3.3v, always present |
-| 5 | 6 | Not used (went to R6, which is left out). ~24V when pool pump is powered up |
+| 4 | 5 | The jet speed voltage, to the INA260's VBUS pin: about 1.2 V to 3.3 V, always present |
+| 5 | 6 | Not used (goes to R6, which is left out): about 38 V when the pool pump is powered up |
 
 The other contacts aren't connected on the board.
 
-**Check the cable.** 
-Phone cables vary
-
-Phone cables come in two kinds: straight-through
+**Check the cable.** Phone cables vary: they come in two kinds. Straight-through
 cables connect each contact to the same contact at the other end, and
 "reversed" cables (common for telephones) swap them end for end (1 to 6,
 2 to 5, 3 to 4). Which kind you need depends on how the port's pins are
-wired. The cable the author uses works. Check yours with a multimeter
-before you rely on it: with the cable plugged into the port and the
-board, and the pool running, measure between the Pace jack's pins 5 and 3
-on the back of the board. The voltage should change as the jet speed
-changes.
+wired. The cable the author uses works. A wrong cable could put the 38 V
+power line where the sensor expects at most a few volts, so **check yours
+with a multimeter before the INA260 is plugged in:**
+
+1. Raspberry Pi off, INA260 unplugged from its socket.
+2. Plug the cable into the pool's port and the board's Pace jack, and
+   turn the pool on.
+3. On the back of the board, measure from the Pace jack's pin 3 (ground)
+   to pin 5: it should read about 1.2 V to 3.3 V and change with the jet
+   speed. From pin 3 to pin 6 it should read about 38 V.
+4. If 38 V shows up anywhere else, or nothing makes sense, unplug the
+   cable and try the other kind.
 
 <!-- Bill: which kind of cable you use (straight-through or reversed), and
 which of the port's own contacts carry the voltage and ground. Also: where
