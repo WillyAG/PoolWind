@@ -110,9 +110,9 @@ Before the first start:
 - The pool switched on, with the pool's own remote at hand.
 - **The monitor is in portrait** (taller than wide). The install script
   sets this up, so it happens by itself a few seconds after the desktop
-  appears. If it doesn't, double-click **Monitor Toggle**, and if your
-  monitor isn't the author's, see [working from home](#9-working-from-home)
-  for its settings.
+  appears. If it doesn't, double-click **Monitor Toggle**. Another monitor
+  than the author's usually works without changes: see
+  [working from home](#9-working-from-home).
 - **Calibration:** the `poolwind_calibration.txt` that comes with PoolWind
   holds the author's pool. Its pace table should be close for a pool of
   the same model (section 5.2), but **set the swim area for
