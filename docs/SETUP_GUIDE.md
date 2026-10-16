@@ -1,74 +1,7 @@
 # PoolWind Setup and Calibration Guide
 
 **DRAFT.** Comments like `<!-- Bill: ... -->` are notes for the author.
-They don't show on GitHub. The install script described here is written
-but not yet tested on a fresh SD card.
-
----
-
-## TEMPORARY: fresh-install test plan (Bill: delete this section before publishing)
-
-The first real trial of this guide: setting up PoolWind on a fresh SD card
-as a new user would, with only the parts and the documents, and without
-Claude to ask during the test.
-
-### 1. Read the documents the way a user will: on GitHub
-
-- Create the GitHub repository as **private** (only Bill can see it).
-- Claude uploads (pushes) the release folder from the Pi, with Bill's OK.
-- Read the documents on the PC in the browser, exactly as a new user will:
-  formatted pages, working links, the README as the front page.
-- The fresh Pi downloads PoolWind with the `git clone` command in section 3,
-  which tests the real install path.
-
-Fallback without GitHub: copy the `poolwind-public` folder to a USB stick
-and open the `.md` files in VS Code on the PC (Ctrl+Shift+V for the
-formatted preview).
-
-**Installing from the stick (2026-10-11: the release folder is on Bill's
-stick `BILL_G` as `PoolWind-download`).** Instead of the `git clone` line in
-section 3, open a terminal on the fresh card and type:
-
-```
-cp -r /media/$USER/BILL_G/PoolWind-download ~/
-bash ~/PoolWind-download/install.sh
-```
-
-**Before putting the original card back,** copy `~/PoolWind/install.log` to
-the stick for Claude to read.
-
-### 2. Claude prepares beforehand
-
-- **The install script** (`install.sh`), writing every step to a log file,
-  so the fresh card's install can be read afterwards, errors included.
-- **The release program in `software/`:** the current version as
-  `poolwind.py`, with the shipped defaults (3:00 top pace, height 66) and
-  the author's pool calibration file.
-- **The desktop icon** the script installs.
-- **Sections 2-3 of this guide** (the SD card and installing), at least as
-  rough steps to follow.
-
-### 3. During the test
-
-- Use a **spare SD card**. Make a fresh backup of the real card first, then
-  keep it somewhere safe.
-- **Follow the documents literally,** not from memory. Wherever own
-  knowledge is needed to get past a step, that's exactly what needs fixing.
-- **Keep a running list:** every question, unclear step or guess, and how
-  long things took. Phone photos of error messages and confusing screens
-  help a lot.
-- Use a **spare USB stick** to try "Setting up a new stick" as a new swimmer
-  would.
-- **Jet tests:** nobody in the pool.
-
-### 4. After the test
-
-- Put the real SD card back.
-- Give Claude the list and photos; Claude reads the install log.
-- Fix the script and the documents together, and repeat the test if
-  needed.
-
----
+They don't show on GitHub.
 
 This guide is for the person who builds and installs PoolWind: installing
 the software, fitting it to your pool, and the settings behind the scenes.
@@ -125,7 +58,9 @@ pool's jet. Do them with nobody in the pool.
 
 ## 3. Installing PoolWind
 
-Open a terminal on the Pi (or connect with SSH) and type:
+Open a terminal on the Pi: click the **Terminal** icon (a black screen
+with `>_`) on the bar at the top of the desktop. Type these two lines,
+pressing Enter after each:
 
 ```
 git clone https://github.com/WillyAG/PoolWind.git ~/PoolWind-download
