@@ -68,7 +68,13 @@ bash ~/PoolWind-download/install.sh
 ```
 
 The first line downloads PoolWind into a `PoolWind-download` folder. The
-second runs the install script, which:
+second runs the install script.
+
+**It asks for your password once:** the password you chose in Raspberry Pi
+Imager (section 2). Nothing shows on the screen while you type it, not even
+dots; type it and press Enter.
+
+The install script:
 
 - installs the libraries PoolWind needs: OpenCV, NumPy, SciPy, PyQt5,
   matplotlib, lgpio, the Adafruit INA260 library, ffmpeg, exfatprogs and
@@ -83,7 +89,9 @@ second runs the install script, which:
 - copies PoolWind into a **`PoolWind` folder** in your home folder. This is
   where the program, its settings files and the `CSV Vault` live;
 - adds two icons to the desktop: **PoolWind**, and **Monitor Toggle** for
-  [working from home](#9-working-from-home).
+  [working from home](#9-working-from-home);
+- turns the monitor to **portrait** (taller than wide) every time the Pi
+  starts, ready for swimming.
 
 It writes everything it does to a log file, `install.log`, in the
 `PoolWind` folder. If something goes wrong, that's the place to look.
@@ -100,12 +108,11 @@ Before the first start:
 
 - **Nobody in the pool.**
 - The pool switched on, with the pool's own remote at hand.
-- **Turn the monitor to portrait.** In the desktop's settings
-  (Raspberry Pi menu → Preferences → **Control Centre**, then its screen
-  settings), rotate the monitor so it's taller than it is wide. PoolWind
-  doesn't change the monitor itself.
-  <!-- Bill: check the exact names in Control Centre (tab and rotate
-  option) on your Pi; older Raspberry Pi OS called it Screen Configuration. -->
+- **The monitor is in portrait** (taller than wide). The install script
+  sets this up, so it happens by itself a few seconds after the desktop
+  appears. If it doesn't, double-click **Monitor Toggle**, and if your
+  monitor isn't the author's, see [working from home](#9-working-from-home)
+  for its settings.
 - **Calibration:** the `poolwind_calibration.txt` that comes with PoolWind
   holds the author's pool. Its pace table should be close for a pool of
   the same model (section 5.2), but **set the swim area for
@@ -346,7 +353,7 @@ program.
 narrow to work in comfortably, and VNC shows you the same picture. Double-click
 **Monitor Toggle** on the Pi's desktop to turn the monitor to **landscape**
 (full width) while you work. Double-click it again to turn it back to
-**portrait**.
+**portrait**. Restarting the Pi also turns it back to portrait.
 
 > **Always turn the monitor back to portrait before anyone swims.**
 

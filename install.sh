@@ -1,7 +1,7 @@
 #!/bin/bash
 # PoolWind install script.
 #
-#   git clone https://github.com/<user>/PoolWind.git ~/PoolWind-download
+#   git clone https://github.com/WillyAG/PoolWind.git ~/PoolWind-download
 #   bash ~/PoolWind-download/install.sh
 #
 # Sets up a Raspberry Pi 5 running Raspberry Pi OS (64-bit, with desktop)
@@ -93,11 +93,17 @@ if ! command -v raspi-config > /dev/null; then
     exit 1
 fi
 
-echo "Your password may be asked for once (for installing system packages)."
+echo "Type your password when asked: the one you chose in Raspberry Pi Imager."
+echo "(Nothing shows on the screen while you type it. Press Enter at the end.)"
 if ! sudo -v; then
     echo "Couldn't get administrator rights (sudo). Nothing was changed."
     exit 1
 fi
+# Keep sudo's permission fresh until the script ends, so the password is
+# asked for only once, however long the downloads take.
+( while sleep 50; do sudo -n true 2> /dev/null || exit; done ) &
+SUDO_KEEPALIVE=$!
+trap 'kill $SUDO_KEEPALIVE 2> /dev/null' EXIT
 
 # --------------------------------------------------------------------------
 step "1/8  Installing system packages (this can take several minutes)"
@@ -129,23 +135,17 @@ for g in gpio i2c video; do
     fi
 done
 # PoolWind sets up new swimmer USB sticks with sudo (umount, mkfs.exfat,
-# mkdir, mount). Raspberry Pi OS's first user may already use sudo without
-# a password; if not, allow just these four commands.
-sudo -k    # forget the password typed earlier, to test the real setting
-if sudo -n true 2> /dev/null; then
-    say "   sudo already works without a password: nothing to add"
-else
-    sudo -v
-    tmp="$(mktemp)"
-    printf '%s ALL=(root) NOPASSWD: %s, %s, %s, %s\n' "$USER" \
-        "$(command -v umount)" "$(sudo sh -c 'command -v mkfs.exfat')" \
-        "$(command -v mkdir)" "$(command -v mount)" > "$tmp"
-    cat "$tmp" >> "$LOG"
-    run sudo visudo -c -f "$tmp"
-    run sudo install -m 0440 -o root -g root "$tmp" /etc/sudoers.d/poolwind
-    rm -f "$tmp"
-    say "   allowed setting up USB sticks without a password"
-fi
+# mkdir, mount): allow just these four commands without a password.
+# (Harmless if this user's sudo needs no password anyway.)
+tmp="$(mktemp)"
+printf '%s ALL=(root) NOPASSWD: %s, %s, %s, %s\n' "$USER" \
+    "$(command -v umount)" "$(sudo sh -c 'command -v mkfs.exfat')" \
+    "$(command -v mkdir)" "$(command -v mount)" > "$tmp"
+cat "$tmp" >> "$LOG"
+run sudo visudo -c -f "$tmp"
+run sudo install -m 0440 -o root -g root "$tmp" /etc/sudoers.d/poolwind
+rm -f "$tmp"
+say "   allowed setting up USB sticks without a password"
 
 step "7/8  Copying PoolWind to $PW_DIR"
 if [ -f "$PW_DIR/poolwind.py" ]; then
@@ -157,8 +157,29 @@ say "   installed poolwind.py"
 copy_if_missing "$SOFTWARE/poolwind_defaults.txt"    "$PW_DIR/poolwind_defaults.txt"
 copy_if_missing "$SOFTWARE/poolwind_calibration.txt" "$PW_DIR/poolwind_calibration.txt"
 run mkdir -p "$HOME/.local/bin"
-copy_if_missing "$SOFTWARE/toggle_monitor.sh" "$HOME/.local/bin/toggle_monitor.sh"
-run chmod +x "$HOME/.local/bin/toggle_monitor.sh"
+# The Monitor Toggle script: always the new version, but keeping the monitor
+# settings at its top (OUTPUT, PORTRAIT_SIZE, LANDSCAPE_SIZE) if already set.
+TOGGLE="$HOME/.local/bin/toggle_monitor.sh"
+if [ -f "$TOGGLE" ]; then
+    run cp "$TOGGLE" "$TOGGLE.previous"
+    new="$(mktemp)"
+    cp "$SOFTWARE/toggle_monitor.sh" "$new"
+    for v in OUTPUT PORTRAIT_SIZE LANDSCAPE_SIZE; do
+        old_line="$(grep -m1 "^$v=" "$TOGGLE.previous")"
+        if [ -n "$old_line" ]; then
+            awk -v v="$v" -v l="$old_line" \
+                'index($0, v "=") == 1 && !done { print l; done = 1; next } { print }' \
+                "$new" > "$new.tmp" && mv "$new.tmp" "$new"
+        fi
+    done
+    run cp "$new" "$TOGGLE"
+    rm -f "$new"
+    say "   updated toggle_monitor.sh (your monitor settings kept)"
+else
+    run cp "$SOFTWARE/toggle_monitor.sh" "$TOGGLE"
+    say "   installed toggle_monitor.sh"
+fi
+run chmod +x "$TOGGLE"
 
 step "8/8  Desktop icons"
 DESKTOP="$(xdg-user-dir DESKTOP 2> /dev/null || echo "$HOME/Desktop")"
@@ -184,6 +205,20 @@ Terminal=false
 EOF
 run chmod +x "$DESKTOP/PoolWind.desktop" "$DESKTOP/Monitor_Toggle.desktop"
 say "   added PoolWind and Monitor Toggle"
+
+# Turn the monitor to portrait every time the desktop starts, so it's
+# always ready for swimming. (The Monitor Toggle icon still switches to
+# landscape for working.)
+run mkdir -p "$HOME/.config/autostart"
+cat > "$HOME/.config/autostart/poolwind-portrait.desktop" << EOF
+[Desktop Entry]
+Type=Application
+Name=PoolWind portrait monitor
+Comment=Turn the pool monitor to portrait when the desktop starts
+Exec=sh -c 'sleep 3; $TOGGLE portrait'
+Terminal=false
+EOF
+say "   the monitor turns to portrait each time the Pi starts"
 
 # --------------------------------------------------------------------------
 step "Done"
