@@ -424,12 +424,14 @@ PoolWind reads it through the board's Pace jack (Pace Volt In) and the
 INA260 sensor.
 
 On the author's pool controller there is only one port a phone plug fits
-into: that's the one.
+into, on the bottom left edge of the controller: use that one.
 
-Connect it with a standard 6-wire **phone cable** (6P6C plugs, sometimes
-sold as RJ25 or RJ12), long enough to reach from the pool's controller to
-the interface board. The phone plug is smaller but fits the board's 8-pin
-RJ45 jack: its six contacts land on the middle six pins of the jack.
+Connect it with a **phone cable** (6-position plugs), long enough to reach
+from the pool's controller to the interface board. The author's cable
+has only the center four wires (a 6P4C or RJ14 cable), which is all the
+board needs; a 6-wire cable (6P6C, sometimes sold as RJ25 or RJ12) works
+too. The phone plug is smaller but fits the board's 8-pin RJ45 jack: its
+six contacts land on the middle six pins of the jack.
 
 The board uses two of the wires: the pool's ground and the jet speed
 voltage.
@@ -446,53 +448,55 @@ it is used only as the reference for the jet speed voltage.
 
 The other contacts aren't connected on the board.
 
-**Check the cable.** Phone cables vary: they come in two kinds. Straight-through
-cables connect each contact to the same contact at the other end, and
-"reversed" cables (common for telephones) swap them end for end (1 to 6,
-2 to 5, 3 to 4). Which kind you need depends on how the port's pins are
-wired. The cable the author uses works. A wrong cable could put the 38 V
-power line where the sensor expects at most a few volts, so **check yours
-with a multimeter before the INA260 is plugged in:**
+### Check the cable voltage
 
-1. Raspberry Pi off, INA260 unplugged from its socket.
-2. Plug the cable into the pool's port and the board's Pace jack, and
-   turn the pool on.
-3. On the back of the board, measure from the Pace jack's pin 3 (ground)
-   to pin 5: it should read about 1.2 V to 3.3 V and change with the jet
-   speed. From pin 3 to pin 6 it should read about 38 V.
-4. If 38 V shows up anywhere else, or nothing makes sense, unplug the
-   cable and try the other kind.
+Phone cables come in two kinds: straight-through cables connect each
+contact to the same contact at the other end, and "reversed" cables
+(common for telephones) swap them end for end (1 to 6, 2 to 5, 3 to 4).
+The author's cable is straight-through. With a reversed cable, the 38 V
+line and ground trade places, which is why this check is done with
+nothing else connected:
 
-<!-- Bill: which kind of cable you use (straight-through or reversed), and
-which of the port's own contacts carry the voltage and ground. Also: where
-the port is on the control box. -->
+1. Plug your cable into the pool controller's port (or wire it in if you
+   have to) and into the interface board's Pace jack. The board needs only
+   the Pace jack soldered in for this. **Don't plug in the INA260, and
+   don't connect the ribbon cable to the Raspberry Pi.**
+2. On the back of the board, put the multimeter's ground probe on the
+   Pace jack's pin 3 and the other probe on pin 5. It should read a small
+   positive voltage, 1.2 V to 3.3 V. On the author's pool this voltage is
+   always present: the pool doesn't need to be turned on.
+3. Use the spare remote to raise the jet speed: the voltage should rise.
+   Lower the jet speed: it should fall.
+
+**Essential: if the small voltage isn't present on pin 5, or it doesn't
+change with the jet speed, PoolWind will not work.** It is the feedback
+that tells PoolWind what its remote button presses did.
+
+You could also check pin 6, but it isn't needed, as pin 6 isn't currently
+used. On the author's pool it shows about 38 V, only while the pool pump
+motor is turned on.
 
 ### If you have a Pace Display
 
-If you have a working Pace Display, connect PoolWind through a **Y
-splitter** so both stay plugged in: a short phone cable from the port to
-the splitter, then the Pace Display and a longer phone cable to the
-interface board.
+If you have a working Pace Display, connect the interface board through a
+**Y splitter** so both stay plugged in: a short phone cable from the port
+to the splitter, then the Pace Display and a longer phone cable to the
+interface board. All three cables should be straight-through.
 
-**Choose the splitter carefully.** Many cheap splitters divide the wires
-between the two legs instead of sending every wire to both (RJ45 "Ethernet
-splitters", for example, send pins 1, 2, 3 and 6 to one leg and 4, 5, 7
-and 8 to the other). With a splitter like that, PoolWind can get the
-voltage but no ground (the author found this out the hard way). Use a
-splitter that connects **every wire straight through to both legs**, and
-check it with a multimeter before connecting it to the pool.
+**Choose the splitter carefully.** Use a splitter that connects every wire
+straight through to both legs, and check it with a multimeter before
+connecting it to the pool.
 
-**Seal the splitter** in a case with desiccant bags. The author's own Pace
-Display corroded inside and stopped working, so the author now runs
-PoolWind without a splitter. You might want to find a way to seal the
-Pace Display as well.
+**Seal the splitter and the Pace Display** in a case with desiccant bags.
+Use any method that works. The author's own Pace Display was ruined by
+corrosion from the moist, chlorinated air.
 
 ## 7. The camera
 
 The camera selected for this is wide angle with a 120 degree view, chosen so it can see the entire swim area of the pool without being mounted too high.
 
 - **Mounting position:** this depends on your pool, so there's no single
-  right way. However it is mounted, the camera must see the whole swim area, between the benches, from the back to the front of the pool. Make plans so the camera will be about 5 to 6 feet above the pool but be flexible, the distance may have to be adjusted. See the section below **Setup the camera** to help you place the camera correctly
+  right way. However it is mounted, the camera must see the whole swim area, between the benches, from the back to the front of the pool. Make plans so the camera will be about 5 to 6 feet above the pool but be flexible, the distance may have to be adjusted. See the setup guide, [section 5.1 (The swim area)](SETUP_GUIDE.md#51-the-swim-area), to help you place the camera correctly.
   Placement isn't critical, any image outside this area is trimmed out.
   Also it is not essential that the camera is mounted exactly in the center point of the pool, still the closer the better. PoolWind has perspective correction which visually moves the camera to the center but distorts the objects it sees. The camera could hang off the ceiling or be mounted on poles from the side and brought in toward the center. The mount should be sturdy though because you don't want the camera to shake. 
   
@@ -504,24 +508,24 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
 
 ## 8. The poolside station
 
-The Raspberry Pi, the control interface board, and the monitor sit together in a waterproof case with a clear door, beside the pool. The case used worked perfectly although a little small, see "Monitor" below. The clear door came with an injection molding spot right in the middle that was not polished down. Polishing with a Dremel tool worked but was tedious and the plastic tried to melt. 
+The Raspberry Pi, the control interface board, and the monitor sit together in a waterproof case with a clear door, beside the pool. The case used worked perfectly although the clear door came with an injection-molding spot right in the middle that was not polished down. Polishing with a Dremel tool worked but was tedious and the plastic tried to melt. 
 
-Build as you see fit. For instance, the Raspberry Pi could sit further away from the pool and the monitor and mouse could be at the pools edge. **Emphasizing waterproof** Or find a waterproof touchscreen: that would be ideal if there is such a thing. You could use two monitors and set up a work station further away from the pool (the Raspberry Pi has two HDMI ports).
+Build as you see fit. For instance, the Raspberry Pi could sit further away from the pool and the monitor and mouse could be at the pool's edge. **Emphasizing waterproof** Or find a waterproof touchscreen: that would be ideal if there is such a thing. You could use two monitors and set up a work station further away from the pool (the Raspberry Pi has two HDMI ports).
 The keyboard is rarely used and is not needed at the pool edge. It is used for changing default settings, setting up the USB stick, for moving or deleting files, and general computer stuff. 
 
 **Please read [SAFETY.md](../SAFETY.md) first.**
 
-- **Monitor:** the 10-inch Eyoyo only just fits the case, partially within the clear door. Its control buttons had to be removed. Mount it in **portrait** (taller than wide).
+- **Monitor:** the 10-inch Eyoyo only just fits the case, partially within the clear door. Its control buttons had to be removed. Mount it in **portrait** mode (taller than wide).
 
 - **Keyboard and mouse:** waterproof, USB.
 
 - **Heat:** a closed waterproof case traps heat. For swimming alone this
   was no problem: the author turns the Raspberry Pi off between swims. It
-  overheated only when left running all day. The fix that works all the
-  time, even on hot summer days, is a large heatsink (about 3 × 4 in)
-  mounted in a hole cut in the case wall and sealed, with its fins outside
-  and its flat side inside. The Raspberry Pi is placed so it draws its air
-  from near the heatsink.
+  overheated only when left running on a hot summer's day. The fix that
+  works all the time is a large heatsink (about 3 × 4 in) mounted in a
+  hole cut in the case wall and sealed, with its fins outside and its flat
+  side inside. The Raspberry Pi is placed so it draws its air from near
+  the heatsink.
 
 ![Everything tucked into the case](images/PoolWind_Station_inside.jpg)
 
