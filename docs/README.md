@@ -4,7 +4,7 @@ License: see [LICENSE.md](../LICENSE.md).
 
 Read them in this order:
 
-1. **[Build guide](BUILD_GUIDE.md):** the two checks to make before buying
+1. **[Build guide](BUILD_GUIDE.md):** the three checks to make before buying
    anything, the interface board, wiring the remote, the Pace Display port,
    the camera and the poolside station. The parts are in the
    [parts list](../hardware/PARTS_LIST.md). [DRAFT]

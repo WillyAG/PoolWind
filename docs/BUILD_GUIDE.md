@@ -9,11 +9,11 @@ electronics next to water. Never* open or modify the pool's own control box,
 pump or wiring: PoolWind connects only to a pool remote and to the Pace
 Display port. *(You will have to open the control box once to plug in the Pace Display cable. Disconnect power first.)
 
-## Before you buy anything: two checks
+## Before you buy anything: three checks
 
 PoolWind depends on two things about your pool that the author could only
-check on his own pool. If either fails, the rest of this guide won't
-help, so check both first.
+check on his own pool, and on the skills of whoever builds it. If any of
+these fails, the rest of this guide won't help, so check all three first.
 
 1. **Your remote.** PoolWind works by wiring relays across the buttons of
    the pool's remote. The author's remote is an Endless Pools **EP1** (inside, a
@@ -28,6 +28,20 @@ help, so check both first.
    [section 6](#6-the-pace-display-port)). Measure it with a multimeter: it
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified.
+3. **Your skills.** PoolWind is a do-it-yourself project, not a product: it
+   isn't for sale, and there's no kit. You buy the parts from various
+   suppliers, then build, install and set it up yourself, at your own risk
+   (see [SAFETY.md](../SAFETY.md)). It's intended for someone experienced
+   in electronics who can:
+   - solder through-hole parts neatly, and use a multimeter;
+   - order a printed circuit board from its Gerber files;
+   - open the pool's remote and solder fine wires to its circuit board;
+   - work on a Raspberry Pi: type commands in a terminal and edit text
+     files;
+   - make the station and the remote safe and watertight beside a pool.
+
+   If that isn't you, find someone it describes to help: a friend, a local
+   makerspace or an electronics hobbyist.
 
 ## Contents
 

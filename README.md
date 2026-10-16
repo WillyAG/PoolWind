@@ -25,7 +25,7 @@ pattern and his speed improved noticeably as a result.
 ## Getting started
 
 1. **Read [SAFETY.md](SAFETY.md).**
-2. **Check your pool first:** [two checks to make before buying anything](docs/BUILD_GUIDE.md#before-you-buy-anything-two-checks).
+2. **Check first:** [three checks to make before buying anything](docs/BUILD_GUIDE.md#before-you-buy-anything-three-checks): your remote, your pool's Pace Display port, and your skills.
    They take a few minutes and tell you whether PoolWind can work with your pool.
 3. **Gather the parts:** the [parts list](hardware/PARTS_LIST.md), about $480 in all.
 4. **Build it:** the [build guide](docs/BUILD_GUIDE.md).
