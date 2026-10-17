@@ -188,10 +188,23 @@ this, giving OnOff top priority.
 Press **X** at the top right of the screen to close PoolWind. It then:
 
 1. winds the jet down to its lowest setting,
-2. releases its control of the pool's remote, and
-3. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick.
+2. releases its control of the pool's remote,
+3. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
+4. **ejects your USB stick** and tells you so.
 
-Wait a few seconds after PoolWind closes before removing your USB stick.
+When the message says **"USB stick ejected"**, you can remove your stick.
+The next swimmer can insert theirs before starting PoolWind.
+
+If the message says **"USB stick not ejected"**, your swim is still saved,
+but don't pull the stick yet. Something else is using it (for example a
+file manager window showing it). Close that, then eject the stick yourself:
+click the **eject icon (⏏)** in the top bar of the screen and choose your
+stick. Remove it when its icon disappears from the desktop.
+
+**Why eject?** The Raspberry Pi doesn't write to a USB stick at once: it
+can hold the last part of your swim in memory for up to half a minute.
+Pulling a stick that hasn't been ejected can lose the end of your swim,
+or leave the stick needing repair.
 
 Once PoolWind is closed, the pool works normally with its own remote.
 
@@ -208,9 +221,10 @@ Swimmers without a stick all share one log on the Pi, so their swims can't be to
 ### Insert USB stick before, remove after
 
 > **Insert your USB stick before starting PoolWind, and remove it only after
-> closing PoolWind.** Pulling it out during a swim won't affect the jet, but
-> the rest of that swim won't be recorded. A stick inserted while PoolWind is
-> running isn't used until the next start.
+> PoolWind has closed and ejected it** (see
+> [Finishing a swim](#5-finishing-a-swim)). Pulling it out during a swim won't
+> affect the jet, but the rest of that swim won't be recorded. A stick
+> inserted while PoolWind is running isn't used until the next start.
 
 ### How much it holds depends on **logRate**
 
@@ -222,7 +236,8 @@ If your stick is nearly full when PoolWind starts, it asks what to do:
 - **Erase Oldest Video**: delete your oldest training videos to make room.
   PoolWind shows exactly what it will delete and asks you to confirm first.
   Your swim logs are kept.
-- **Eject & Replace**: close PoolWind so you can use a different stick.
+- **Eject & Replace**: eject the stick and close PoolWind, so you can use a
+  different stick.
 
 ### Setting up a new stick
 
