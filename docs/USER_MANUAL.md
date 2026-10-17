@@ -297,7 +297,7 @@ pool's pump on or off and is there for emergency purposes.
 
 The swim's training video plays together with a plot of your swim:
 
-<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
+<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the zone highlight as a light band across the shoulders, and the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
 
 - **Pace** over time (shown first), or **MPH** over distance: switch with
   the **MPH** button. 
@@ -313,7 +313,7 @@ The swim's training video plays together with a plot of your swim:
 | **▶ Play / Pause** | Plays or pauses. The video starts playing by itself and stops at the end |
 | Mouse wheel over the plot | Zooms time or distance in and out |
 | Mouse wheel over **Play** or the speed label | Plays faster or slower |
-| **Compress Gaps** | Shortens the breaks between swims to a few swconds, so the plot shows mostly swimming. The gaps are quite large between days (if multiple days were selected) and those are compressed as well. |
+| **Compress Gaps** | Shortens the breaks between swims to a few seconds, so the plot shows mostly swimming. The gaps are quite large between days (if multiple days were selected) and those are compressed as well. |
 | Left click on the plot and drag | Moves the cursor and swim video through time or distance |
 | Right click on the plot and drag | Moves the entire plot and cursor left or right |
 | Click on the video | Turns the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) on or off (swims recorded since it was added) |
