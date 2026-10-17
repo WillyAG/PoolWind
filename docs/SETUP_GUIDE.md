@@ -269,13 +269,13 @@ limit.
 
 **Ejecting the stick at close (`'ejectStickOnClose'`).** `True` (shipped):
 when PoolWind closes, it writes everything to the swimmer's USB stick and
-ejects it, then says the stick can be removed (or, if something else was
-using the stick, that it couldn't be ejected). This suits a pool shared
-by several swimmers, each taking their stick away. `False`: PoolWind
-writes everything to the stick but leaves it in, with no message. This
-suits a single swimmer who keeps their stick in the Pi all the time. A
-`False` stick must still be ejected with the eject icon (⏏) in the top bar
-before it's removed. Set it in the defaults file for everyone, or on a
+unmounts it, so it's safe to remove. There's no message, except when
+something else was using the stick and it couldn't be ejected. The stick
+isn't powered off, so if it stays in, the next start mounts it again: no
+need to unplug it to come straight back in. `False`: PoolWind writes
+everything to the stick but leaves it mounted, so its files still show in
+the File Manager (handy for a developer). A `False` stick must still be
+ejected with the eject icon (⏏) in the top bar before it's removed. Set it in the defaults file for everyone, or on a
 swimmer's stick for that swimmer. New sticks get the defaults file's
 value.
 

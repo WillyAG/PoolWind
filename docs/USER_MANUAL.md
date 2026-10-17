@@ -198,14 +198,16 @@ Press **X** at the top right of the screen to close PoolWind. It then:
 1. winds the jet down to its lowest setting,
 2. releases its control of the pool's remote,
 3. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
-4. **ejects your USB stick** and tells you so (unless your stick's
+4. **ejects your USB stick**, so it's safe to remove (unless your stick's
    `'ejectStickOnClose'` setting is `False`: see below).
 
-When the message says **"USB stick ejected"**, you can remove your stick.
-The next swimmer can insert theirs before starting PoolWind.
+There's no message: once PoolWind has closed, you can remove your stick,
+and the next swimmer can insert theirs before starting PoolWind. Or leave
+it in: if you start PoolWind again, it finds your stick and your settings
+without unplugging it.
 
-If the message says **"USB stick not ejected"**, your swim is still saved,
-but don't pull the stick yet. Something else is using it (for example a
+Only if PoolWind can't eject the stick does a message say **"USB stick not
+ejected"**. Your swim is still saved, but don't pull the stick yet. Something else is using it (for example a
 file manager window showing it). Close that, then eject the stick yourself:
 click the **eject icon (⏏)** in the top bar of the screen and choose your
 stick. Remove it when its icon disappears from the desktop.
@@ -305,6 +307,9 @@ The swim's training video plays together with a plot of your swim:
 - A **cursor** on the plot follows the video, frame by frame. Move the
   cursor and the video jumps to that moment.
 - A **swim date** is shown centered and under the top header that represents the date of the plot where the cursor is positioned. If multiple days were selected, that date will change as the cursor moves through the plot.
+- The **zoneHighlight** is turned on, shown by the lighter band
+- The **plot window** can be moved out of the way by click and drag on the top header.
+- Note the **Avg** (average Pace of swim to the moment). **Pace** (the current pace at the moment), **Dist** (total distance to the moment) are part of the video, which also show when played on a seperate video player.
 
 **Controls:**
 
@@ -340,8 +345,8 @@ The same user settings live in two places:
   stick is in. A setting missing from the stick comes from the main
   settings file.
 - To edit either file, find it with the File Manager and double-click it.
-  If PoolWind has closed and ejected your stick, pull it out and plug it
-  back in first. Keep the quote marks, commas and brackets exactly as they
+  After PoolWind has closed, your stick is ejected and doesn't show in the
+  File Manager: pull it out and plug it back in first. Keep the quote marks, commas and brackets exactly as they
   are. Changes take effect within about a second, even while PoolWind is
   running (except `recordTrainingVideo` and `logRate`, which take effect at
   the next start).
@@ -353,7 +358,7 @@ The same user settings live in two places:
 | `'swimmersHeight'` | `66` | Your height in inches. Helps PoolWind judge your position |
 | `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
-| `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes. `False` leaves it in, with no message: for a swimmer who keeps their stick in the Pi all the time. Eject it with the eject icon (⏏) before removing it |
+| `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes, so it's safe to remove (it can also stay in for the next start). `False` leaves it open, so its files still show in the File Manager after PoolWind closes. Eject it with the eject icon (⏏) before removing it |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
 
 ### logRate: how often PoolWind records
