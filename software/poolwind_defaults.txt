@@ -19,4 +19,6 @@
 
 ,'logRate': 5
 
+,'ejectStickOnClose': True
+
 }

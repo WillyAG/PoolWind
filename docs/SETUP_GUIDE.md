@@ -267,6 +267,18 @@ example) or on a swimmer's stick for that swimmer.
 Higher rates also use more of the Pi's time (about 10 % at 15), so 15 is the
 limit.
 
+**Ejecting the stick at close (`'ejectStickOnClose'`).** `True` (shipped):
+when PoolWind closes, it writes everything to the swimmer's USB stick and
+ejects it, then says the stick can be removed (or, if something else was
+using the stick, that it couldn't be ejected). This suits a pool shared
+by several swimmers, each taking their stick away. `False`: PoolWind
+writes everything to the stick but leaves it in, with no message. This
+suits a single swimmer who keeps their stick in the Pi all the time. A
+`False` stick must still be ejected with the eject icon (⏏) in the top bar
+before it's removed. Set it in the defaults file for everyone, or on a
+swimmer's stick for that swimmer. New sticks get the defaults file's
+value.
+
 The files are written like this:
 
 ```
@@ -309,7 +321,6 @@ PoolWind to be closed and started again.
 | `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
 | `'developerMode'` | `False` | Developer tools: see [Testing at a desk](#8-testing-at-a-desk). Also shows the position bar and the `dIdx`, `V` (jet voltage) and `CoM` readouts on the pool screen, shows the position bar on the Swim Plot video while the zone highlight is on, and allows raw video. Users leave it off: the position bar also moves with swim angle and depth, not just the stroke, which would confuse a swimmer |
 | `'readouts'` | `True` | Developer: with `developerMode` on, `False` hides the `dIdx`, `V` and `CoM` numbers on the pool screen (for example for a screenshot) |
-| `'ejectStickOnClose'` | `True` | Ejects the swimmer's USB stick when PoolWind closes (see the [user manual](USER_MANUAL.md#5-finishing-a-swim)). Developer: `False` keeps the stick in while you work with its files; the closing message then says to eject it with the eject icon (⏏) before removing it |
 | `'comBar'` | `True` | Developer: with `developerMode` on, `False` hides the position bar (pool screen and Swim Plot) but keeps the readouts. The zone highlight is the steadier reference |
 | `'algorithm (basic or swimmerPace)'` | `'swimmerPace'` | Developer: the control method. `'swimmerPace'` is the method the manuals describe; leave it. `'basic'` is a simple baseline for building new control methods on. Main defaults file only: a USB stick's line is ignored |
 | `'paceTrace'` | `False` | Developer: writes a detailed `pace_trace_*.csv` file of the pace estimate, about 15 MB an hour |

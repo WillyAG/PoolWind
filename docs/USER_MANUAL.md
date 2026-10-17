@@ -196,7 +196,8 @@ Press **X** at the top right of the screen to close PoolWind. It then:
 1. winds the jet down to its lowest setting,
 2. releases its control of the pool's remote,
 3. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
-4. **ejects your USB stick** and tells you so.
+4. **ejects your USB stick** and tells you so (unless your stick's
+   `'ejectStickOnClose'` setting is `False`: see below).
 
 When the message says **"USB stick ejected"**, you can remove your stick.
 The next swimmer can insert theirs before starting PoolWind.
@@ -348,6 +349,7 @@ The same user settings live in two places:
 | `'swimmersHeight'` | `66` | Your height in inches. Helps PoolWind judge your position |
 | `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
+| `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes. `False` leaves it in, with no message: for a swimmer who keeps their stick in the Pi all the time. Eject it with the eject icon (⏏) before removing it |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
 
 ### logRate: how often PoolWind records
