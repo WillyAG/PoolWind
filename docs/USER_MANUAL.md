@@ -120,9 +120,9 @@ again to turn it off. It is turned off when PoolWind starts.
 - It stays put while the jet holds a speed, so it's a **stationary
   reference**: you can see a stronger or easier stroke carry you forward or
   let you drift back against it.
-- It moves only after the water has caught up with a change the swimmer makes, but
-  a few seconds later. That's the same delay that a sprint you might make runs you
-  into the wall: you can watch it happen.
+- It moves a few seconds after you do, once the water has caught up. That
+  same delay is why a sprint can run you into the wall: you can watch it
+  happen.
 - Don't blame the program for the slow movement of the band, it only reflects built in pool delays of setting the jet speed (moving the valve) and moving the mass of the water. Nothing can speed that up.
 
 The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
