@@ -124,11 +124,12 @@ again to turn it off. It is turned off when PoolWind starts.
 - It moves only after the water has caught up with a change in jet speed,
   a few seconds later. That's the same delay that makes a sprint run you
   into the wall: you can watch it happen.
+- Don't blame the program for the slow movement of the band, it only reflects built in pool delays of setting the jet speed (moving the valve) and moving the mass of the water. Nothing can speed that up.
 
 The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
 
 ### swimArea definition
-**swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left)  **Set Swim Area...** (see the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
+**swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left)  **Set Swim Area...** (see [The swim area](SETUP_GUIDE.md#51-the-swim-area) in the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
 
 ### swimZone definition
 **swimZone** is a subset of the swimArea and is a lateral zone down the middle of the pool that has a width of 35% (as shipped) of the swimArea. It's a "zone" because PoolWind only responds to swims occurring in the swimZone.
