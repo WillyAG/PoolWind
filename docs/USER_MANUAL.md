@@ -50,6 +50,8 @@ swimmer's stick (see [Setting up a new stick](#setting-up-a-new-stick)).
 The screen shows the camera's view of the pool swimming area from above, with your
 numbers on top in large letters you can read from anywhere in the pool.
 
+<img src="images/PoolWind_Pool_screen.png" width="300" alt="The pool screen during a swim: the swimmer seen from above, the Pace 2:12 in large letters, 2:34 avg and 0.067 mi below it, the Suspend button, and the Hold, View, UP, DN and OnOff buttons along the bottom">
+
 **Your numbers:**
 
 | On screen | Meaning |
