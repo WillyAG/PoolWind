@@ -308,6 +308,7 @@ PoolWind to be closed and started again.
 | `'zoneHighlight'` | `False` | Whether the zone highlight is on when PoolWind starts. A tap on the picture turns it on or off either way |
 | `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
 | `'developerMode'` | `False` | Developer tools: see [Testing at a desk](#8-testing-at-a-desk). Also shows the position bar and the `dIdx`, `V` (jet voltage) and `CoM` readouts on the pool screen, shows the position bar on the Swim Plot video while the zone highlight is on, and allows raw video. Users leave it off: the position bar also moves with swim angle and depth, not just the stroke, which would confuse a swimmer |
+| `'readouts'` | `True` | Developer: with `developerMode` on, `False` hides the `dIdx`, `V` and `CoM` numbers on the pool screen (for example for a screenshot) |
 | `'ejectStickOnClose'` | `True` | Ejects the swimmer's USB stick when PoolWind closes (see the [user manual](USER_MANUAL.md#5-finishing-a-swim)). Developer: `False` keeps the stick in while you work with its files; the closing message then says to eject it with the eject icon (⏏) before removing it |
 | `'comBar'` | `True` | Developer: with `developerMode` on, `False` hides the position bar (pool screen and Swim Plot) but keeps the readouts. The zone highlight is the steadier reference |
 | `'paceTrace'` | `False` | Developer: writes a detailed `pace_trace_*.csv` file of the pace estimate, about 15 MB an hour |
