@@ -1,6 +1,35 @@
 
 if True:  # keep this here as an  easy way to skip over all this
-    # poolwindAI_v15.1   --
+    # poolwindAI_v15.2   --
+    #
+    # poolwindAI_v15.1   -- SAFETY, LOGGING AND SWIM PLOT fixes:
+    #                       - UP/DN CAN'T STAY PRESSED off the main screen
+    #                         (Bill, 2026-10-15: a relay left on while a plot
+    #                         was open ran the jet to high). Swim Plot and Set
+    #                         Swim Area wind down, then release UP/DN and
+    #                         disconnect their pins (On/Off stays connected,
+    #                         Hold off); coming back reconnects, winds down
+    #                         again and starts from slow. A relay watchdog
+    #                         releases UP/DN if the main loop stops for 1 s;
+    #                         a wind-down gives up after 60 s; outputs are
+    #                         claimed already off.
+    #                       - ON/OFF on the calendar and plot screens. The
+    #                         calendar won't open a day without swims ("Pick
+    #                         a green date"); a plot without data has a "Back
+    #                         to the calendar" button (no Esc needed).
+    #                       - SWIM LOG on a steady schedule: 'logRate' rows and
+    #                         video frames per second (built in 5, 1-15), set
+    #                         in the defaults file or on a swimmer's stick;
+    #                         the video keeps real time.
+    #                       - SWIM PLOT: playback follows the recorded clock;
+    #                         a gap needs a pause of at least 1 s; smoothing
+    #                         is ~6 s at any rate.
+    #                       - 'paceTrace' (built in off): the pace_trace debug
+    #                         file only when switched on.
+    #                       - A new USB stick mounts under the user's own
+    #                         /media folder and IDs.
+    #                       Pool-tested 2026-10-16: "the fixes worked."
+    #                       Archived 2026-10-16; the next version is v15.2.
     #
     # poolwindAI_v7.44   -- SETTINGS REORGANIZED for other users:
     #                       - BUILT_IN_DEFAULTS (just above class App): the
@@ -623,6 +652,12 @@ BUILT_IN_DEFAULTS = {
 
     # --- swimmer (fallbacks if the defaults file leaves them out) ---
     'paceMin, Max': ('5:00', '1:30'),    # pace limits (slowest, fastest), min/100 yd
+
+    # --- control algorithm: developer choice (Bill, 2026-10-17) ---
+    # 'swimmerPace' (the manuals are written around it), or 'basic' (the
+    # simple baseline new algorithms are built on). Set in the main
+    # defaults file only, on its own: not on a USB stick, and not tied to
+    # developerMode.
     'algorithm (basic or swimmerPace)': 'swimmerPace',
 
     # --- swimmer detection ---
@@ -643,8 +678,20 @@ BUILT_IN_DEFAULTS = {
     # 5 is smooth enough for pace; 15 gives smooth stroke video at three
     # times the storage. Limited to LOG_RATE_RANGE.
     'logRate': 5,
+    # Eject the USB stick when PoolWind closes (a user setting, also on a
+    # stick: a swimmer who keeps their stick in all the time sets False).
+    'ejectStickOnClose': True,
     'paceTrace': False,                  # developer: pace_trace_*.csv debug file, ~15 MB/hour (live)
+    'comBar': True,                      # developer: the CoM bar, pool screen and replay (live)
+    'readouts': True,                    # developer: the dIdx / V / CoM numbers on the pool screen (live)
     'Runtime: hotReloadParameters': True,  # pick up defaults-file and USB-stick edits while running
+
+    # --- swim zone highlight ---
+    # The zone of the pool that matches the jet's current speed is lit up
+    # faintly, on the pool screen and on Swim Plot replay. A tap on the
+    # picture switches it on or off (both screens).
+    'zoneHighlight': False,              # True = shown when the program starts
+    'zoneHighlightLevel': 0.20,          # how bright: 0.05 barely seen, 0.3 strong
 }
 
 
@@ -719,9 +766,11 @@ class App:
         self._ind_check_t = 0.0
         self.usb_data_dir = None
         ind_defaults, usb_root = self._find_individual_defaults()
+        self._stick_root = None      # the swimmer's stick, ejected at close
         if ind_defaults is not None:
             self._apply_individual_defaults(ind_defaults)
             self.usb_data_dir = usb_root
+            self._stick_root = usb_root
             self._check_usb_free_space()
         else:
             # No configured swimmer stick found -- if a blank/unrecognized
@@ -1043,6 +1092,7 @@ class App:
         self.raw_voltage = 0.0      # unsmoothed 5-read average (pace trace)
 
     def UpdateLoop(self):
+        self._last_update_loop_t = time.time()      # relay watchdog heartbeat
         # ------------------------------------------------------------
         #  Measure valve voltage (real or simulated)
         # ------------------------------------------------------------
@@ -1065,6 +1115,9 @@ class App:
             self.plateau_voltages
         )
 
+        # The jet's zone, for the swim zone highlight (display and log only)
+        self.jetZone, self.jetZones = self.controller.jet_zone(valveVoltage)
+
         # ------------------------------------------------------------
         # Selected algorithm (defaults file) -> desired index + swim_pace
         # ------------------------------------------------------------
@@ -1076,7 +1129,9 @@ class App:
         # (A short-press drive was tried in v7.42 and removed: the radio
         # remote loses ~30-50% of single presses and occasionally sends the
         # previous command -- pace notes section 15.)
-        if getattr(self, "_pump_pulsing", False):
+        if getattr(self, "_winding_down", False):
+            pass    # a wind-down is holding DN (initial_voltage_winddown): hands off
+        elif getattr(self, "_pump_pulsing", False):
             # OnOff sequence in progress: hands off UP/DN (see OnOff_btn_press)
             if self.currentDirection != "LEVEL":
                 self.relay_off()
@@ -1229,8 +1284,13 @@ class App:
                 com_h = int(self.window.CoM_h or 0)
                 com_w = self.window.com_w_tick()
                 com_w = -1 if com_w is None else int(com_w)
+                # columns 8-9 (since v15.2): the jet's zone (-1 = none) and
+                # the number of zones, for the swim zone highlight on replay
+                zone = getattr(self, "jetZone", None)
+                zone = -1 if zone is None else int(zone)
+                zones = int(getattr(self, "jetZones", 0) or 0)
                 f.write(f"{timestamp:.2f},{pace:.2f},{self.total_distance:.3f},{segment_id},{frameNum},"
-                        f"{com_h},{com_w}\n")
+                        f"{com_h},{com_w},{zone},{zones}\n")
         except OSError as e:
             # Last-resort net: the mid-session free-space reserve in
             # _perspect_video_writer should make this unreachable, but
@@ -1302,11 +1362,15 @@ class App:
                 return
 
             if clicked is eject_btn:
-                QMessageBox.information(
-                    None, "Replace USB Drive",
-                    "Please eject the drive, insert a different one, and "
-                    "restart Poolwind."
-                )
+                if self._eject_stick(self.usb_data_dir):
+                    text = ("The USB stick has been ejected. Remove it, insert "
+                            "a different one, and start PoolWind again.")
+                else:
+                    text = ("The USB stick couldn't be ejected: something else "
+                            "is using it. Close anything showing the stick, "
+                            "eject it with the eject icon (\u23cf) in the top "
+                            "bar, insert a different one, and start PoolWind again.")
+                QMessageBox.information(None, "Replace USB Drive", text)
                 sys.exit()
 
             # Erase Oldest Video -- plan which files this would delete
@@ -1549,8 +1613,9 @@ class App:
                 self.KEY_HEIGHT: height,
                 self.KEY_PACE: (Utils.DecimalToTime(max_pace), Utils.DecimalToTime(min_pace)),
                 self.KEY_RECORD: self.REPdefaults[self.KEY_RECORD],
-                self.KEY_ALGO: self.REPdefaults[self.KEY_ALGO],
+                # (no algorithm line: a developer choice since 2026-10-17)
                 self.KEY_LOGRATE: self.REPdefaults[self.KEY_LOGRATE],
+                self.KEY_EJECT: bool(self.REPdefaults.get(self.KEY_EJECT, True)),
             }
             ind_path = os.path.join(new_mount_path, "poolwind_ind_defaults.txt")
             with open(ind_path, "w") as f:
@@ -1565,6 +1630,7 @@ class App:
 
             self._apply_individual_defaults(ind_defaults)
             self.usb_data_dir = new_mount_path
+            self._stick_root = new_mount_path
             self.data_dir = os.path.join(new_mount_path, "CSV Vault")
             os.makedirs(self.data_dir, exist_ok=True)
 
@@ -1602,8 +1668,10 @@ class App:
     KEY_RECORD      = "recordTrainingVideo"
     KEY_ALGO        = "algorithm (basic or swimmerPace)"
     KEY_LOGRATE     = "logRate"         # built in: 5
+    KEY_EJECT       = "ejectStickOnClose"   # built in: True
     LOG_RATE_RANGE  = (1, 15)           # rows (and video frames) per second
-    STICK_KEYS      = (KEY_HEIGHT, KEY_PACE, KEY_RECORD, KEY_ALGO, KEY_LOGRATE)
+    STICK_KEYS      = (KEY_HEIGHT, KEY_PACE, KEY_RECORD, KEY_LOGRATE,
+                       KEY_EJECT)       # (algorithm: main file only, 2026-10-17)
     OLD_SETTING_NAMES = {
         "defaultPaceMin, Max":              KEY_PACE,
         "PaceLimitsDec":                    KEY_PACE,      # decimal minutes, e.g. (5, 1.5)
@@ -1672,9 +1740,11 @@ class App:
         if self.KEY_RECORD in ind:
             self.REPdefaults[self.KEY_RECORD] = bool(ind[self.KEY_RECORD])
         if self.KEY_ALGO in ind:
-            self.REPdefaults[self.KEY_ALGO] = ind[self.KEY_ALGO]
+            print("algorithm on the USB stick is ignored (a developer setting: main defaults file only)")
         if self.KEY_LOGRATE in ind:              # used at program start
             self.REPdefaults[self.KEY_LOGRATE] = ind[self.KEY_LOGRATE]
+        if self.KEY_EJECT in ind:                # used at close
+            self.REPdefaults[self.KEY_EJECT] = bool(ind[self.KEY_EJECT])
         self._ind_defaults = dict(ind_defaults)
 
     # ---------------------------------------------------------------
@@ -1965,6 +2035,16 @@ class App:
         - noiseAllowed% of plateau width
         - sliding miniPlateau
         - overLap% intrusion threshold
+
+        NOTE (2026-10-16): despite the "Schmitt trigger" comment below, this
+        has no memory of the step it chose last time, so it is not
+        hysteresis: it is nearest-step with the edges between steps moved a
+        little where the steps are unevenly spaced (with the valve's 0.15 it
+        differs from plain nearest-step at 11 of 6576 test voltages across
+        the calibration table). It is steady in practice because the jet
+        parks on its steps and the voltage is EMA-smoothed. It drives the
+        relays (_hold_drive), so it is left as it is; the swim zone
+        highlight has real hysteresis of its own (SwimController.jet_zone).
         """
 
         lastIndex = len(plateau) - 1
@@ -2133,6 +2213,28 @@ class App:
     PUMP_PULSE_MS      = 2000   # OnOff held this long
     PUMP_POST_DELAY_MS = 500    # after releasing OnOff, before UP/DN may resume
 
+    # Pump buttons off the main screen ask first (Bill, 2026-10-17: "they
+    # are too easy to press ... a message pop up like: 'Are you sure? This
+    # will toggle the pump on or off - OK, Cancel'"). The pool screen's
+    # OnOff stays one touch, for emergencies. All pump buttons are tinted
+    # a light red (PUMP_BTN_*).
+    PUMP_BTN_BGR = (185, 185, 225)                  # pool screen (OpenCV, BGR)
+    # Qt buttons, same tint. The border is needed: the Pi desktop's button
+    # style ignores a background colour on its own (seen 2026-10-17).
+    PUMP_BTN_STYLE = ("QPushButton { background-color: #e1b9b9; border: 1px solid #9c7c7c;"
+                      " border-radius: 3px; padding: 5px; }"
+                      " QPushButton:pressed { background-color: #c99d9d; }")
+
+    def OnOff_confirm(self, parent=None):
+        box = QMessageBox(parent)
+        box.setIcon(QMessageBox.Question)
+        box.setWindowTitle("Pump On/Off")
+        box.setText("Are you sure? This will turn the pool's pump on or off.")
+        box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        box.setDefaultButton(QMessageBox.Cancel)
+        if box.exec_() == QMessageBox.Ok:
+            self.OnOff_btn_press()
+
     def OnOff_btn_press(self):
         # Momentary pulse on Qt timers (mouse-release is not wired to any
         # button action, so we can't rely on btn_release() here). Takes
@@ -2271,12 +2373,90 @@ class App:
         else:
             print("[Pace sanity check] no pace samples logged this session.")
 
+        # ------------------------------------------------------------
+        # 7c. The swimmer's USB stick: eject it the OS way, so nothing
+        #     is left waiting to be written (Linux can hold writes for
+        #     up to 30 s) and it can be pulled at once. Bill, 2026-10-17:
+        #     "eject every time with the developer setting", and a
+        #     closing message for each case.
+        # ------------------------------------------------------------
+        self._close_stick()
+
         print("Shutdown complete.")
 
         # ------------------------------------------------------------
         # 8. EXIT PROGRAM IMMEDIATELY
         # ------------------------------------------------------------
         sys.exit(0)
+
+    # ------------------------------------------------------------------
+    # USB stick eject (since v15.2)
+    # ------------------------------------------------------------------
+    def _eject_stick(self, root):
+        """
+        Eject the stick mounted at `root` the way the desktop's eject icon
+        does (gio -> udisks: write everything, unmount, power off). A stick
+        PoolWind mounted itself (new-stick setup, sudo mount) is unmounted
+        with sudo umount (allowed by the install's sudoers rule) instead.
+        Returns True when it is no longer mounted.
+        """
+        if not root:
+            return False
+        try:
+            os.sync()                  # whatever happens next, the data is written
+        except Exception:
+            pass
+        if not os.path.ismount(root):
+            return True
+        try:
+            subprocess.run(["gio", "mount", "-e", root],
+                           capture_output=True, text=True, timeout=30)
+        except Exception as e:
+            print("Eject (gio) failed:", e)
+        if os.path.ismount(root):
+            try:
+                subprocess.run(["sudo", "-n", "umount", root],
+                               capture_output=True, text=True, timeout=30)
+            except Exception as e:
+                print("Eject (umount) failed:", e)
+        ejected = not os.path.ismount(root)
+        print(f"USB stick {root}: {'ejected' if ejected else 'NOT ejected (in use?)'}")
+        return ejected
+
+    def _close_stick(self):
+        """At close: eject the swimmer's stick and say so, or say why it
+        couldn't be ejected. No message without a stick, or when
+        'ejectStickOnClose' is False (Bill, 2026-10-17): then everything is
+        just written to the stick, and it stays in."""
+        root = getattr(self, "_stick_root", None)
+        if not root or not os.path.isdir(root):
+            return                     # no stick in: nothing to say
+        name = os.path.basename(os.path.normpath(root))
+        if not self.REPdefaults.get(self.KEY_EJECT, True):
+            try:
+                os.sync()              # the swim is on the stick, not just in memory
+            except Exception:
+                pass
+            print(f"USB stick '{name}' left in ('ejectStickOnClose' is False); everything written")
+            return
+        if self._eject_stick(root):
+            title = "USB stick ejected"
+            text = (f"Your swim is saved on '{name}', and the stick has been "
+                    "ejected.\n\nYou can remove it now. The next swimmer can "
+                    "insert their own stick before starting PoolWind.")
+        else:
+            title = "USB stick not ejected"
+            text = (f"Your swim is saved on '{name}', but the stick couldn't be "
+                    "ejected: something else is using it (for example a file "
+                    "manager window or an editor).\n\nClose anything showing "
+                    "the stick, then eject it with the eject icon (\u23cf) in "
+                    "the top bar before removing it.")
+        print(title + ": " + text.replace("\n\n", " "))
+        try:
+            if QApplication.instance() is not None:
+                QMessageBox.information(None, title, text)
+        except Exception as e:
+            print("Couldn't show the USB stick message:", e)
 
     def launch_background_compressor(self, rawfile, outfile):
         script_path = "/tmp/poolwind_compress.sh"
@@ -2383,9 +2563,10 @@ class App:
         self.PaceLimitsDec = self.REPdefaults["PaceLimitsDec"]
         print("USB stick settings reloaded.")
 
-    def initial_voltage_winddown(self):
+    def initial_voltage_winddown(self, title="Starting Up"):
         """
-        Before the UI appears, force the valve DOWN until voltage < minV.
+        Force the valve DOWN until voltage < minV: before the UI appears,
+        at shutdown, and when leaving or returning to the main screen.
         Shows a small modal window with live voltage updates.
         """
         if self.valveOption != "real":
@@ -2393,7 +2574,7 @@ class App:
 
         # --- Create modal popup ---
         msg = QtWidgets.QMessageBox()
-        msg.setWindowTitle("Starting Up")
+        msg.setWindowTitle(title)
         msg.setIcon(QtWidgets.QMessageBox.Information)
         msg.setStandardButtons(QtWidgets.QMessageBox.NoButton)
         msg.setWindowModality(QtCore.Qt.ApplicationModal)
@@ -2416,6 +2597,11 @@ class App:
 
 
         # --- Loop until voltage drops below minV ---
+        # Time limit: if the voltage never gets there (Pace cable unplugged,
+        # a pool that ignores DN while the pump is off, ...), stop pressing
+        # DN instead of waiting forever.
+        self._winding_down = True
+        give_up_at = time.time() + self.WINDDOWN_TIMEOUT_S
         while True:
             QtWidgets.QApplication.processEvents()   # keep UI alive
             self.DN_relay()
@@ -2426,12 +2612,80 @@ class App:
             msg.setInformativeText(f"Voltage: {volts:.3f} V")
             if volts <= minV:
                 break
+            if time.time() > give_up_at:
+                print(f"Wind-down stopped after {self.WINDDOWN_TIMEOUT_S:.0f} s: the voltage "
+                      f"stayed at {volts:.3f} V, above {minV:.3f} V")
+                break
 
             time.sleep(0.05)  # gentle polling
 
         # --- Stop relay ---
         self.relay_off()
+        self._winding_down = False
         msg.close()
+
+    WINDDOWN_TIMEOUT_S = 60.0     # longest a wind-down may hold DN
+
+    # ------------------------------------------------------------------
+    # Leaving the main screen (Swim Plot, Set Swim Area): the main loop
+    # pauses there, and it is the only code that releases UP/DN. So wind
+    # the jet down first, then disconnect the UP and DN relays until the
+    # main screen is back. On/Off stays connected. (Bill, 2026-10-16: a
+    # relay left on while a plot was open ran the jet up to high.)
+    # ------------------------------------------------------------------
+    # Swim zone highlight on/off, shared by the pool screen and Swim Plot
+    # replay; starts as 'zoneHighlight' says.
+    def zone_highlight_on(self):
+        if not hasattr(self, "_zone_highlight"):
+            self._zone_highlight = bool(self.REPdefaults.get("zoneHighlight", True))
+        return self._zone_highlight
+
+    def toggle_zone_highlight(self):
+        self._zone_highlight = not self.zone_highlight_on()
+
+    def leave_main_screen(self):
+        self.hold_mode = False                  # no held speed to come back to
+        self.initial_voltage_winddown("Leaving the pool screen")
+        self.relay_off()
+        self.GPIO.release(self.PIN_UP)
+        self.GPIO.release(self.PIN_DN)
+
+    def return_to_main_screen(self):
+        self.GPIO.reclaim(self.PIN_UP)
+        self.GPIO.reclaim(self.PIN_DN)
+        self.relay_off()
+        self.initial_voltage_winddown("Back to the pool screen")
+        # Start the jet target from slow, as at startup: the swimmer has to
+        # be found again before the jet speeds up, and nothing from before
+        # the menu (position, grace window) carries over.
+        w = self.window
+        w.EMA_CoM_h = 10.0
+        w.CoM_h = 10
+        w.windDownStartTime = 0.0
+        w._out_of_view_since_found = True
+        self._last_update_loop_t = time.time()
+
+    # ------------------------------------------------------------------
+    # Relay watchdog: a timer of its own, outside the main loop. If the
+    # main loop hasn't run for RELAY_WATCHDOG_S (a stall, a slow camera,
+    # a dialog), let go of UP/DN, so a held button can never run the jet
+    # away. The loop presses them again when it runs.
+    # ------------------------------------------------------------------
+    RELAY_WATCHDOG_S = 1.0
+
+    def start_relay_watchdog(self):
+        self._last_update_loop_t = time.time()
+        self._relay_watchdog = QTimer()
+        self._relay_watchdog.timeout.connect(self._relay_watchdog_check)
+        self._relay_watchdog.start(250)
+
+    def _relay_watchdog_check(self):
+        if getattr(self, "_winding_down", False) or self.currentDirection == "LEVEL":
+            return
+        stalled = time.time() - getattr(self, "_last_update_loop_t", 0.0)
+        if stalled > self.RELAY_WATCHDOG_S:
+            print(f"Relay watchdog: main loop stalled {stalled:.1f} s, UP/DN released")
+            self.relay_off()
 
     def detect_current_mode(self):
         try:
@@ -2486,10 +2740,13 @@ class App:
         frame_raw   = []
         comh_raw    = []
         comw_raw    = []
+        zone_raw    = []    # columns 8-9 (since v15.2): jet zone, number of zones
+        zones_raw   = []
 
         if not os.path.isfile(csv_path):
             if with_com:
-                return time_raw, pace_raw, dist_raw, segment_raw, frame_raw, comh_raw, comw_raw
+                return (time_raw, pace_raw, dist_raw, segment_raw, frame_raw,
+                        comh_raw, comw_raw, zone_raw, zones_raw)
             return time_raw, pace_raw, dist_raw, segment_raw, frame_raw
 
         with open(csv_path, "r") as f:
@@ -2516,6 +2773,11 @@ class App:
                     cw = float(parts[6]) if len(parts) >= 7 else float("nan")
                 except ValueError:
                     ch = cw = float("nan")
+                try:
+                    zn = float(parts[7]) if len(parts) >= 9 else float("nan")
+                    zs = float(parts[8]) if len(parts) >= 9 else float("nan")
+                except ValueError:
+                    zn = zs = float("nan")
 
                 time_raw.append(t)
                 pace_raw.append(p)
@@ -2524,9 +2786,12 @@ class App:
                 frame_raw.append(frm)
                 comh_raw.append(ch)
                 comw_raw.append(cw)
+                zone_raw.append(zn)
+                zones_raw.append(zs)
 
         if with_com:
-            return time_raw, pace_raw, dist_raw, segment_raw, frame_raw, comh_raw, comw_raw
+            return (time_raw, pace_raw, dist_raw, segment_raw, frame_raw,
+                    comh_raw, comw_raw, zone_raw, zones_raw)
         return time_raw, pace_raw, dist_raw, segment_raw, frame_raw
 
     def load_today_csv(self):
@@ -2556,7 +2821,7 @@ class App:
         long blocking call with no feedback.
         """
         time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw = [], [], [], [], [], []
-        comh_raw, comw_raw = [], []
+        comh_raw, comw_raw, zone_raw, zones_raw = [], [], [], []
 
         # cumulative_distance_miles in each day's CSV restarts at 0 for
         # that day (App.total_distance resets on every new run/session).
@@ -2570,7 +2835,7 @@ class App:
         while d <= to_date:
             day_num += 1
             csv_path = os.path.join(self.data_dir, f"{d.isoformat()}.csv")
-            t, p, dist, seg, frm, ch, cw = self._parse_csv_file(csv_path, with_com=True)
+            t, p, dist, seg, frm, ch, cw, zn, zs = self._parse_csv_file(csv_path, with_com=True)
             if dist:
                 days_own_total = dist[-1]   # this day's final distance, before offsetting
                 dist = [x + dist_offset for x in dist]
@@ -2583,21 +2848,24 @@ class App:
             frame_raw.extend(frm)
             comh_raw.extend(ch)
             comw_raw.extend(cw)
+            zone_raw.extend(zn)
+            zones_raw.extend(zs)
             if progress_cb is not None:
                 progress_cb(day_num, total_days, d)
             d += timedelta(days=1)
 
         zipped = sorted(zip(time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw,
-                            comh_raw, comw_raw),
+                            comh_raw, comw_raw, zone_raw, zones_raw),
                         key=lambda x: x[0])
         if zipped:
             (time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw,
-             comh_raw, comw_raw) = map(list, zip(*zipped))
+             comh_raw, comw_raw, zone_raw, zones_raw) = map(list, zip(*zipped))
         else:
             time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw = [], [], [], [], [], []
-            comh_raw, comw_raw = [], []
+            comh_raw, comw_raw, zone_raw, zones_raw = [], [], [], []
 
-        return time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw, comh_raw, comw_raw
+        return (time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw,
+                comh_raw, comw_raw, zone_raw, zones_raw)
 
 class QtMainWindow(QMainWindow):  # Version 4.0 original
     def __init__(self, app):
@@ -3306,22 +3574,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
     def BodyCoMCorrection(self, CoM):
         height, poolLength = self.app.REPdefaults["swimmersHeight,poolLength"]
-
-        # Full body length
-        L = height * 1.29
-
-        # Anatomy proportions -- from Bill's own measured reach (2026-08-27):
-        # 35" back-center to fingertips, 56" back-center to toes, 91"
-        # combined. Restored after the previous 0.6/1.0 fractions (which
-        # don't even sum to 1.0) were found to push back_corr past 500,
-        # breaking the front/back branch selection below for realistic
-        # anatomy.
-        front_len = L * (35 / 91)   # back-center → fingertips
-        back_len  = L * (56 / 91)   # back-center → toes
-
-        # Convert lengths to virtual units
-        front_corr = (front_len / poolLength) * 1000
-        back_corr  = (back_len  / poolLength) * 1000
+        back_corr, front_corr = body_corr_spans(height, poolLength)
 
         # Piecewise-linear stretch (2026-08-27): the raw (measured) CoM
         # range the body-center can physically occupy while both toes
@@ -3415,6 +3668,9 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
                 return
         # End button handling
 
+        # 3) Anywhere else on the picture: swim zone highlight on/off
+        self.app.toggle_zone_highlight()
+
     def eventFilter(self, obj, event):
         p = obj
         while p is not None:
@@ -3475,38 +3731,49 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         h, w = frame.shape[:2]   # should be 640×480
 
         # ---------------------------------------------------------
+        # 0. Swim zone highlight (tap the picture to switch it)
+        # ---------------------------------------------------------
+        if self.app.zone_highlight_on():
+            draw_zone_band_on(frame, getattr(self.app, "jetZone", None),
+                              getattr(self.app, "jetZones", 0),
+                              float(self.app.REPdefaults.get("zoneHighlightLevel", 0.10)))
+
+        # ---------------------------------------------------------
         # 1. + 2. Development readouts: the CoM bar and the dIdx / V / CoM
         #         numbers. Hidden unless 'developerMode' is True.
         # ---------------------------------------------------------
         if self.app.REPdefaults["developerMode"]:
-            # CoM line (CoM is 0–1000 normalized)
-            self.draw_com_bar(frame)
+            # CoM line (CoM is 0–1000 normalized); 'comBar' False hides it
+            if self.app.REPdefaults.get("comBar", True):
+                self.draw_com_bar(frame)
 
-            # Numeric fields (positions in 480×640 working space)
-            cv2.putText(frame,
-                        f"dIdx: {self.app.desiredIndex}",
-                        (75, 217),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1,
-                        (255, 255, 0),
-                        2)
+            # Numeric fields (positions in 480×640 working space); 'readouts'
+            # False hides them (e.g. a screenshot for the user manual)
+            if self.app.REPdefaults.get("readouts", True):
+                cv2.putText(frame,
+                            f"dIdx: {self.app.desiredIndex}",
+                            (75, 217),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (255, 255, 0),
+                            2)
 
-            cv2.putText(frame,
-                        f"V: {self.app.currentVoltage:.3f}",
-                        (250, 217),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1,
-                        (255, 255, 0),
-                        2)
+                cv2.putText(frame,
+                            f"V: {self.app.currentVoltage:.3f}",
+                            (250, 217),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (255, 255, 0),
+                            2)
 
-            cv2.putText(frame,
-                        f"CoM: {self.CoM_h}",
-                        (165, 340),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1,
-                        (255, 255, 0),
-                        2,
-                        cv2.LINE_AA)
+                cv2.putText(frame,
+                            f"CoM: {self.CoM_h}",
+                            (165, 340),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (255, 255, 0),
+                            2,
+                            cv2.LINE_AA)
 
         # ---------------------------------------------------------
         # 3. Pace, Avg Pace, Distance
@@ -3601,6 +3868,10 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             elif name == "Resume":
                 fill_color = (0, 0, 200)      # RED
                 label = "Resume"
+
+            elif name == "OnOff":
+                fill_color = self.app.PUMP_BTN_BGR   # light red: the pump
+                label = name
 
             else:
                 fill_color = (200, 200, 200)
@@ -3733,15 +4004,18 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
     def openPlacePoints(self):
         self.app.pause_update_loop = True
+        self.app.leave_main_screen()
         self._enter_submenu()
         dlg = PlacePointsWindow(self.app, self)
         dlg.exec_()
         self._exit_submenu()
+        self.app.return_to_main_screen()
         self.app.pause_update_loop = False
         QTimer.singleShot(0, self.qt_update_loop)   # <-- restart
 
     def openSwimPlot(self):
         self.app.pause_update_loop = True
+        self.app.leave_main_screen()
         self._enter_submenu()
 
         # qt_update_loop only stops RESCHEDULING itself once pause_update_loop
@@ -3783,6 +4057,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             dlg.exec_()
 
         self._exit_submenu()
+        self.app.return_to_main_screen()
         self.app.pause_update_loop = False
         QTimer.singleShot(0, self.qt_update_loop)   # <-- restart
 
@@ -4238,6 +4513,48 @@ class DisplayCanvas(QWidget):
             painter = QPainter(self)
             painter.drawPixmap(0, 0, self._pixmap)
 
+def body_corr_spans(height, poolLength):
+    """
+    BodyCoMCorrection's reach, in CoM units (0-1000 = the pool's length):
+    (back_corr, front_corr) = back-center to toes, back-center to
+    fingertips, for a swimmer `height` inches tall.
+
+    Anatomy proportions -- from Bill's own measured reach (2026-08-27):
+    35" back-center to fingertips, 56" back-center to toes, 91" combined.
+    Restored after the previous 0.6/1.0 fractions (which don't even sum to
+    1.0) were found to push back_corr past 500, breaking the front/back
+    branch selection in BodyCoMCorrection for realistic anatomy.
+    """
+    L = height * 1.29                 # full body length
+    front_len = L * (35 / 91)         # back-center -> fingertips
+    back_len  = L * (56 / 91)         # back-center -> toes
+    return (back_len / poolLength) * 1000, (front_len / poolLength) * 1000
+
+
+def draw_zone_band_on(frame, zone, zones, level):
+    """
+    Lights up swim zone `zone` of `zones` across the whole frame: the
+    picture is divided into `zones` equal bands, slowest (0) at the very
+    bottom (back of the pool), fastest at the very top. `level` = how much
+    white is blended in (0.10 is faint).
+
+    (First drawn where the swimmer's body center has to be for the zone,
+    which left the bottom and top of the picture unused; Bill, 2026-10-17:
+    "when the Suspend button is pressed and the voltage goes low, the zone
+    highlight shows about a third of the way up. It should be at the very
+    bottom.")
+    """
+    if zone is None or not zones or zone < 0 or zone >= zones or level <= 0:
+        return
+    h, w = frame.shape[:2]
+    y_top = int(round((zones - zone - 1) * h / zones))
+    y_bot = int(round((zones - zone) * h / zones))
+    if y_bot <= y_top:
+        return
+    band = frame[y_top:y_bot]
+    cv2.addWeighted(band, 1.0 - level, np.full_like(band, 255), level, 0, dst=band)
+
+
 def draw_com_bar_on(frame, com_h, com_w, zone_width, size_h=1000.0, size_w=700.0):
     """
     Draws the CoM bar onto `frame`, scaled to the frame's size: a horizontal
@@ -4322,12 +4639,14 @@ class SwimController:
         (relays, logging, display) is shared infrastructure; only what
         happens in here differs between algorithms.
         """
-        name = self.app.REPdefaults.get(self.ALGO_KEY, "basic")
+        # A developer choice since 2026-10-17, from the main defaults file
+        # only (a stick's line is ignored), whatever developerMode is.
+        name = self.app.REPdefaults.get(self.ALGO_KEY, "swimmerPace")
         if name not in self.ALGORITHMS:
             if getattr(self, "_bad_algo_name", None) != name:
-                print(f"Unknown algorithm {name!r} in defaults -- using 'basic'")
+                print(f"Unknown algorithm {name!r} in defaults -- using 'swimmerPace'")
                 self._bad_algo_name = name
-            name = "basic"
+            name = "swimmerPace"
 
         if name != getattr(self, "_active_algo", None):
             # Switched (or first run): restart any algorithm state so the
@@ -4417,6 +4736,82 @@ class SwimController:
         n = len(steps)
         k = int(max(0.0, min(1000.0, CoM)) / 1000.0 * n)
         return steps[min(n - 1, k)]
+
+    # How far past the halfway point between two steps the voltage must go
+    # before the highlight moves to the next zone, as a fraction of the gap:
+    # 0.25 = three quarters of the way to the next step (the 75% the
+    # "Schmitt trigger" in findClosestPlateauIndex was meant to have).
+    JET_ZONE_HYSTERESIS = 0.25
+
+    def jet_zone(self, volts):
+        """
+        The zone (0 = slowest, at the back) whose jet step the pool is on
+        now, from the smoothed Pace Display voltage, for the swim zone
+        highlight. Returns (zone, number of zones), or (None, n) when the
+        jet is outside the zones (below the slow limit after a wind-down,
+        above the fast limit).
+
+        Real hysteresis (Bill, 2026-10-16: "valveIndex is fine as the basis
+        for highlighting. It shows what the pool is doing in relationship
+        to what the swimmer is doing."): it remembers the zone it showed
+        and moves to a neighbour only when the voltage is past the halfway
+        point plus JET_ZONE_HYSTERESIS of the gap, so it can't flicker on
+        an edge. Zones come from _zone_steps, which already treats
+        near-duplicate steps (1.185 / 1.186 V) as one.
+        """
+        # Smoothed first with the WATER LAG, WATER_TAU seconds (the same lag
+        # the Swimmer Pace estimator gives the water after a jet step), so
+        # the band moves when the water has caught up, not when the voltage
+        # steps. Time-based, so the loop speed doesn't change it; WATER_TAU
+        # is read every pass (hot reload). Display only: the relay drive
+        # doesn't see it. (Bill, 2026-10-17: first 'Zone_HL_alpha' per
+        # loop pass "to keep it from jumping around so much", then: "The
+        # EMF delay could actually represent the lag in moving the mass of
+        # water after a voltage change." -> "use WATER_TAU for the zone
+        # highlight smoothing.")
+        now = time.time()
+        try:
+            tau = max(0.05, float(self.app.REPdefaults.get("WATER_TAU", 5.0)))
+        except (TypeError, ValueError):
+            tau = 5.0
+        # In Hold the band follows the jet directly (Bill, 2026-10-17: with
+        # the smoothing, UP/DN in Hold made the highlight "slow or jumpy");
+        # leaving Hold, the smoothing carries on from where the jet is.
+        prev = getattr(self, "_zhl_volts", None)
+        last_t = getattr(self, "_zhl_t", None)
+        if prev is not None and last_t is not None and not self.app.hold_mode:
+            dt = max(0.0, now - last_t)
+            volts = prev + (1.0 - math.exp(-dt / tau)) * (volts - prev)
+        self._zhl_volts = volts
+        self._zhl_t = now
+
+        steps = self._zone_steps()
+        V = [self.app.plateau_voltages[i] for i in steps]
+        n = len(V)
+        if n == 0:
+            return None, 0
+        if getattr(self, "_jet_zone_key", None) != self._zone_steps_key:
+            self._jet_zone = None             # zones changed (e.g. a stick's limits)
+            self._jet_zone_key = self._zone_steps_key
+
+        # Outside the zones by more than half a step: no highlight
+        gap_lo = (V[1] - V[0]) if n > 1 else 0.05
+        gap_hi = (V[-1] - V[-2]) if n > 1 else 0.05
+        if volts < V[0] - gap_lo / 2 or volts > V[-1] + gap_hi / 2:
+            self._jet_zone = None
+            return None, n
+
+        z = self._jet_zone
+        if z is None or z >= n:
+            z = min(range(n), key=lambda i: abs(volts - V[i]))
+        else:
+            h = self.JET_ZONE_HYSTERESIS
+            while z < n - 1 and volts > (V[z] + V[z + 1]) / 2 + h * (V[z + 1] - V[z]):
+                z += 1
+            while z > 0 and volts < (V[z] + V[z - 1]) / 2 - h * (V[z] - V[z - 1]):
+                z -= 1
+        self._jet_zone = z
+        return z, n
 
     def _swimmerPaceAlgo(self, CoM, timestamp, pool_pace):
         """
@@ -4540,6 +4935,7 @@ class GPIOWrapper:
         # Open the RP1 GPIO chip
         self.chip = lgpio.gpiochip_open(0)
         self.claimed_pins = set()
+        self.released_pins = set()   # disconnected while off the main screen
 
     def setwarnings(self, value):
         pass  # no warnings in lgpio
@@ -4553,12 +4949,31 @@ class GPIOWrapper:
             return
 
         if direction == self.OUT:
-            lgpio.gpio_claim_output(self.chip, pin)
+            # Level 1 = relay OFF (the relay board is active low), so the
+            # relay doesn't flick on for an instant while being claimed.
+            lgpio.gpio_claim_output(self.chip, pin, 1)
             self.claimed_pins.add(pin)
+            self.released_pins.discard(pin)
+
+    def release(self, pin):
+        """Disconnect an output: the pin becomes an input, so the relay
+        board gets no signal at all (its relay can't switch on), and
+        output() ignores the pin until reclaim()."""
+        if pin is None or pin in self.released_pins:
+            return
+        lgpio.gpio_write(self.chip, pin, 1)          # relay OFF first
+        lgpio.gpio_claim_input(self.chip, pin)
+        self.released_pins.add(pin)
+
+    def reclaim(self, pin):
+        """Make a released pin an output again, starting OFF."""
+        if pin is None or pin not in self.released_pins:
+            return
+        self.setup(pin, self.OUT)
 
     def output(self, pin, value):
-        # Ignore pin if simulate mode assigned pin=None
-        if pin is None:
+        # Ignore pin if simulate mode assigned pin=None, or while released
+        if pin is None or pin in self.released_pins:
             return
 
         # App logic: True = ON, False = OFF
@@ -5317,6 +5732,7 @@ class SwimDateRangeDialog(QDialog):
         # Mark dates that actually have swim data instead of the default
         # (fairly useless) Saturday/Sunday red styling.
         data_dates = self._find_data_dates()
+        self._data_dates = set(data_dates)
 
         # Avg-pace cache + loaded-months set are shared (same dict/set
         # object) between both calendars, so browsing to a given month in
@@ -5365,15 +5781,29 @@ class SwimDateRangeDialog(QDialog):
         # worth hardcoding.
         layout.addStretch(1)
 
+        # Shown when OK is pressed on a range without any swims (Bill,
+        # 2026-10-16: the plot screen then said "No data ... Press Esc",
+        # and without a keyboard there was no way out).
+        self.no_data_lbl = QLabel("")
+        self.no_data_lbl.setAlignment(Qt.AlignCenter)
+        self.no_data_lbl.setStyleSheet("color: #b00; font-weight: bold;")
+        layout.addWidget(self.no_data_lbl)
+
         btn_layout = QHBoxLayout()
         self.ok_btn = QPushButton("OK")
         self.ok_btn.setDefault(True)      # Enter key triggers this
         self.ok_btn.setAutoDefault(True)
         self.close_btn = QPushButton("Close")   # consistent with SwimPlotWindow's Close
-        self.ok_btn.clicked.connect(self.accept)
+        # The pool's On/Off, also off the main screen (Bill, 2026-10-16)
+        self.pump_btn = QPushButton("Pump On/Off")
+        self.pump_btn.setAutoDefault(False)
+        self.pump_btn.setStyleSheet(self.app.PUMP_BTN_STYLE)
+        self.ok_btn.clicked.connect(self._ok_if_data)
         self.close_btn.clicked.connect(self.reject)
+        self.pump_btn.clicked.connect(lambda: self.app.OnOff_confirm(self))
         btn_layout.addWidget(self.ok_btn)
         btn_layout.addWidget(self.close_btn)
+        btn_layout.addWidget(self.pump_btn)
         layout.addLayout(btn_layout)
 
         self.setLayout(layout)
@@ -5383,6 +5813,16 @@ class SwimDateRangeDialog(QDialog):
         # QCalendarWidget's internal QTableView (undocumented but stable
         # across Qt5) — if it ever fails, we just skip the cursor move.
         QTimer.singleShot(0, lambda: self._position_cursor_on_today(self.from_cal))
+
+    def _ok_if_data(self):
+        """OK: open the plot only if a day in the range has swim data
+        (green dates); otherwise say so and stay on the calendar."""
+        from_date, to_date = self.get_range()
+        if any(from_date <= d <= to_date for d in self._data_dates):
+            self.no_data_lbl.setText("")
+            self.accept()
+        else:
+            self.no_data_lbl.setText("No swims on the chosen date(s). Pick a green date.")
 
     def _position_cursor_on_today(self, calendar):
         try:
@@ -5534,11 +5974,12 @@ class SwimPlotWindow(QDialog):
                 return
             progress_state["last_update"] = now
             self.loading_label.setText(
-                f"Please wait, loading data...\n({day_num}/{total_days}: {d.isoformat()})"
+                f"Please wait, loading data...\n({day_num}/{total_days}: {d.strftime('%m-%d-%Y')})"
             )
             QApplication.processEvents()
 
-        time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw, comh_raw, comw_raw = \
+        (time_raw, pace_raw, dist_raw, segment_raw, frame_raw, date_raw,
+         comh_raw, comw_raw, zone_raw, zones_raw) = \
             self.app.load_csv_range(self.from_date, self.to_date, progress_cb=_progress)
 
         if time_raw is None or len(time_raw) == 0:
@@ -5578,8 +6019,9 @@ class SwimPlotWindow(QDialog):
 
         # First row goes into both arrays
         last_ch, last_cw = comh_raw[0], comw_raw[0]
-        short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw])
-        full_rows.append([last_t,      last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw])
+        last_zn, last_zs = zone_raw[0], zones_raw[0]
+        short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw, last_zn, last_zs])
+        full_rows.append([last_t,      last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw, last_zn, last_zs])
 
         # Track last normal delta for synthetic time
         last_delta_real = dt
@@ -5598,6 +6040,17 @@ class SwimPlotWindow(QDialog):
         def gap_detector(last_real_t, new_real_t, dt):
             delta = new_real_t - last_real_t
             return delta >= max(dt * 1.5, MIN_GAP_SEC)
+
+        # A CLUSTER of pauses with only moments of swimming between them
+        # (getting out, putting the cover back: the camera loses and finds
+        # the swimmer again and again) is ONE pause when compressed: a
+        # pause starting less than CLUSTER_SEC after the previous one ended
+        # gets no compressed filler of its own. Bill, 2026-10-17: on 10/16
+        # "there is a gap that will not compress" -- ten pauses in 51 s at
+        # 18:55 got ten fillers, ~25 s wide on the plot. Day boundaries
+        # always keep theirs.
+        CLUSTER_SEC = 2.0
+        prev_gap_end_t = None
 
         # ------------------------------------------------------------
         # MAIN LOOP
@@ -5621,6 +6074,10 @@ class SwimPlotWindow(QDialog):
                 real_gap = new_real_t - last_real_t
                 max_fill = int(real_gap // dt)
                 short_fill = min(int(4.0 // dt), max_fill)
+                if (prev_gap_end_t is not None and new_date == last_date
+                        and last_real_t - prev_gap_end_t < CLUSTER_SEC):
+                    short_fill = 0          # same cluster: one filler already shown
+                prev_gap_end_t = new_real_t
 
                 # ====================================================
                 # FULL-GAP FILL (REAL TIME)
@@ -5649,13 +6106,13 @@ class SwimPlotWindow(QDialog):
                 t_full = last_t
                 for _ in range(full_fill_count):
                     t_full += full_fill_step
-                    full_rows.append([t_full, 7.0, last_d, last_seg, last_frame, last_date, float("nan"), float("nan")])
+                    full_rows.append([t_full, 7.0, last_d, last_seg, last_frame, last_date] + [float("nan")] * 4)
 
                 # ====================================================
                 # SHORT-GAP FILL (SYNTHETIC TIME — FROZEN)
                 # ====================================================
                 for _ in range(short_fill):
-                    short_rows.append([last_syn_t, 7.0, last_d, last_seg, last_frame, last_date, float("nan"), float("nan")])
+                    short_rows.append([last_syn_t, 7.0, last_d, last_seg, last_frame, last_date] + [float("nan")] * 4)
 
                 # ====================================================
                 # ADVANCE TIMELINES AFTER GAP
@@ -5696,8 +6153,10 @@ class SwimPlotWindow(QDialog):
             last_frame = new_frame
             last_date  = new_date
 
-            full_rows.append([last_t,     last_p, last_d, last_seg, last_frame, last_date, comh_raw[i], comw_raw[i]])
-            short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date, comh_raw[i], comw_raw[i]])
+            full_rows.append([last_t,     last_p, last_d, last_seg, last_frame, last_date,
+                              comh_raw[i], comw_raw[i], zone_raw[i], zones_raw[i]])
+            short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date,
+                               comh_raw[i], comw_raw[i], zone_raw[i], zones_raw[i]])
 
         # ------------------------------------------------------------
         # Insert Idx as column 0
@@ -5742,6 +6201,8 @@ class SwimPlotWindow(QDialog):
         self.X_date  = array_in[:, 6]   # date.toordinal(), for per-day AVI lookup
         self.X_comh  = array_in[:, 7]   # CoM_h when logged (NaN: older CSV / gap)
         self.X_comw  = array_in[:, 8]   # swimmer tick CoM_w (-1: none, NaN: unknown)
+        self.X_zone  = array_in[:, 9]   # jet zone (-1: none, NaN: before v15.2 / gap)
+        self.X_zones = array_in[:, 10]  # number of zones then
 
         # ------------------------------------------------------------
         # SMOOTH X_pace FOR DISPLAY (does not affect runtime data)
@@ -5787,7 +6248,10 @@ class SwimPlotWindow(QDialog):
         if not self.build_arrays():
             # No data for the selected date(s) — nothing to show.
             if getattr(self, "loading_label", None) is not None:
-                self.loading_label.setText("No data for the selected date(s). Press Esc")
+                self.loading_label.setText("No data for the selected date(s).")
+            back_btn = QPushButton("Back to the calendar")
+            back_btn.clicked.connect(self.reject)
+            self.layout.addWidget(back_btn, alignment=Qt.AlignCenter)
             return
 
         self._prepare_display_arrays()
@@ -6028,7 +6492,7 @@ class SwimPlotWindow(QDialog):
         # currently active/playing; updated in _update_crosshair as
         # the crosshair moves across a multi-day range.
         def _day_title(ni):
-            return date.fromordinal(int(self.X_date[ni])).isoformat()
+            return date.fromordinal(int(self.X_date[ni])).strftime("%m-%d-%Y")
 
         ax_pace.set_title(_day_title(start_idx), fontsize=8)
         ax_mph.set_title(_day_title(start_idx), fontsize=8)
@@ -6080,6 +6544,7 @@ class SwimPlotWindow(QDialog):
             update_mini_label(_ps['idx'])
         overlay.toggle_btn.clicked.connect(on_toggle)
         overlay.plot_btn.clicked.connect(self.on_close)
+        overlay.pump_btn.clicked.connect(lambda: self.app.OnOff_confirm(self))
 
         # Compress Gaps toggle — rebuilds the whole overlay against the
         # other array (short_gap_array vs full_gap_array), preserving the
@@ -6123,13 +6588,20 @@ class SwimPlotWindow(QDialog):
                 _show_replay_frame()
 
         def _show_replay_frame():
-            # Plain recorded frame, plus the CoM bar if switched on (left-
-            # click the video) and this row has a logged CoM.
+            # Plain recorded frame, plus (switched by a tap on the video,
+            # the same switch as on the pool screen) the swim zone
+            # highlight where this row has a logged zone (since v15.2), and
+            # for developers the CoM bar where it has a logged CoM.
             if self._replay_frame is None:
                 return
             frame = self._replay_frame.copy()
             ni = self._replay_ni
-            if (self._replay_bar_on and self.app.REPdefaults["developerMode"]
+            on = self.app.zone_highlight_on()
+            if on and ni is not None and not np.isnan(self.X_zone[ni]) and self.X_zone[ni] >= 0:
+                draw_zone_band_on(frame, int(self.X_zone[ni]), int(self.X_zones[ni]),
+                                  float(self.app.REPdefaults.get("zoneHighlightLevel", 0.10)))
+            if (on and self.app.REPdefaults["developerMode"]
+                    and self.app.REPdefaults.get("comBar", True)
                     and ni is not None and not np.isnan(self.X_comh[ni])):
                 cw = self.X_comw[ni]
                 draw_com_bar_on(frame, float(self.X_comh[ni]),
@@ -6141,18 +6613,15 @@ class SwimPlotWindow(QDialog):
             self.app.window.display_canvas.setFrame(QPixmap.fromImage(qimg))
 
         def _toggle_replay_bar():
-            # Developer tool only: the bar also moves with swim angle and
-            # depth, not just the stroke -- confusing for a swimmer
-            if not self.app.REPdefaults["developerMode"]:
-                return
-            self._replay_bar_on = not self._replay_bar_on
+            # Swim zone highlight (everyone) and, for developers, the CoM
+            # bar (it also moves with swim angle and depth, not just the
+            # stroke -- confusing for a swimmer)
+            self.app.toggle_zone_highlight()
             _show_replay_frame()
 
-        # CoM bar on replay (developerMode only): off by default, left-click
-        # the video to toggle (kept through Compress/Expand Gaps rebuilds,
-        # like the Pace/MPH view). The filter stays installed either way: it
-        # also keeps clicks on the replay from reaching the pool screen.
-        self._replay_bar_on = getattr(self, "_replay_bar_on", False)
+        # A left-click on the video switches the swim zone highlight (and the
+        # developer CoM bar). The filter also keeps clicks on the replay
+        # from reaching the pool screen.
         self._replay_frame = None
         self._replay_ni = None
         self._bar_filter = _LeftClickFilter(
@@ -6512,6 +6981,15 @@ class DraggableOverlay(QFrame):
 
         handle_layout.addStretch()
 
+        # The pool's On/Off, also off the main screen (Bill, 2026-10-16)
+        self.pump_btn = QPushButton("On/Off", self.handle)
+        self.pump_btn.setFixedSize(50, 20)
+        self.pump_btn.setStyleSheet(
+            "QPushButton { font-size: 11px; padding: 0px; background-color: #e1b9b9;"
+            " border: 1px solid #9c7c7c; border-radius: 3px; }"
+            " QPushButton:pressed { background-color: #c99d9d; }")
+        handle_layout.addWidget(self.pump_btn)
+
         self.plot_btn = QPushButton("Close", self.handle)   # closes SwimPlotWindow, back to the calendar
         self.plot_btn.setFixedSize(50, 20)
         self.plot_btn.setStyleSheet("font-size: 11px; padding: 0px;")
@@ -6574,6 +7052,7 @@ if __name__ == "__main__":
     window = QtMainWindow(app)
     app.window = window       # allow App.shutdown() to close the window
     window.show()
+    app.start_relay_watchdog()
 
     # 5. Ensure shutdown runs when Qt exits normally
     qt_app.aboutToQuit.connect(app.shutdown)
