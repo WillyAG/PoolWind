@@ -303,14 +303,24 @@ PoolWind to be closed and started again.
 | `'Sensitivity'` | `5000` | Minimum size, in pixels, of something the camera counts as a swimmer |
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
-| `'DRIFT_SCALE'`, `'WATER_TAU'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.5`, `5.0`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
-| `'developerMode'` | `False` | Developer tools: see [Testing at a desk](#8-testing-at-a-desk). Also shows the position bar and the `dIdx`, `V` (jet voltage) and `CoM` readouts on the pool screen, lets a click on the Swim Plot video show the position bar there, and allows raw video. Users leave it off: the position bar also moves with swim angle and depth, not just the stroke, which would confuse a swimmer |
+| `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.5`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
+| `'WATER_TAU'` | `5.0` | Seconds the water takes to catch up after the jet changes speed. Used **twice**: by the Swimmer Pace estimate, and as the delay of the [zone highlight](USER_MANUAL.md#seeing-your-zone-the-zone-highlight) (with 5, the band moves about 7 seconds after a jet step). Changing it changes both |
+| `'zoneHighlight'` | `False` | Whether the zone highlight is on when PoolWind starts. A tap on the picture turns it on or off either way |
+| `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
+| `'developerMode'` | `False` | Developer tools: see [Testing at a desk](#8-testing-at-a-desk). Also shows the position bar and the `dIdx`, `V` (jet voltage) and `CoM` readouts on the pool screen, shows the position bar on the Swim Plot video while the zone highlight is on, and allows raw video. Users leave it off: the position bar also moves with swim angle and depth, not just the stroke, which would confuse a swimmer |
+| `'comBar'` | `True` | Developer: with `developerMode` on, `False` hides the position bar (pool screen and Swim Plot) but keeps the readouts. The zone highlight is the steadier reference |
 | `'paceTrace'` | `False` | Developer: writes a detailed `pace_trace_*.csv` file of the pace estimate, about 15 MB an hour |
 | `'Runtime: hotReloadParameters'` | `True` | Picks up settings changes while running |
 
 The swimmer settings also have built-in fallbacks, used only if the
 defaults file leaves them out: `'paceMin, Max': ('5:00', '1:30')`,
 `'algorithm (basic or swimmerPace)': 'swimmerPace'` and `'logRate': 5`.
+
+**The swim log** (`CSV Vault/<date>.csv`, one line per record, no header):
+time, pace, distance, video segment, frame, position (`CoM_h`), swimmer
+tick (`CoM_w`, `-1` = none), and since the zone highlight, the jet's zone
+(`-1` = none) and the number of zones. Older files without the last two
+columns replay without the highlight.
 
 ## 8. Testing at a desk
 
