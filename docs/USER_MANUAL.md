@@ -325,13 +325,23 @@ In between macro and micro views, the plots can tell you if those movements comb
 
 ## 8. Your settings
 
-Settings live in two places, with the **same names** in both:
+The same user settings live in two places:
 
-- **The main settings file** (`poolwind_defaults.txt`, next to the
-  program): the starting settings for everyone.
-- **Your USB stick** (`poolwind_ind_defaults.txt`): your personal
-  settings. Anything on your stick replaces the main file's value while
-  your stick is in.
+- **The main settings file** (`/home/<username>/PoolWind/poolwind_defaults.txt`,
+  where `<username>` is the one you chose in Raspberry Pi Imager): the
+  starting settings for everyone, based on an average adult swimmer.
+- **Your USB stick** (`/media/<username>/<stick name>/poolwind_ind_defaults.txt`):
+  your personal settings. They replace the main settings file's while the
+  stick is in. A setting missing from the stick comes from the main
+  settings file.
+- To edit either file, find it with the File Manager and double-click it.
+  If PoolWind has closed and ejected your stick, pull it out and plug it
+  back in first. Keep the quote marks, commas and brackets exactly as they
+  are. Changes take effect within about a second, even while PoolWind is
+  running (except `recordTrainingVideo` and `logRate`, which take effect at
+  the next start).
+
+### User settings
 
 | Setting | Example | Meaning |
 |---|---|---|
@@ -339,32 +349,6 @@ Settings live in two places, with the **same names** in both:
 | `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
-
-Two more settings work **only in the main settings file** (not on a stick):
-
-| Setting | Example | Meaning |
-|---|---|---|
-| `'zoneHighlight'` | `False` | Whether the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) is on when PoolWind starts (`True` or `False`). A tap on the picture still turns it on or off |
-| `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
-
-You can edit either file with a text editor. Keep the quote marks, commas
-and brackets exactly as they are. Changes take effect within about a
-second, even while PoolWind is running (except `recordTrainingVideo` and
-`logRate`, which take effect at the next start).
-
-### Finding your stick's settings file
-
-Your stick's settings file is called `poolwind_ind_defaults.txt` and sits
-at the top of the stick, next to the `CSV Vault` folder. To open it:
-
-1. Double-click your stick's icon on the desktop. It has the swimmer's name
-   you gave it when the stick was set up (for example `BILL_G`). If
-   PoolWind has closed and ejected the stick, pull it out and plug it back
-   in first.
-2. Double-click `poolwind_ind_defaults.txt`. It opens in a text editor.
-3. Make your change, save, and close the editor.
-4. If PoolWind isn't running, eject the stick with the eject icon (⏏) in
-   the top bar before removing it.
 
 ### logRate: how often PoolWind records
 
@@ -384,18 +368,12 @@ frames. Go back to `5` for everyday swims, so your stick doesn't fill three
 times as fast. Lower than 5 saves more space but makes the video jumpy.
 
 **How to change it.** Add or change this line in your stick's
-`poolwind_ind_defaults.txt` (see
-[Finding your stick's settings file](#finding-your-sticks-settings-file)):
+`poolwind_ind_defaults.txt` 
 
 ```
 ,'logRate': 15
 ```
 
-On your stick, it applies only to you. In the main settings file, it
-applies to everyone whose stick doesn't set its own. **It takes effect the
-next time PoolWind starts.** Swim Plot plays days recorded at different
-rates together correctly, so you can switch as often as you like.
-
-Other settings (the pool's calibration, safety limits and advanced tuning)
+**Other settings** (the pool's calibration, safety limits and advanced tuning)
 are covered in the setup and calibration guide. They're for technicians
 and builders, not for day-to-day swimming.
