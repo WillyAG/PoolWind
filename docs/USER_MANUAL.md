@@ -350,6 +350,20 @@ and brackets exactly as they are. Changes take effect within about a
 second, even while PoolWind is running (except `recordTrainingVideo` and
 `logRate`, which take effect at the next start).
 
+### Finding your stick's settings file
+
+Your stick's settings file is called `poolwind_ind_defaults.txt` and sits
+at the top of the stick, next to the `CSV Vault` folder. To open it:
+
+1. Double-click your stick's icon on the desktop. It has the swimmer's name
+   you gave it when the stick was set up (for example `BILL_G`). If
+   PoolWind has closed and ejected the stick, pull it out and plug it back
+   in first.
+2. Double-click `poolwind_ind_defaults.txt`. It opens in a text editor.
+3. Make your change, save, and close the editor.
+4. If PoolWind isn't running, eject the stick with the eject icon (⏏) in
+   the top bar before removing it.
+
 ### logRate: how often PoolWind records
 
 While you swim, PoolWind takes **snapshots**: each one is a line in your swim
@@ -368,7 +382,8 @@ frames. Go back to `5` for everyday swims, so your stick doesn't fill three
 times as fast. Lower than 5 saves more space but makes the video jumpy.
 
 **How to change it.** Add or change this line in your stick's
-`poolwind_ind_defaults.txt`:
+`poolwind_ind_defaults.txt` (see
+[Finding your stick's settings file](#finding-your-sticks-settings-file)):
 
 ```
 ,'logRate': 15
