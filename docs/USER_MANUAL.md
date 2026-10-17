@@ -84,6 +84,10 @@ camera view. The other three show what the camera's swimmer detection
 sees, in black and white. They help when checking that PoolWind is
 detecting you properly. Press View until the camera view returns.
 
+**Tap the picture** (anywhere off the buttons) to light up the zone that
+matches the jet's speed; tap again to turn it off. See
+[Seeing your zone](#seeing-your-zone-the-zone-highlight).
+
 ## 4. Swimming with PoolWind
 
 ### How the jet follows you
@@ -103,6 +107,23 @@ You can change strokes, speed up, and slow down to rest without running into
 the front or the back of the pool. But a **sprint** will put you into the wall.
 Delays in jet response and changing the momentum of the large volume of water 
 take a few seconds. Give the system a little time to work.
+
+### Seeing your zone: the zone highlight
+
+**Tap the picture** (anywhere off the buttons) to light up the zone that
+matches the jet's speed right now, as a faint band across the screen. Tap
+again to turn it off. It starts off each time PoolWind starts.
+
+- The band is the **jet's** zone, not yours: slowest at the bottom of the
+  screen (the back of the pool), fastest at the top.
+- It stays put while the jet holds a speed, so it's a **stationary
+  reference**: you can see a stronger or easier stroke carry you forward or
+  let you drift back against it.
+- It moves only after the water has caught up with a change in jet speed,
+  a few seconds later. That's the same delay that makes a sprint run you
+  into the wall: you can watch it happen.
+
+The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
 
 ### swimArea definition
 **swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left)  **Set Swim Area...** (see the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
@@ -222,12 +243,25 @@ For children and weaker swimmers, choose a **slow top Pace**, for example
 
 Open the menu (**≡**, top left) and choose **Swim Plot...**.
 
+While you're away from the pool screen, PoolWind doesn't adjust the jet:
+
+- **"Leaving the pool screen"**: the jet first winds down to its lowest
+  setting, and PoolWind lets go of the pool's UP and DN controls.
+- **OnOff** still works: the calendar and the plot screen each have a button
+  for the pump.
+- **"Back to the pool screen"**: when you return, the jet winds down
+  again and starts from its lowest setting, as at startup.
+
+The same happens with **Set Swim Area...**.
+
 ### Choosing the days
 
 A window with two calendars appears: **From** and **To**. Both start on
-today. Days with swims are marked, and each shows that day's average Pace.
-Pick a single day or a range, then press **OK**. **Close** returns to the
-pool screen.
+today. Days with swims are marked in green, and each shows that day's
+average Pace. Pick a single day or a range, then press **OK**. If none of the
+chosen days has a swim, PoolWind says so and stays on the calendars: pick a
+green date. **Close** returns to the pool screen. **Pump On/Off** turns the
+pool's pump on or off.
 
 ### The plot and video
 
@@ -249,13 +283,15 @@ The swim's training video plays together with a plot of your swim:
 | **Compress Gaps** | Shortens the breaks between swims, so the plot shows mostly swimming |
 | Left click on the plot and drag | Moves the cursor and swim video through time or distance |
 | Right click on the plot and drag | Moves the entire plot and cursor left or right |
+| Click on the video | Turns the [zone highlight](#seeing-your-zone-the-zone-highlight) on or off (swims recorded since it was added) |
+| **On/Off** | Turns the pool's pump on or off |
 | **Close** | Back to the calendars, to pick another day |
 
 ### What to look for
 
 The heart of PoolWind's training value is that you can see how different stroke styles and methods affect your swimming. In a macro view, you can see on the calendar's daily average Pace how you've improved day by day. Of course that depends on what your stroke style is and which ones you used during the day's session.
 
-In the micro view, you can look at the video and see how each stroke and kick builds a momentary acceleration against the pool's stationary backdrop. 
+In the micro view, you can look at the video and see how each stroke and kick builds a momentary acceleration against the pool's stationary backdrop. Turn on the zone highlight for a clearer backdrop: it shows the zone of the jet's speed at that moment, so you can see each stroke carry you forward or let you slip back against it.
 
 In between macro and micro views, the plots can tell you if those movements combine to build up speed but can never resolve down to the level that shows the effects of each single stroke or kick. A trained eye can look at all three views and determine what might improve style.
 
@@ -276,6 +312,13 @@ Settings live in two places, with the **same names** in both:
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
 | `'algorithm (basic or swimmerPace)'` | `'swimmerPace'` | The control method. `'swimmerPace'` is the full method (use this); `'basic'` is a simpler one |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster |
+
+Two more settings work **only in the main settings file** (not on a stick):
+
+| Setting | Example | Meaning |
+|---|---|---|
+| `'zoneHighlight'` | `False` | Whether the [zone highlight](#seeing-your-zone-the-zone-highlight) is on when PoolWind starts (`True` or `False`). A tap on the picture still turns it on or off |
+| `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
 
 You can edit either file with a text editor. Keep the quote marks, commas
 and brackets exactly as they are. Changes take effect within about a
