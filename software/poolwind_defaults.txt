@@ -17,8 +17,6 @@
 
 ,'recordTrainingVideo': True
 
-,'algorithm (basic or swimmerPace)': 'swimmerPace'
-
 ,'logRate': 5
 
 }

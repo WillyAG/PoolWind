@@ -311,12 +311,13 @@ PoolWind to be closed and started again.
 | `'readouts'` | `True` | Developer: with `developerMode` on, `False` hides the `dIdx`, `V` and `CoM` numbers on the pool screen (for example for a screenshot) |
 | `'ejectStickOnClose'` | `True` | Ejects the swimmer's USB stick when PoolWind closes (see the [user manual](USER_MANUAL.md#5-finishing-a-swim)). Developer: `False` keeps the stick in while you work with its files; the closing message then says to eject it with the eject icon (⏏) before removing it |
 | `'comBar'` | `True` | Developer: with `developerMode` on, `False` hides the position bar (pool screen and Swim Plot) but keeps the readouts. The zone highlight is the steadier reference |
+| `'algorithm (basic or swimmerPace)'` | `'swimmerPace'` | Developer: the control method. Only read with `developerMode` on; otherwise PoolWind always uses `'swimmerPace'`, the method the manuals describe. `'basic'` is a simple baseline for building new control methods on |
 | `'paceTrace'` | `False` | Developer: writes a detailed `pace_trace_*.csv` file of the pace estimate, about 15 MB an hour |
 | `'Runtime: hotReloadParameters'` | `True` | Picks up settings changes while running |
 
 The swimmer settings also have built-in fallbacks, used only if the
-defaults file leaves them out: `'paceMin, Max': ('5:00', '1:30')`,
-`'algorithm (basic or swimmerPace)': 'swimmerPace'` and `'logRate': 5`.
+defaults file leaves them out: `'paceMin, Max': ('5:00', '1:30')` and
+`'logRate': 5`.
 
 **The swim log** (`CSV Vault/<date>.csv`, one line per record, no header):
 time, pace, distance, video segment, frame, position (`CoM_h`), swimmer

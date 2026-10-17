@@ -59,7 +59,7 @@ pattern and his speed improved noticeably as a result.
 
 - Automatic detection if swimmer leaves the center swim zone, pausing data collection and lowering the jet flow to its lowest setting
 
-- Per-swimmer USB sticks: personal settings (height, pace limits, video recording switch, preferred algorithm) and swim data. Months of data can be collected depending on the size of the USB stick
+- Per-swimmer USB sticks: personal settings (height, pace limits, video recording switch) and swim data. Months of data can be collected depending on the size of the USB stick
 (Approx 70 hours on a 32 GB stick) 
 
 - Safety voltage limits
@@ -67,8 +67,6 @@ pattern and his speed improved noticeably as a result.
 - Jet flow winds down automatically at startup and shutdown to lowest level
 
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
-
-- Selectable control algorithms (a simple baseline, and the full Swimmer Pace algorithm)
 
 ## Compatibility
 

@@ -218,7 +218,7 @@ Once PoolWind is closed, the pool works normally with its own remote.
 
 Each swimmer has their own USB stick. It holds:
 
-- **your settings**: height, Pace limits, logRate (optional), whether to record training video, and the control method (see [Your settings](#8-your-settings));
+- **your settings**: height, Pace limits, logRate (optional) and whether to record training video (see [Your settings](#8-your-settings));
 - **your swims**: a log of every swim and its training video, in a folder
   called `CSV Vault`.
 
@@ -321,7 +321,7 @@ The heart of PoolWind's training value is that you can see how different stroke 
 
 In the micro view, you can look at the video and see how each stroke and kick builds a momentary acceleration against the pool's stationary backdrop. Turn on the zone highlight for a clearer backdrop: it shows the zone of the jet's speed at that moment, so you can see each stroke carry you forward or let you slip back against it.
 
-In between macro and micro views, the plots can tell you if those movements combine to build up speed but can never resolve down to the level that shows the effects of each single stroke or kick. A trained eye can look at all three views and determine what might improve style.
+In between macro and micro views, the plots can tell you if those movements combine to build up speed. However the plots can never resolve down to the level that shows the effects of each single stroke or kick. A trained eye can look at all three views and determine what might improve style.
 
 ## 8. Your settings
 
@@ -338,7 +338,6 @@ Settings live in two places, with the **same names** in both:
 | `'swimmersHeight'` | `66` | Your height in inches. Helps PoolWind judge your position |
 | `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
-| `'algorithm (basic or swimmerPace)'` | `'swimmerPace'` | The control method. `'swimmerPace'` is the full method (use this); `'basic'` is a simpler one |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
 
 Two more settings work **only in the main settings file** (not on a stick):
