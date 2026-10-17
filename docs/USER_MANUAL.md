@@ -86,7 +86,7 @@ detecting you properly. Press View until the camera view returns.
 
 **Tap the picture** (anywhere off the buttons) to light up the zone that
 matches the jet's speed; tap again to turn it off. See
-[Seeing your zone](#seeing-your-zone-the-zone-highlight).
+[Seeing the jet's zone](#seeing-the-jets-zone-the-zone-highlight).
 
 ## 4. Swimming with PoolWind
 
@@ -108,21 +108,20 @@ the front or the back of the pool. But a **sprint** will put you into the wall.
 Delays in jet response and changing the momentum of the large volume of water 
 take a few seconds. Give the system a little time to work.
 
-### Seeing your zone: the zone highlight
+### Seeing the jet's zone: the zone highlight
 
 **Tap the picture** (anywhere off the buttons) to light up the zone that
 matches the jet's speed right now, as a faint band across the screen. Tap
 again to turn it off. It is turned off when PoolWind starts.
 
-- The band is the **jet's** zone, not yours: slowest at the bottom of the
-  screen (the back of the pool), fastest at the top.
+- The band is the **jet's** zone, not yours: It is not a physical zone but it represents the rate the water is moving.  You can think of the band as the readout of a jet speed meter, slowest at the bottom of the screen (the back of the pool), fastest at the top.
   For how the zones work, see
-  [PoolWind in brief](../README.md#poolwind-in-brief) in the README.
+  [PoolWind in brief](../README.md#poolwind-in-brief) in README.
 - It stays put while the jet holds a speed, so it's a **stationary
   reference**: you can see a stronger or easier stroke carry you forward or
   let you drift back against it.
-- It moves only after the water has caught up with a change in jet speed,
-  a few seconds later. That's the same delay that makes a sprint run you
+- It moves only after the water has caught up with a change the swimmer makes, but
+  a few seconds later. That's the same delay that a sprint you might make runs you
   into the wall: you can watch it happen.
 - Don't blame the program for the slow movement of the band, it only reflects built in pool delays of setting the jet speed (moving the valve) and moving the mass of the water. Nothing can speed that up.
 
@@ -146,7 +145,7 @@ This set can be turned on or off as a whole. When "on", the latest data is displ
 PoolWind turns on dataTracking only if you are in the swimZone but allows you to deviate in and out with no problem.
 
 - if you leave the swimZone and stand next to it, dataTracking is suspended and the jet winds down to its lowest setting after a few (3) seconds
-- if you leave the pool and the camera can't see you, dataTracking is suspended and the jet winds down to its lowest setting immediately
+- if you leave the pool and the camera can't see you, dataTracking stops within a fraction of a second, and the jet starts winding down at once, stepping down to its lowest setting over several seconds (there's no 3-second wait)
 - dataTracking is re-enabled when you re-enter the swimZone
 
 ### Pausing: Suspend and Resume
@@ -235,6 +234,10 @@ Swimmers without a stick all share one log on the Pi, so their swims can't be to
 
 ### How much it holds depends on **logRate**
 
+**logRate** is how many snapshots of your swim PoolWind records each second.
+See [logRate: how often PoolWind records](#lograte-how-often-poolwind-records)
+for what it is, and why and how to change it.
+
 A 32 GB USB stick, at the shipped logRate of 5, holds roughly 70 hours of swim data and video. At logRate of 15, the stick holds about 25 hours. It's a tradeoff of video smoothness vs data size.
 
 If your stick is nearly full when PoolWind starts, it asks what to do:
@@ -305,7 +308,7 @@ The swim's training video plays together with a plot of your swim:
 | **Compress Gaps** | Shortens the breaks between swims, so the plot shows mostly swimming |
 | Left click on the plot and drag | Moves the cursor and swim video through time or distance |
 | Right click on the plot and drag | Moves the entire plot and cursor left or right |
-| Click on the video | Turns the [zone highlight](#seeing-your-zone-the-zone-highlight) on or off (swims recorded since it was added) |
+| Click on the video | Turns the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) on or off (swims recorded since it was added) |
 | **On/Off** | Turns the pool's pump on or off |
 | **Close** | Back to the calendars, to pick another day |
 
@@ -333,19 +336,48 @@ Settings live in two places, with the **same names** in both:
 | `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
 | `'algorithm (basic or swimmerPace)'` | `'swimmerPace'` | The control method. `'swimmerPace'` is the full method (use this); `'basic'` is a simpler one |
-| `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster |
+| `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
 
 Two more settings work **only in the main settings file** (not on a stick):
 
 | Setting | Example | Meaning |
 |---|---|---|
-| `'zoneHighlight'` | `False` | Whether the [zone highlight](#seeing-your-zone-the-zone-highlight) is on when PoolWind starts (`True` or `False`). A tap on the picture still turns it on or off |
+| `'zoneHighlight'` | `False` | Whether the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) is on when PoolWind starts (`True` or `False`). A tap on the picture still turns it on or off |
 | `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
 
 You can edit either file with a text editor. Keep the quote marks, commas
 and brackets exactly as they are. Changes take effect within about a
 second, even while PoolWind is running (except `recordTrainingVideo` and
 `logRate`, which take effect at the next start).
+
+### logRate: how often PoolWind records
+
+While you swim, PoolWind takes **snapshots**: each one is a line in your swim
+log (time, Pace, distance) and one frame of your training video, always
+together, so the plot and the video stay in step in Swim Plot. **logRate**
+is how many snapshots it takes per second, from 1 to 15.
+
+| logRate | Good for | Video | A 32 GB stick holds |
+|---|---|---|---|
+| `5` (shipped) | Everyday swims: following your Pace and stroke rhythm | Steps visibly from frame to frame | About 70 hours |
+| `15` | Studying a single stroke or kick, slowed down in Swim Plot | Smooth, even in slow motion | About 25 hours |
+
+**Why change it.** Raise it to `15` for sessions where you want to study
+your technique closely: each arm pull and kick shows in three times as many
+frames. Go back to `5` for everyday swims, so your stick doesn't fill three
+times as fast. Lower than 5 saves more space but makes the video jumpy.
+
+**How to change it.** Add or change this line in your stick's
+`poolwind_ind_defaults.txt`:
+
+```
+,'logRate': 15
+```
+
+On your stick, it applies only to you. In the main settings file, it
+applies to everyone whose stick doesn't set its own. **It takes effect the
+next time PoolWind starts.** Swim Plot plays days recorded at different
+rates together correctly, so you can switch as often as you like.
 
 Other settings (the pool's calibration, safety limits and advanced tuning)
 are covered in the setup and calibration guide. They're for technicians
