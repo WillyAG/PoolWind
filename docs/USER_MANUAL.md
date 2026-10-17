@@ -297,6 +297,8 @@ pool's pump on or off and is there for emergency purposes.
 
 The swim's training video plays together with a plot of your swim:
 
+<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
+
 - **Pace** over time (shown first), or **MPH** over distance: switch with
   the **MPH** button. 
 - Faster swimming means a lower Pace but the Pace plot is inverted to avoid confusion. Up means faster swimming in both plots.
