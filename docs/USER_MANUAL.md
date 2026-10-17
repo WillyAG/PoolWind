@@ -112,10 +112,12 @@ take a few seconds. Give the system a little time to work.
 
 **Tap the picture** (anywhere off the buttons) to light up the zone that
 matches the jet's speed right now, as a faint band across the screen. Tap
-again to turn it off. It starts off each time PoolWind starts.
+again to turn it off. It is turned off when PoolWind starts.
 
 - The band is the **jet's** zone, not yours: slowest at the bottom of the
   screen (the back of the pool), fastest at the top.
+  For how the zones work, see
+  [PoolWind in brief](../README.md#poolwind-in-brief) in the README.
 - It stays put while the jet holds a speed, so it's a **stationary
   reference**: you can see a stronger or easier stroke carry you forward or
   let you drift back against it.
@@ -159,7 +161,9 @@ As mentioned directly above, leaving the swimZone also suspends dataTracking but
 ### Hold: a steady jet
 
 Press **Hold** to adjust the jet flow to a constant level.
-- by the time you exit the swimZone and get to the button, the jet probably will have wound down to its lowest setting. You push the button now.
+- you had already left the swimZone to reach the monitor and mouse
+- data tracking had stopped
+- the jet probably had or will soon have wound down to its lowest setting
 - the button turns yellow and says **Vary**, an easily seen reminder that the jet is no longer following you
 - immediately the jet will start to increase its flow to where it was when you exited the swimZone
 - press and hold **UP** or **DN** to vary the jet flow as indicated by the Pace display
@@ -169,13 +173,15 @@ When you return back to the swimZone:
 - dataTracking resumes
 
 Press **Vary** to go back to automatic control. 
+- you had already left the swimZone to reach the monitor and mouse
+- data tracking had stopped
 - the jet winds down to its lowest level 
 - PoolWind runs normally
 
 Note that if a coach is pressing the buttons for you and you remain in the swimZone, the jet flow will not wind down and dataTracking remains active. 
 
 Hold is useful for drills or steady-Pace training. Remember that in Hold,
-the jet doesn't slow down if you fall back.
+the jet doesn't slow down if you fall back, get out of the swim zone, or even leave the pool.
 
 ### OnOff: the pump
 
