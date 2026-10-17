@@ -73,7 +73,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **Vary** (yellow) | Shown while Hold is on. Use **UP** and **DN** to vary the held speed, and press **Vary** to go back to automatic control |
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
-| **OnOff** | Turns the pool's pump on or off |
+| **OnOff** (light red) | Turns the pool's pump on or off, at one touch |
 | **≡** (top left) | Menu: **Set Swim Area...** and **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
@@ -272,8 +272,10 @@ While you're away from the pool screen, PoolWind doesn't adjust the jet:
 
 - **"Leaving the pool screen"**: the jet first winds down to its lowest
   setting, and PoolWind lets go of the pool's UP and DN controls.
-- **OnOff** still works: the calendar and the plot screen each have a button
-  for the pump.
+- **OnOff** still works: the calendar and the plot screen each have a
+  light red button for the pump. To prevent an accidental press, it asks
+  "Are you sure?" first: press **OK** to turn the pump on or off, or
+  **Cancel**.
 - **"Back to the pool screen"**: when you return, the jet winds down
   again and starts from its lowest setting, as at startup.
 
@@ -286,17 +288,18 @@ today. Days with swims are marked in green, and each shows that day's
 average Pace. Pick a single day or a range, then press **OK**. If none of the
 chosen days has a swim, PoolWind says so and stays on the calendars: pick a
 green date. **Close** returns to the pool screen. **Pump On/Off** turns the
-pool's pump on or off.
+pool's pump on or off and is there for emergency purposes.
 
 ### The plot and video
 
 The swim's training video plays together with a plot of your swim:
 
 - **Pace** over time (shown first), or **MPH** over distance: switch with
-  the **MPH** button. PoolWind remembers your choice.
-- Faster swimming plots higher on the Pace plot.
+  the **MPH** button. 
+- Faster swimming means a lower Pace but the Pace plot is inverted to avoid confusion. Up means faster swimming in both plots.
 - A **cursor** on the plot follows the video, frame by frame. Move the
   cursor and the video jumps to that moment.
+- A **swim date** is shown centered and under the top header that represents the date of the plot where the cursor is positioned. If multiple days were selected, that date will change as the cursor moves through the plot.
 
 **Controls:**
 
@@ -305,11 +308,11 @@ The swim's training video plays together with a plot of your swim:
 | **▶ Play / Pause** | Plays or pauses. The video starts playing by itself and stops at the end |
 | Mouse wheel over the plot | Zooms time or distance in and out |
 | Mouse wheel over **Play** or the speed label | Plays faster or slower |
-| **Compress Gaps** | Shortens the breaks between swims, so the plot shows mostly swimming |
+| **Compress Gaps** | Shortens the breaks between swims to a few swconds, so the plot shows mostly swimming. The gaps are quite large between days (if multiple days were selected) and those are compressed as well. |
 | Left click on the plot and drag | Moves the cursor and swim video through time or distance |
 | Right click on the plot and drag | Moves the entire plot and cursor left or right |
 | Click on the video | Turns the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) on or off (swims recorded since it was added) |
-| **On/Off** | Turns the pool's pump on or off |
+| **On/Off** (light red) | Turns the pool's pump on or off, after "Are you sure?" (**OK** / **Cancel**) |
 | **Close** | Back to the calendars, to pick another day |
 
 ### What to look for
