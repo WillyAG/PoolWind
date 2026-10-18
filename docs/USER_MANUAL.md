@@ -28,6 +28,10 @@ pool are covered in the build guide and the setup and calibration guide.
 - **Know how to take manual control:** close PoolWind (see
   [Finishing a swim](#5-finishing-a-swim)). PoolWind fights against any change
   the pool's own remote makes.
+- **Take any pool cover off before starting PoolWind,** and close PoolWind
+  before putting it back on. A cover changes what the camera sees: PoolWind
+  may take part of it for a swimmer and adjust the jet when nobody is
+  swimming.
 
 ## 2. Starting PoolWind
 
@@ -192,6 +196,10 @@ pool's remote. PoolWind briefly stops adjusting the speed while it does
 this, giving OnOff top priority.
 
 ## 5. Finishing a swim
+
+> **Close PoolWind before putting on a pool cover.** A cover changes what
+> the camera sees, and PoolWind may take part of it for a swimmer and adjust
+> the jet when nobody is swimming.
 
 Press **X** at the top right of the screen to close PoolWind. It then:
 
