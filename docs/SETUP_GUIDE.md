@@ -213,13 +213,18 @@ Changes to the calibration file take effect at the next start.
 ### 5.4 Pool length and the center lane
 
 ```
-,'poolLength': 180
+,'poolLength': 162
 
 ,'middleSwimZone %': 35
 ```
 
-- **`poolLength`** is the swim area's length, front to back, in inches.
-  PoolWind uses it to turn positions in the camera picture into distances.
+- **`poolLength`** is the swim area's length in inches: from the back wall
+  to the edge of the jet unit, **not** the whole pool. It's the same length
+  as the swim area you set in [5.1](#51-the-swim-area). On the author's
+  Standard Endless Pool, the pool is 180" long and the jet unit's edge is
+  18" from the front, so `poolLength` is 162. PoolWind uses it to turn
+  positions in the camera picture into distances: how far your fingertips
+  and toes reach toward each end, and how fast you drift forward or back.
 - **`middleSwimZone %`** is the width of the center lane where PoolWind
   tracks the swimmer, as a percentage of the swim area's width. Wider
   catches a swimmer who drifts sideways; narrower ignores people standing
@@ -318,7 +323,7 @@ PoolWind to be closed and started again.
 | `'Sensitivity'` | `5000` | Minimum size, in pixels, of something the camera counts as a swimmer |
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
-| `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.5`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
+| `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.67`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
 | `'WATER_TAU'` | `5.0` | Seconds the water takes to catch up after the jet changes speed. Used **twice**: by the Swimmer Pace estimate, and as the delay of the [zone highlight](USER_MANUAL.md#seeing-the-jets-zone-the-zone-highlight) (with 5, the band moves about 7 seconds after a jet step). Changing it changes both |
 | `'zoneHighlight'` | `False` | Whether the zone highlight is on when PoolWind starts. A tap on the picture turns it on or off either way |
 | `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
