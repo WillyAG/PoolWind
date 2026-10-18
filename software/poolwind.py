@@ -1492,12 +1492,45 @@ class App:
                 continue
         return freed
 
+    def _mount_usb_sticks(self):
+        """
+        Mounts any USB stick that is plugged in but not mounted, such as
+        the stick PoolWind unmounted when it last closed. Bill, 2026-10-17:
+        the same swimmer "just quit the program for some reason and then
+        wanted back in right away. He shouldn't have to replug the stick."
+        Uses udisksctl, which the desktop user may run without a password.
+        Removable disks only (/sys/block/<disk>/removable), never the SD card.
+        """
+        for removable_path in glob.glob("/sys/block/sd*/removable"):
+            try:
+                with open(removable_path) as f:
+                    if f.read().strip() != "1":
+                        continue
+                disk = "/dev/" + removable_path.split("/")[3]
+                out = subprocess.run(["lsblk", "-rpno", "PATH,FSTYPE,MOUNTPOINT", disk],
+                                     capture_output=True, text=True, timeout=5).stdout
+            except Exception:
+                continue
+            for line in out.splitlines():
+                parts = line.split(" ")
+                if len(parts) < 2 or not parts[1] or (len(parts) > 2 and parts[2]):
+                    continue           # no filesystem, or already mounted
+                try:
+                    r = subprocess.run(["udisksctl", "mount", "-b", parts[0],
+                                        "--no-user-interaction"],
+                                       capture_output=True, text=True, timeout=15)
+                    print("USB stick mount:", (r.stdout or r.stderr).strip())
+                except Exception as e:
+                    print("USB stick mount failed:", e)
+
     def _find_individual_defaults(self):
         """
         Scans mounted USB drives for a poolwind_ind_defaults.txt at their
-        root. Returns (dict, usb_root_dir), or (None, None) if no
+        root (after mounting any stick left unmounted at the last close).
+        Returns (dict, usb_root_dir), or (None, None) if no
         recognized swimmer's stick is present.
         """
+        self._mount_usb_sticks()
         matches = sorted(glob.glob("/media/*/*/poolwind_ind_defaults.txt"))
         if not matches:
             return None, None
@@ -2394,10 +2427,12 @@ class App:
     # ------------------------------------------------------------------
     def _eject_stick(self, root):
         """
-        Eject the stick mounted at `root` the way the desktop's eject icon
-        does (gio -> udisks: write everything, unmount, power off). A stick
-        PoolWind mounted itself (new-stick setup, sudo mount) is unmounted
-        with sudo umount (allowed by the install's sudoers rule) instead.
+        Make the stick mounted at `root` safe to remove: write everything
+        and unmount it (gio -> udisks). Unlike the desktop's eject icon it
+        is not powered off, so if it stays in, the next start mounts it
+        again (_mount_usb_sticks) with no replug. A stick PoolWind mounted
+        itself (new-stick setup, sudo mount) is unmounted with sudo umount
+        (allowed by the install's sudoers rule) instead.
         Returns True when it is no longer mounted.
         """
         if not root:
@@ -2409,7 +2444,7 @@ class App:
         if not os.path.ismount(root):
             return True
         try:
-            subprocess.run(["gio", "mount", "-e", root],
+            subprocess.run(["gio", "mount", "-u", root],
                            capture_output=True, text=True, timeout=30)
         except Exception as e:
             print("Eject (gio) failed:", e)
@@ -2420,14 +2455,15 @@ class App:
             except Exception as e:
                 print("Eject (umount) failed:", e)
         ejected = not os.path.ismount(root)
-        print(f"USB stick {root}: {'ejected' if ejected else 'NOT ejected (in use?)'}")
+        print(f"USB stick {root}: {'unmounted, safe to remove' if ejected else 'NOT unmounted (in use?)'}")
         return ejected
 
     def _close_stick(self):
-        """At close: eject the swimmer's stick and say so, or say why it
-        couldn't be ejected. No message without a stick, or when
-        'ejectStickOnClose' is False (Bill, 2026-10-17): then everything is
-        just written to the stick, and it stays in."""
+        """At close: make the swimmer's stick safe to remove. A message only
+        when it couldn't be (something else is using it). Bill, 2026-10-17:
+        no other messages are needed now that a restart finds the stick
+        again. With 'ejectStickOnClose' False everything is just written to
+        the stick, and it stays mounted."""
         root = getattr(self, "_stick_root", None)
         if not root or not os.path.isdir(root):
             return                     # no stick in: nothing to say
@@ -2440,10 +2476,7 @@ class App:
             print(f"USB stick '{name}' left in ('ejectStickOnClose' is False); everything written")
             return
         if self._eject_stick(root):
-            title = "USB stick ejected"
-            text = (f"Your swim is saved on '{name}', and the stick has been "
-                    "ejected.\n\nYou can remove it now. The next swimmer can "
-                    "insert their own stick before starting PoolWind.")
+            return                     # safe to remove, or to leave in for the next start
         else:
             title = "USB stick not ejected"
             text = (f"Your swim is saved on '{name}', but the stick couldn't be "
