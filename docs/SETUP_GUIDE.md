@@ -210,21 +210,21 @@ With the author's pace table, `(1.46, 2.15)` keeps the jet between about
 
 Changes to the calibration file take effect at the next start.
 
-### 5.4 Pool length and the center lane
+### 5.4 Usable pool length and the center lane
 
 ```
-,'poolLength': 162
+,'usablePoolLength': 162
 
 ,'middleSwimZone %': 35
 ```
 
-- **`poolLength`** is the swim area's length in inches: from the back wall
+- **`usablePoolLength`** is the swim area's length in inches: from the back wall
   to the edge of the jet unit, **not** the whole pool. It's the same length
   as the swim area you set in [5.1](#51-the-swim-area). On the author's
   Standard Endless Pool, the pool is 180" long and the jet unit's edge is
-  18" from the front, so `poolLength` is 162. PoolWind uses it to turn
+  18" from the front, so `usablePoolLength` is 162. PoolWind uses it to turn
   positions in the camera picture into distances: how far your fingertips
-  and toes reach toward each end, and how fast you drift forward or back.
+  and toes reach toward each end, and how fast you drift forward or back. (Before v15.3 it was called `poolLength`; older files still work.)
 - **`middleSwimZone %`** is the width of the center lane where PoolWind
   tracks the swimmer, as a percentage of the swim area's width. Wider
   catches a swimmer who drifts sideways; narrower ignores people standing
