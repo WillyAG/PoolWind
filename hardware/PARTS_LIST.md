@@ -1,11 +1,10 @@
 # PoolWind Parts List
 
-**DRAFT.** The examples are the parts the author used. Any equivalent part
+The examples are the parts the author used. Any equivalent part
 will do. Prices are approximate US prices checked in October 2026; they
 change often, so check before buying. If an example is no longer sold,
 Amazon usually shows a replacement: choose one that matches the
-description and the notes. Comments like `<!-- Bill: ... -->` are notes
-for the author.
+description and the notes.
 
 License: see [LICENSE.md](../LICENSE.md).
 
@@ -16,7 +15,7 @@ License: see [LICENSE.md](../LICENSE.md).
 | 3 | Waterproof keyboard: foldable silicone roll-up keyboard, USB | [amazon.com/dp/B06WWM5TC6](https://www.amazon.com/dp/B06WWM5TC6) | $15–20 | Has held up very well at the poolside and dries out easily |
 | 4 | Waterproof mouse: Adesso iMouse W3, USB | [amazon.com/dp/B01LXR3R5J](https://www.amazon.com/dp/B01LXR3R5J) | $30 | |
 | 5 | Waterproof case with a clear cover: LMioEtool IP65 box, 11.4 × 7.5 × 5.5 in | [amazon.com/dp/B07PDV2F2N](https://www.amazon.com/dp/B07PDV2F2N) | $45–115 | Holds the Raspberry Pi, the interface board and the monitor at the poolside. Similar boxes vary widely in price |
-| 6 | Monitor: Eyoyo 10-inch IPS LCD, 1280×800 | [amazon.com/dp/B072N2YGXN](https://www.amazon.com/dp/B072N2YGXN) | $90–110 | Mounted in portrait. 245 × 166 × 33 mm: it only just fits the case, and its control buttons had to be removed. Check the fit against your case. Some Eyoyo 10-inch models are only 1024×768: check the resolution |
+| 6 | Monitor: Eyoyo 10-inch IPS LCD, 1280×800 | [amazon.com/dp/B072N2YGXN](https://www.amazon.com/dp/B072N2YGXN) | $90–110 | Comes with its power supply. Mounted in portrait. 245 × 166 × 33 mm: it only just fits the case, and its control buttons had to be removed. Check the fit against your case. Some Eyoyo 10-inch models are only 1024×768: check the resolution |
 | 7 | USB extension cable, 10 ft: AINOPE USB 3.0 | [amazon.com/dp/B07ZV6FHWF](https://www.amazon.com/dp/B07ZV6FHWF) | $6 | For the camera. A longer run may need an active (repeater) USB extension |
 | 8 | RJ45 jacks: Treedix RJ45 8-pin connector and breakout board kit (4 jacks, each with a small breakout board) | [amazon.com/dp/B08HGS5G8N](https://www.amazon.com/dp/B08HGS5G8N) | $11–15 | One kit covers all three jacks. Two are soldered straight onto the interface board (the Pace jack and the Remote jack), without their breakout boards. The third, on its breakout board, is mounted on the back of the modified remote (see the build guide, section 5) |
 | 9 | INA260 voltage/current sensor breakout: Adafruit #4226 | [adafruit.com/product/4226](https://www.adafruit.com/product/4226) | $10 | Plugs into a header on the interface board. Reads the Pace Display port voltage over I2C. Must be an **INA260**: the program uses the INA260 library |
@@ -31,12 +30,6 @@ License: see [LICENSE.md](../LICENSE.md).
 | 18 | Network cable, straight-through, Cat5e or Cat6 | | $5–12 | Remote to the interface board. Length to suit your pool |
 | 19 | Phone cable(s), straight-through, 4-wire (6P4C, RJ14) or 6-wire (6P6C) | | $5–10 | From the pool controller's Pace Display port to the interface board's Pace jack (a phone plug fits the RJ45 jack). The center four wires are all the board needs. Length to suit your pool. **If a Pace Display is already installed:** a short cable from the port to the Y splitter, and a longer one from the splitter to the interface board |
 | 20 | Y splitter for the Pace Display cable (only if you have a Pace Display) | | | Must connect every wire straight through to both outlets. Many phone splitters are "L1/L2" types that split the wires between the outlets: these won't work. A "6P6C (RJ12) straight-through" splitter carries all six wires. See the build guide, section 6 |
-| 21 | Heatsink, about 3 × 4 in (only if the Raspberry Pi will run for hours at a time) | | | Mounted in a sealed hole in the case wall, fins outside. See the build guide, section 8 |
+| 21 | Heatsink, about 3 × 4 in (only if you find it's needed: the author's Pi only needed one once it was left running for hours at a time) | | | Mounted in a sealed hole in the case wall, fins outside. See the build guide, section 8 |
 | 22 | For the remote's watertight box: a small clear plastic box, silicone putty, electrical tape, small desiccant packs | | $5–15 | Any spare box that fits the remote will do. See the build guide, section 5 |
 | | **Total (without the remote)** | | **about $480** | Mostly depends on the case and the monitor |
-
-<!-- Bill: open questions
-- Bill has two spare interface PCBs (could be offered to early builders?).
-- Anything missing: camera mount, monitor power supply, GFCI outlet.
-- The heatsink you used (link or size), and the Y splitter once verified.
--->

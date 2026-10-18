@@ -1,8 +1,5 @@
 # PoolWind Setup and Calibration Guide
 
-**DRAFT.** Comments like `<!-- Bill: ... -->` are notes for the author.
-They don't show on GitHub.
-
 This guide is for the person who builds and installs PoolWind: installing
 the software, fitting it to your pool, and the settings behind the scenes.
 Swimmers only need the [user manual](USER_MANUAL.md).
@@ -133,9 +130,6 @@ Check that:
   **UP** a few times and **DN** a few times (one jet step per press, see
   the [user manual](USER_MANUAL.md)), and watch the jet change. Then close
   PoolWind: it winds the jet back down.
-  <!-- Bill: does Hold step the jet with nobody in the pool, or does the
-  inactivity wind-down take over? This is the same question as the build
-  guide's relay test (section 9, step 4); settle both at the pool session. -->
 
 ## 5. Calibrating for your pool
 
@@ -169,16 +163,22 @@ gives the same voltage. To turn a voltage into a pace, PoolWind needs a
 table of pairs: the pace, and the voltage at that pace.
 
 **The table that comes with PoolWind was measured on the author's pool, a
-Standard Endless Pool.** On a pool of the same model it should be close
-enough to start with, but it hasn't been checked on any other pool.
-Measuring your own table is optional, and can be done later.
+Standard Endless Pool.** It hasn't been checked on any other pool.
+
+**Does it fit your pool?** Measure the Pace Display port voltage with a
+multimeter (the build guide's
+[second check](BUILD_GUIDE.md#before-you-buy-anything-three-checks)) while
+you change the jet speed. If it goes from about **1.2 V** at the slowest to
+about **3.2 V** at very fast, the table that comes with PoolWind should
+work. Take care at high speeds, and stop if the pool shows too much
+stress. Above about 2.6 V the Pace Display stays at its fastest reading,
+1:00. If your pool's range is different, you'll need your own table.
 
 **To measure your own table,** use the PoolWind calibration program
 (planned). It will build the table automatically, reading each voltage
 through PoolWind's own voltage sensor. You'll only need to do one of two
 things at each jet speed: type in the pace shown on your Pace Display, if
 you have one, or drop ping-pong balls in the water for it to time.
-<!-- Bill: link to the calibration program's description once it exists. -->
 
 ```
 'pace_voltage': [

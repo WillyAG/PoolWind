@@ -6,7 +6,7 @@ How to build it: see the [build guide](../docs/BUILD_GUIDE.md).
 
 ## Contents
 
-- [Parts list](PARTS_LIST.md), with approximate 2026 prices. [DRAFT]
+- [Parts list](PARTS_LIST.md), with approximate 2026 prices.
 - `schematics/` — the interface board design as a [Fritzing](https://fritzing.org)
   project (`PoolWind_interface_board.fzz`). Open it in Fritzing to see the
   breadboard, schematic and PCB views, or to change the design.

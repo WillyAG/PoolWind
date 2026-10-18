@@ -80,9 +80,7 @@ See the [parts list](../hardware/PARTS_LIST.md).
 **Tools:** soldering iron and solder, wire cutters and strippers, a small
 screwdriver set (to open the remote), a drill (for the remote's jack), and
 a multimeter (for checking the Pace Display port voltage and the Y
-splitter).
-
-<!-- Bill: anything else you needed? -->
+splitter). Other tools are at the builder's discretion.
 
 ## 3. The Raspberry Pi
 
