@@ -274,7 +274,10 @@ something else was using the stick and it couldn't be ejected. The stick
 isn't powered off, so if it stays in, the next start mounts it again: no
 need to unplug it to come straight back in. `False`: PoolWind writes
 everything to the stick but leaves it mounted, so its files still show in
-the File Manager (handy for a developer). A `False` stick must still be
+the File Manager. `False` suits a single swimmer who leaves the stick in
+the Pi (and a developer); `True` suits a coach, or several swimmers each
+taking their stick away. A coach who needs to edit a `True` stick plugs it
+in, or unplugs it and plugs it back in, while PoolWind is closed. A `False` stick must still be
 ejected with the eject icon (⏏) in the top bar before it's removed. Set it in the defaults file for everyone, or on a
 swimmer's stick for that swimmer. New sticks get the defaults file's
 value.

@@ -208,7 +208,7 @@ without unplugging it.
 
 Only if PoolWind can't eject the stick does a message say **"USB stick not
 ejected"**. Your swim is still saved, but don't pull the stick yet. Something else is using it (for example a
-file manager window showing it). Close that, then eject the stick yourself:
+terminal open in the stick's folder, or a video playing from it). Close that, then eject the stick yourself:
 click the **eject icon (⏏)** in the top bar of the screen and choose your
 stick. Remove it when its icon disappears from the desktop.
 
@@ -216,6 +216,16 @@ stick. Remove it when its icon disappears from the desktop.
 can hold the last part of your swim in memory for up to half a minute.
 Pulling a stick that hasn't been ejected can lose the end of your swim,
 or leave the stick needing repair.
+
+**Which setting suits you?**
+
+- **A single swimmer who leaves the stick in the Pi:** set
+  `'ejectStickOnClose'` to `False`. The stick stays open, and you can look
+  at its files after PoolWind closes.
+- **A coach, or several swimmers sharing the pool:** keep it `True`, so each
+  swimmer can take their stick away.
+- **A coach who needs to edit a stick:** plug it in (or unplug it and plug it
+  back in) while PoolWind is closed. It then shows in the File Manager.
 
 Once PoolWind is closed, the pool works normally with its own remote.
 
@@ -358,7 +368,7 @@ The same user settings live in two places:
 | `'swimmersHeight'` | `66` | Your height in inches. Helps PoolWind judge your position |
 | `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
-| `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes, so it's safe to remove (it can also stay in for the next start). `False` leaves it open, so its files still show in the File Manager after PoolWind closes. Eject it with the eject icon (⏏) before removing it |
+| `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes, so it's safe to remove (it can also stay in for the next start). `False` leaves it open, so its files still show in the File Manager after PoolWind closes. Eject it with the eject icon (⏏) before removing it. See [Which setting suits you?](#5-finishing-a-swim) |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
 
 ### logRate: how often PoolWind records
