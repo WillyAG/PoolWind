@@ -28,7 +28,7 @@ pace table, safety limits) and explains every setting.
 ## Tested platform
 
 - Raspberry Pi 5, Raspberry Pi OS based on Debian 13 (trixie), Python 3.13
-- OpenCV 4.13, NumPy 2.2, SciPy 1.17, matplotlib 3.10, PyQt5,
+- OpenCV 4.13, NumPy 2.2, SciPy 1.17, matplotlib 3.10, PySide6 6.8,
   Adafruit INA260 1.3 (with Blinka `board`), lgpio
 
 ## Where your swims are saved

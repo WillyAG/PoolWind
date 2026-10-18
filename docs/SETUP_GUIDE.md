@@ -73,7 +73,7 @@ dots; type it and press Enter.
 
 The install script:
 
-- installs the libraries PoolWind needs: OpenCV, NumPy, SciPy, PyQt5,
+- installs the libraries PoolWind needs: OpenCV, NumPy, SciPy, PySide6,
   matplotlib, lgpio, the Adafruit INA260 library, ffmpeg, exfatprogs and
   i2c-tools;
 - turns on **I2C**, which the voltage sensor uses;

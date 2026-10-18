@@ -22,7 +22,7 @@ LOG="$PW_DIR/install.log"
 PIP_PACKAGES="opencv-python==4.13.0.92 scipy==1.17.1 adafruit-circuitpython-ina260==1.3.21"
 
 # Debian packages.
-APT_PACKAGES="python3-numpy python3-scipy python3-matplotlib python3-pyqt5 \
+APT_PACKAGES="python3-numpy python3-scipy python3-matplotlib python3-pyside6.qtwidgets \
 python3-lgpio python3-pip ffmpeg exfatprogs i2c-tools realvnc-vnc-server"
 
 # --------------------------------------------------------------------------

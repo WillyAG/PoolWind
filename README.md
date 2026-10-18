@@ -110,6 +110,8 @@ PoolWind is a shared hobby project, free for personal, hobby and other noncommer
 
 Copyright © William A. Gorlitz. U.S. Copyright Registration TXu 2-304-621.
 
+PoolWind doesn't include other people's software. The install script fetches the libraries it uses, each under its own license: for example PySide6 (Qt for Python) under the LGPL v3, and OpenCV under the Apache 2.0 license.
+
 
 ## Support
 
@@ -118,6 +120,6 @@ Copyright © William A. Gorlitz. U.S. Copyright Registration TXu 2-304-621.
 
 ## Acknowledgments
 
-- PoolWind relies on OpenCV, NumPy, SciPy, PyQt5 and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, CoPilot, finishing with Anthropic's Claude Code).
+- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, CoPilot, finishing with Anthropic's Claude Code).
 
 
