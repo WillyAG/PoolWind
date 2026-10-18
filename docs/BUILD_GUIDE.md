@@ -24,7 +24,7 @@ these fails, the rest of this guide won't help, so check all three first.
    button and it can run on about 5 V. Open yours and compare it with the
    photos before buying parts.
 2. **The Pace Display port voltage.** PoolWind reads the jet speed as a
-   voltage on the pool's Pace Display port ranging from about 1.2v to 3.3v (see
+   voltage on the pool's Pace Display port ranging from about 1.2v to 3.2v (see
    [section 6](#6-the-pace-display-port)). Measure it with a multimeter: it
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified.
@@ -455,7 +455,7 @@ it is used only as the reference for the jet speed voltage.
 | Phone plug contact | Interface board's Pace jack pin | Use |
 |---|---|---|
 | 2 | 3 | Ground (the Raspberry Pi's ground) |
-| 4 | 5 | The jet speed voltage, to the INA260's VBUS pin: about 1.2 V to 3.3 V, always present |
+| 4 | 5 | The jet speed voltage, to the INA260's VBUS pin: about 1.2 V to 3.2 V, always present |
 | 5 | 6 | Not used (goes to R6, which is left out): about 38 V when the pool pump is powered up |
 
 The other contacts aren't connected on the board.
@@ -475,7 +475,7 @@ nothing else connected:
    don't connect the ribbon cable to the Raspberry Pi.**
 2. On the back of the board, put the multimeter's ground probe on the
    Pace jack's pin 3 and the other probe on pin 5. It should read a small
-   positive voltage, 1.2 V to 3.3 V. On the author's pool this voltage is
+   positive voltage, 1.2 V to 3.2 V. On the author's pool this voltage is
    always present: the pool doesn't need to be turned on.
 3. Use the spare remote to raise the jet speed: the voltage should rise.
    Lower the jet speed: it should fall.

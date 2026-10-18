@@ -4,6 +4,10 @@
 
 <img src="docs/images/PoolWind_Station_running.jpg" width="400" alt="The PoolWind station beside the pool: a portrait monitor in a waterproof case showing the pace, average pace and distance, with a waterproof keyboard and mouse">
 
+> No GitHub account is needed to read or download anything here. If the
+> GitHub app on your phone asks you to sign in, open the link in your web
+> browser instead, or in a private (incognito) tab.
+
 ## PoolWind in brief
 
 PoolWind monitors your swim with an overhead camera and adjusts the pool's jet flow so that you will not run into the front or the rear of the pool as you swim faster or slower. The pool is divided into "zones", each representing an increasing jet speed toward the front. As you move forward through these zones the jet flow will increase until you settle into a zone where your swim is balanced with the jet flow. Forward movement stops. Swim harder and you move into the next zone where the jet flow increases further. The program is set to your specifications and the last zone should be just beyond your most powerful stroke. When you decide to rest a bit, the jet will move you backwards to a zone where your swim is once again balanced as the jet flow relaxes. You can change stroke styles without running into walls.
