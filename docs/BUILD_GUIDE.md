@@ -571,7 +571,13 @@ Before connecting anything to the pool:
    To see what the camera sees, use the Raspberry Pi VLC Media Player and select 'Open Capture Device' -> 'Video Device Name' -> '/dev/video0' -> 'Play'. You should orient the camera so that it displays the pool with the **pool front to the left**. Don't try to correct the orientation with the program. Once you see the entire swim area in view you're done.
 4. **Check that the INA260 is found:** in a terminal, `i2cdetect -y 1`
    should show `40` in its table.
-5. **Check the relays click** for Up, Down and On/Off, with the remote not
-   yet connected (setup guide, desk testing).
-6. Then connect the remote and the Pace Display cable, and continue with
+5. **Check the On/Off relay clicks**, with the remote not yet connected:
+   start PoolWind and press **OnOff**. You should hear one short click.
+   The Up and Down relays are checked once everything is connected (step
+   6): without the Pace Display cable PoolWind reads no voltage and, for
+   safety, won't press Down.
+6. **Connect the remote and the Pace Display cable**, then check that **the
+   jet answers** (setup guide, [section 4](SETUP_GUIDE.md#4-first-start)):
+   with nobody in the pool, press **Hold**, then **UP** and **DN** a few
+   times, and watch the jet change one step per press. Continue with
    calibration in the [setup guide](SETUP_GUIDE.md).
