@@ -1,6 +1,46 @@
 
 if True:  # keep this here as an  easy way to skip over all this
-    # poolwindAI_v15.2   --
+    # poolwindAI_v15.3   -- (to run on PySide6 instead of PyQt5)
+    #                       - STILLNESS CHECK REMOVED (2026-10-18): on
+    #                         Raw_2026-09-29 (cover on) the cover's blob
+    #                         moves with the lighting, so it isn't reliable.
+    #                         The user manual says to close PoolWind before
+    #                         putting a cover on.
+    #
+    # poolwindAI_v15.2   -- SWIM ZONE HIGHLIGHT, USB EJECT, STILLNESS CHECK:
+    #                       - ZONE HIGHLIGHT: a tap on the picture (pool
+    #                         screen and Swim Plot replay) lights the jet's
+    #                         zone faintly, slowest at the bottom; it lags the
+    #                         jet like the water (WATER_TAU), directly in
+    #                         Hold. 'zoneHighlight' (off at start) and
+    #                         'zoneHighlightLevel'. Swim log columns zone,
+    #                         zones.
+    #                       - Developer: 'comBar' and 'readouts' hide the CoM
+    #                         bar and the dIdx / V / CoM numbers.
+    #                       - USB STICK made safe to remove at close: written
+    #                         and unmounted (not powered off), and mounted
+    #                         again at the next start (no replug). Message
+    #                         only if something is using it.
+    #                         'ejectStickOnClose' is a user setting (also on a
+    #                         stick). Eject & Replace ejects it too.
+    #                       - The algorithm is a developer choice in the main
+    #                         defaults file only (users get swimmerPace).
+    #                       - PUMP buttons light red; On/Off off the main
+    #                         screen asks "Are you sure?".
+    #                       - SWIM PLOT: closely spaced pauses compress as
+    #                         one gap; dates shown MM-DD-YYYY.
+    #                       - developerMode turns the monitor with the
+    #                         Monitor Toggle script; the landscape warning
+    #                         points to it.
+    #                       - STILLNESS CHECK: a "swimmer" that barely changes
+    #                         for 'stillSeconds' (the pool cover's tape) is
+    #                         not a swimmer; after 'autoSuspendMinutes' with
+    #                         no swimmer PoolWind presses Suspend. Tested on
+    #                         the 10-15-2026 video; not yet pool-tested.
+    #                       - License notice: commercial use is not permitted.
+    #                       Runs on PyQt5 (GPL). Archived 2026-10-18; the
+    #                       next version, v15.3, will run on PySide6 (LGPL),
+    #                       so the noncommercial license stands on its own.
     #
     # poolwindAI_v15.1   -- SAFETY, LOGGING AND SWIM PLOT fixes:
     #                       - UP/DN CAN'T STAY PRESSED off the main screen
@@ -31,513 +71,6 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       Pool-tested 2026-10-16: "the fixes worked."
     #                       Archived 2026-10-16; the next version is v15.2.
     #
-    # poolwindAI_v7.44   -- SETTINGS REORGANIZED for other users:
-    #                       - BUILT_IN_DEFAULTS (just above class App): the
-    #                         tuned development settings, out of the defaults
-    #                         file. A line copied back into the defaults file
-    #                         overrides the built-in value. change_thresh and
-    #                         compressRawVideo removed (raw video is always
-    #                         compressed).
-    #                       - SAME NAMES in the main defaults file and on the
-    #                         USB stick: swimmersHeight, 'paceMin, Max',
-    #                         recordTrainingVideo, 'algorithm (basic or
-    #                         swimmerPace)' (a stick can choose the algorithm).
-    #                         Older names still accepted. The stick is
-    #                         hot-reloadable; a pace
-    #                         change in the main file now applies without a
-    #                         stick too. The program never writes the main
-    #                         defaults file (comments kept); new sticks get a
-    #                         header comment.
-    #                       - CALIBRATION FILE <program name>_calibration.txt:
-    #                         pace_voltage, SafetyVoltageLimits, swimAreaPoints,
-    #                         poolLength, middleSwimZone % and recordRawVideo
-    #                         (safety-critical, technician only, read at
-    #                         startup). Created from the defaults
-    #                         file on first run. Set Swim Area saves it at once
-    #                         in camera mode; in video mode the points are for
-    #                         that run only and shown for pasting into the code
-    #                         next to the test video.
-    #                       - developerMode (built in, False): with it off, the
-    #                         program always runs camera / pool display / real
-    #                         valve, never switches the monitor (users set
-    #                         theirs to portrait themselves; a landscape monitor
-    #                         gets a portrait-shaped window and a reminder),
-    #                         hides the CoM bar and dIdx / V / CoM readouts (also
-    #                         the CoM bar on Swim Plot replay), and records no
-    #                         raw video. Bill's defaults file sets it True for
-    #                         the workplace / device lines, monitor switching,
-    #                         readouts and raw video.
-    #                       - HOLD: UP/DN move one jet step per press (taken on
-    #                         the touch itself), repeating every second while
-    #                         held, never past either end of the pool; only the
-    #                         UP/DN buttons count. The Pace display shows the
-    #                         new step's pace at once until the real pace
-    #                         catches up. In the pool: "Pressing Up stepped up
-    #                         just at the right speed while Pace updated
-    #                         instantly."
-    #                       - Files are found next to the program by its name
-    #                         (PoolWind.py -> PoolWind_defaults.txt ...); the
-    #                         local CSV Vault is created when missing.
-    #                       Archived 2026-10-08 as a root version to come back
-    #                       to; the next version is v15.1.
-    #
-    # poolwindAI_v7.43   -- EVEN-WIDTH INDEX ZONES (SwimController._zone_steps /
-    #                       _index_for_CoM): every reachable jet step between
-    #                       the PaceLimits gets an equal width of pool. Limits
-    #                       snap inward to pace_voltage entries, steps above
-    #                       the safety voltage max are left out (no part of
-    #                       the pool asks for a speed the jet can't reach),
-    #                       entries <0.01 V apart count as one step. Replaces
-    #                       CoM-linear-in-pace, which squeezed the fast steps
-    #                       into 1-2 inch zones. In the pool this ended the
-    #                       ping-pong feel: "the swim I had dreamed about".
-    #                       Bill's stick: (5.0, 1.7); (5.0, 3.0) works for
-    #                       slower swimmers. The startup log lists the zones.
-    #                       Removed: the ping-pong table and its motion
-    #                       signal, JetStepTracker, the 'pace' layout and
-    #                       their defaults keys; relay test scripts deleted.
-    #
-    #                       OnOff takes priority over UP/DN: releases UP/DN,
-    #                       waits 0.3 s, pulses the pump 2 s, waits 0.5 s,
-    #                       with the jet drive hands-off throughout (the radio
-    #                       remote can't send two buttons at once).
-    #
-    #                       CoM bar: no longer recorded into the training
-    #                       video. The swim CSV gains CoM_h and the swimmer
-    #                       tick's CoM_w (-1 = none) as columns 6-7; the swim
-    #                       plot draws the bar on replay, off by default,
-    #                       toggled by a left click on the video (filter on
-    #                       the main window -- the canvas is mouse-transparent).
-    #                       Older CSVs load as before, without a bar.
-    #                       Pace trace now records the zone target only.
-    #                       Full history: poolwindAI_v7.39_pace_notes.txt 17-19.
-    #
-    # poolwindAI_v7.42   -- Ping-pong work (trial, OFF by default):
-    #                       SwimController._pingpong step table inside
-    #                       _swimmerPaceAlgo ('Ping-pong control': True/False,
-    #                       T_SETTLE, MOTION_TAU, MOTION_THRESH, HYST,
-    #                       CEILING_TIMEOUT). Motion signal = CoM's trend
-    #                       (CoM only read, never changed). Two pool tries
-    #                       were sluggish/unpredictable; being rethought
-    #                       (pace notes sections 14-17).
-    #                       JetStepTracker: flicker-proof jet step detection
-    #                       from the raw Pace Display voltage (0.6 s average)
-    #                       -- the raw voltage flickers ~0.02 V at some jet
-    #                       settings. Failed INA260 reads are skipped instead
-    #                       of counted as 0 V.
-    #                       A short-press relay drive was tried and REMOVED:
-    #                       the radio remote loses ~30-50% of single presses
-    #                       and ~5% go the wrong way (relay_press_test2-4;
-    #                       notes sections 11-13, 15). The jet is always
-    #                       driven by holding the relay.
-    #
-    #                       UI: on-screen buttons look recessed while
-    #                       touched; date-range calendars start on Sunday;
-    #                       swim plot opens on Pace (MPH via toggle), keeps
-    #                       the Pace/MPH view through Compress/Expand Gaps,
-    #                       plays by default, stops at the end of the data
-    #                       and resumes when the cursor moves back into it
-    #                       (a user Pause sticks until Play). CoM bar drawn
-    #                       in the training video too ('TrainingVideoCoMBar').
-    #                       Pace trace gained raw_voltage, jet_idx,
-    #                       target_idx, cmd_idx, pp_state, motion_v, relay.
-    #
-    # poolwindAI_v7.41   -- Selectable algorithms, chosen by the hot defaults
-    #                       key 'Algorithm (basic or swimmerPace)':
-    #                       SwimController.runAlgorithm dispatches each loop
-    #                       and returns (desiredIndex, swim_pace).
-    #                       _basicAlgo: CoM -> pace -> nearest plateau, with
-    #                       swim_pace = pool_pace (no estimator), for testing
-    #                       the shared infrastructure. _swimmerPaceAlgo calls
-    #                       _basicAlgo for the jet step and adds the
-    #                       speed-domain estimator (moved unchanged from App
-    #                       into SwimController) and its 0.1 smoothing.
-    #                       updateVoltageAndPace now only computes pool_pace;
-    #                       BodyCoMCorrection and all smoothing stay shared.
-    #                       Verified by replay: swimmerPace identical to v7.40.
-    #
-    #                       License notice in the header changed to the
-    #                       PolyForm Noncommercial License 1.0.0 (for the
-    #                       planned public GitHub release). Data folder is now
-    #                       "CSV Vault" next to the program instead of a fixed
-    #                       /home/poolwind path (same folder on this Pi).
-    #
-    #                       Separate test scripts added alongside:
-    #                       relay_step_test.py, relay_press_test2.py and
-    #                       relay_press_test3.py (relay press vs hold timing;
-    #                       pace notes sections 11-13). The ping-pong table
-    #                       and press-style jet drive built on this version
-    #                       were moved to v7.42 after a poor first swim.
-    #
-    # poolwindAI_v7.40   -- Swimmer Pace estimator rebuilt in the SPEED
-    #                       domain (_estimate_swim_pace): swim speed =
-    #                       lagged water speed (100/pool_pace low-passed,
-    #                       WATER_TAU) + DRIFT_SCALE * drift speed, with drift
-    #                       taken from the RAW blob_CoM_h (not the stretched,
-    #                       height-compensated CoM_h), smoothed by DRIFT_TAU and
-    #                       capped at +/-DRIFT_MAX. swim_pace = 100/speed,
-    #                       clamped 0.5-5.0. Both filters preserve the mean, so
-    #                       avg(swim_pace) still tracks avg(pool_pace).
-    #
-    #                       Tuned from pace_trace CSVs of real swims plus a
-    #                       Hold-mode passive-drift test (a floating swimmer
-    #                       drifts back at ~0.37x jet speed). Final hot values:
-    #                       DRIFT_SCALE 1.5, WATER_TAU 5, DRIFT_TAU 5,
-    #                       DRIFT_MAX 25 -- floating now reads a clearly slow
-    #                       Pace, and the plot follows the swim video well.
-    #                       New hot keys WATER_TAU/DRIFT_TAU/DRIFT_MAX;
-    #                       change_thresh no longer used (key left in file).
-    #
-    #                       TEMP: _write_pace_trace writes pace_trace_*.csv per
-    #                       launch (still needed for the ping-pong work).
-    #                       Full history, measurements and the draft ping-pong
-    #                       step state table: poolwindAI_v7.39_pace_notes.txt
-    #                       sections 7-10.
-    #
-    # poolwindAI_v7.39   -- Swimmer Pace estimator, first attempt at smoothing
-    #                       the index-zone (voltage plateau) steps:
-    #                       _estimate_swim_pace's trust weight was gated on how
-    #                       fast pool_pace itself was changing, which switched
-    #                       the CoM-drift correction OFF exactly during a zone-
-    #                       boundary step. Changed to gate on drift
-    #                       plausibility instead (reject only an implausibly
-    #                       large single-frame drift), reusing
-    #                       REPdefaults['change_thresh']. Live test: still
-    #                       spiky. Measured afterward against the real
-    #                       2026-09-20 swim: the reused threshold rejected 35%
-    #                       of samples, because the drift was taken from the
-    #                       height-compensated CoM_h (stretched 1.66x-2.74x by
-    #                       BodyCoMCorrection), so this approach was superseded
-    #                       by the speed-domain rebuild in v7.40. Full history
-    #                       and measurements: poolwindAI_v7.39_pace_notes.txt.
-    #
-    #                       End-of-session Pace sanity-check log: at shutdown
-    #                       prints avg pool_pace vs avg swim_pace (they should
-    #                       converge over a full session) plus how often the
-    #                       drift-plausibility check and the 0.5-5.0 pace clamp
-    #                       triggered.
-    #
-    #                       Video overlay's baked-in pace label changed from
-    #                       "Pace(raw):" to "Pace:" (the value was already
-    #                       swim_pace; "raw" was a stale holdover from before
-    #                       the estimator existed). Audited that the on-screen
-    #                       Pace display and the CSV pace column both already
-    #                       use swim_pace.
-    #
-    # poolwindAI_v7.38   -- Mouse-CoM debug override removed entirely (no
-    #                       longer needed for testing). Hold Mode toggle-off
-    #                       now resyncs the EMA so releasing Hold decays
-    #                       smoothly from the held value instead of jumping to
-    #                       a stale pre-hold one.
-    #
-    #                       USB full-drive handling: Erase Oldest Video now
-    #                       shows a confirm-before-delete dialog listing
-    #                       exactly which files would be erased (Delete/Cancel,
-    #                       Cancel default) before touching anything -- added
-    #                       after a real incident where testing with an
-    #                       artificially-unreachable threshold silently deleted
-    #                       nearly the entire real video history. Pump safety
-    #                       (PIN_PUMP) extended so it's real only when
-    #                       workplace=='pool', not just when Valve=='real',
-    #                       letting the UP/DN valve relays be bench-tested from
-    #                       home with zero chance of the pump itself turning
-    #                       on.
-    #
-    #                       SwimDateRangeDialog date-range calendar redesigned:
-    #                       stacked top/bottom instead of side-by-side (bigger
-    #                       cells), each date shows an avg-pace line
-    #                       (distance/time-weighted, gap-aware, lazily computed
-    #                       per displayed month and cached), From/To selection
-    #                       made fully independent (no more auto-mirroring).
-    #                       Made properly full-screen to match the rest of the
-    #                       app (fixed size + positioned, matching
-    #                       PlacePointsWindow/SwimPlotWindow) after the
-    #                       OK/Close buttons were found clipped off-screen;
-    #                       kept the native title bar per Bill's preference
-    #                       despite Openbox (the WM) reserving a small strip
-    #                       above it for the lxpanel-pi desktop panel that
-    #                       decorated windows can't avoid -- the other full-
-    #                       screen dialogs go frameless specifically to bypass
-    #                       that.
-    #
-    #                       BodyCoMCorrection (fingertip/toe reach-elongation
-    #                       of CoM_h near the pool walls) had accumulated two
-    #                       independent ad hoc fudges (swimmersHeight inflated
-    #                       72->120, front/back reach fractions inflated to
-    #                       non-anatomical values) both compensating for the
-    #                       same underlying "jet doesn't ramp up fast enough
-    #                       near the front" complaint -- both reverted to
-    #                       Bill's real measured values, then the whole
-    #                       correction rewritten from a tapered (never-quite-
-    #                       reaches-the-wall) formula to a piecewise-linear
-    #                       stretch that hits exactly 0/500/1000 at back-
-    #                       wall/center/front-wall. Confirmed live: the
-    #                       corrected reach alone fixed the original ramp-up
-    #                       complaint, no separate non-linear CoM-to-pace curve
-    #                       needed.
-    #
-    #                       Major swimmer-tracking overhaul in
-    #                       get_auto_CoM/qt_update_loop, chasing a real "jet
-    #                       powers up while swimmer is clearly not in the zone"
-    #                       bug through several layers, each confirmed or ruled
-    #                       out against real recorded video / live debug logs
-    #                       rather than guessed: (1) get_auto_CoM's stale-blob
-    #                       position cache had no expiry, letting a brief false
-    #                       or real detection (froth, an elbow) get stuck
-    #                       driving the jet indefinitely once real detection
-    #                       stopped -- bounded to DROPOUT_HOLD_FRAMES=3 (rides
-    #                       through brief real dropouts, expires otherwise);
-    #                       (2) swimmerFound now explicitly requires a real
-    #                       current detection, not just EMA'd values that drift
-    #                       into bounds on their own; (3) the CoM_h wind-down
-    #                       chain now distinguishes "no blob at all" (decay
-    #                       immediately) from "blob just reappeared after being
-    #                       absent" (also decay, do not freeze at a stale last-
-    #                       in-zone value) from "blob continuously present just
-    #                       outside the zone" (the original 3-second grace-
-    #                       freeze, unchanged); (4) the 3-sample rolling median
-    #                       filter in get_auto_CoM removed entirely (measured
-    #                       to cause real hold-then-jump artifacts on zone
-    #                       entry: 73 vs 13 events in a 400-frame test) -- EMA
-    #                       alone handles smoothing; (5) CoM_w's no-blob
-    #                       default changed from a fixed mid-pool guess to 0,
-    #                       EMA snapped (not blended) on reappearance to avoid
-    #                       a transient sweep through the zone width band that
-    #                       could spuriously trigger swimmerFound, then refined
-    #                       to rest at whichever off-zone edge (0 or 700) is
-    #                       nearer the last real position rather than always
-    #                       the same edge, to minimize the visual tick jump.
-    #                       Confirmed at the pool: no CoM errors in any zone,
-    #                       arm-poke false trigger gone, zone-entry tracks
-    #                       immediately with no hesitation.
-    #
-    #                       Development process changes: this project now has a
-    #                       git repository (git init 2026-08-30, source
-    #                       tracked, video/CSV data excluded) after an editor-
-    #                       save-collision incident silently reverted a fix
-    #                       mid-session. Discovered Claude can screenshot the
-    #                       Pi's own live display directly (scrot) and measure
-    #                       pixels precisely, which resolved the
-    #                       SwimDateRangeDialog layout issues on the first
-    #                       correctly-diagnosed attempt after two guess-based
-    #                       attempts missed. Established that reading real
-    #                       captured debug logs beats reasoning from a visual
-    #                       description alone for subtle/intermittent bugs.
-    #
-    # poolwindAI_v7.37   -- Video recording moved from a menu item / dialog
-    #                       (RecordVideoWindow, Raw/Persp checkboxes) to two
-    #                       defaults-file booleans read once at startup:
-    #                       recordRawVideo (main SD defaults file only, a
-    #                       system/admin choice) and recordTrainingVideo
-    #                       (renamed from "Persp"; lives in both the main
-    #                       defaults file and the per-swimmer USB overlay, same
-    #                       override pattern as PaceLimitsDec/swimmersHeight).
-    #
-    #                       USB full-drive handling:
-    #                       App._check_usb_free_space() runs once at startup
-    #                       right after a swimmer's stick is recognized,
-    #                       comparing free space against a 1.5x-margin
-    #                       threshold (~530MB with recordTrainingVideo on,
-    #                       ~636KB CSV-only). If short, a 3-button prompt
-    #                       offers Log in Main Memory (usb_data_dir cleared,
-    #                       personal settings from the stick still apply),
-    #                       Eject & Replace (message then exit -- restart to
-    #                       re-check, no polling), or Erase Oldest Video
-    #                       (_erase_oldest_usb_video() deletes whole oldest
-    #                       <date>_<segment>.avi session files, oldest first,
-    #                       until enough is freed; CSVs never touched; loops
-    #                       back to the prompt if it can't free enough).
-    #
-    #                       Separately, MyVideoCapture._perspect_video_writer()
-    #                       now checks free space every CSV tick and
-    #                       permanently stops writing video (not CSV) for the
-    #                       rest of the session once free space drops below a
-    #                       fixed 10MB reserve. The CSV append itself
-    #                       (accrue_log_disp) is now wrapped in try/except as a
-    #                       last-resort net.
-    #
-    #                       Live-tested 2026-08-27 against a real USB stick
-    #                       (thresholds temporarily raised to force the
-    #                       prompt): Log in Main Memory confirmed working;
-    #                       Eject & Replace not yet exercised live (assumed
-    #                       working); Erase Oldest Video verified only against
-    #                       throwaway dummy files in isolation, not run against
-    #                       real data.
-    #
-    # poolwindAI_v7.36   -- SwimPlot restructured to skip straight to the
-    #                        video screen: date-range calendar now jumps
-    #                        directly into the mini-plot/video overlay
-    #                        (on_open -> _prepare_display_arrays ->
-    #                        _build_video_overlay) with no separate big-
-    #                        plot screen and no entry gate checking for a
-    #                        video on that date. Compress Gaps moved from
-    #                        the old screen's top button row into the
-    #                        overlay's header; Close now closes
-    #                        SwimPlotWindow directly back to the calendar.
-    #                        Removed on_plot/on_toggle_compress and the
-    #                        big-canvas-only mouse handlers (on_press/
-    #                        on_motion/on_release/on_scroll) -- all logic
-    #                        consolidated into reusable methods so the
-    #                        overlay can be built (and rebuilt, e.g. on
-    #                        Compress Gaps toggle) without that screen ever
-    #                        existing.
-    #                        Root-caused and fixed a real-world multi-
-    #                        segment playback desync: a power failure left
-    #                        two AVI segments' persp_writer un-released, so
-    #                        their MJPG/AVI frame index was never
-    #                        finalized -- cv2 reported frame_count 0 and
-    #                        CAP_PROP_POS_FRAMES seeking silently no-opped
-    #                        (every seek landed on frame 1) while sequential
-    #                        reads still worked, causing scrub desync that
-    #                        got worse the further into those segments you
-    #                        moved the crosshair. Added
-    #                        _repair_avi_if_needed(), called at both AVI-
-    #                        open sites, which detects an unfinalized
-    #                        segment (frame_count <= 0, and not the one
-    #                        currently being recorded) and remuxes it in
-    #                        place via `ffmpeg -c copy` (rebuilds the index
-    #                        without re-encoding), keeping the original as
-    #                        a one-time .bak. Confirmed live against a real
-    #                        3-segment interrupted session -- auto-repair
-    #                        fired with no noticeable delay and scrubbing
-    #                        across all three segments was seamless
-    #                        afterward.
-    #
-    # poolwindAI_v7.35   -- SwimPlot multi-day range speed fix: a month-long
-    #                        date range took ~43s from calendar to Plot
-    #                        screen; CSV file loading itself was fast,
-    #                        isolated the rest via a timer-instrumented
-    #                        scratch copy
-    #                        (poolwindAI_v7.test.py, kept separately, not
-    #                        archived here). Root cause was in build_arrays():
-    #                        the full-gap fill loop inserted a synthetic row
-    #                        every dt (0.5s) across EVERY detected gap,
-    #                        including the ~20hr overnight gap between each
-    #                        day's swim session -- measured 11.3M rows for a
-    #                        month, ~28s of the ~37s total. First attempt
-    #                        (matplotlib plot-point min/max decimation) cut
-    #                        render time but became unnecessary once the
-    #                        real fix landed, so it was reverted (reset this
-    #                        file back to v7.34 baseline, then reapplied only
-    #                        the gap-fill fix). Fix: capped full-gap fill to
-    #                        MAX_GAP_FILL_ROWS=200 rows per gap regardless of
-    #                        real duration (true elapsed time still spanned
-    #                        exactly, just coarser spacing); day-boundary
-    #                        gaps get a separate, wider fixed placeholder
-    #                        (DAY_BOUNDARY_FILL_ROWS = 1800/dt, "~0.5 virtual
-    #                        hour") so day divisions stay visually
-    #                        distinguishable from ordinary in-session pauses
-    #                        instead of collapsing to the same 200-row width.
-    #                        Result: month-long range dropped from ~43s to
-    #                        ~4s, confirmed live by Bill (12.7 miles logged
-    #                        this month).
-    #
-    # poolwindAI_v7.34   -- SwimPlot pace display polish: Avg Pace label and the
-    #                        pace-plot crosshair coordinate box now show min:sec
-    #                        (Utils.DecimalToTime) instead of raw decimal. Video
-    #                        screen mini-plots (pace/MPH toggle) now share the
-    #                        same axis labels as the first plot screen (including
-    #                        the overall Avg Pace / total distance summary in the
-    #                        xlabel, left-anchored via matplotlib's loc='left' so
-    #                        it doesn't run under the coordinate box), and gained
-    #                        their own floating grey coordinate box mirroring the
-    #                        first screen's, positioned bottom-right and nudged
-    #                        down to clear the rotated x-tick labels; tick label
-    #                        font size trimmed slightly so the pace and MPH
-    #                        plots' tick text match in length. Root-caused and
-    #                        fixed the video pace-overlay update rate: the AVI's
-    #                        baked-in Pace text was pulling from PaceDisplay,
-    #                        which by design only updates once/sec -- at 5
-    #                        recs/sec that showed as "once every 5 frames".
-    #                        Switched it to read self.app.swim_pace directly so
-    #                        it updates every frame. That then surfaced a real
-    #                        value mismatch against the plot: the plot's pace
-    #                        (and its coordinate box) is a Savitzky-Golay
-    #                        smoothed version of the CSV pace column (see
-    #                        on_plot), while the video bakes in the raw per-
-    #                        frame value -- the two can never be identical since
-    #                        the smoothing needs a centered window (future
-    #                        samples not available at record time). After
-    #                        briefly trying to move the overlay to playback-time
-    #                        (drawn from the already-smoothed X_pace array,
-    #                        guaranteed identical to the plot) and reverting per
-    #                        feedback -- baking the value into the AVI itself
-    #                        was preferred over an exact-match display-only
-    #                        number -- settled on keeping the raw value baked in
-    #                        at record time, relabeled "Pace(raw):" (field
-    #                        nudged left ~2 chars) so the expected difference
-    #                        from the smoothed plot value reads as intentional
-    #                        during review rather than a bug.
-    #
-    # poolwindAI_v7.33   -- Hold Mode / CoM / WindDown redesign: blob detection
-    #                        now runs every frame regardless of hold_mode (CoM_w
-    #                        always live; only CoM_h freezes); swimmerFound is one
-    #                        unified test on live CoM_w; new last_real_CoM_h tracks
-    #                        the last genuine (non-wind-down-decayed) CoM_h so
-    #                        Hold_btn_press freezes the right value; wind-down grace
-    #                        window now freezes CoM_h instead of tracking the live
-    #                        out-of-zone blob position (was spiking the valve while
-    #                        the swimmer walked to the Pi). Mouse-CoM debug override:
-    #                        double-click on the video (independent of hold_mode)
-    #                        arms/disarms mouse-driven CoM_w/CoM_h through the same
-    #                        auto/EMA pipeline as real swimming, with an on-screen
-    #                        indicator. SwimPlot date-range picker: opening SwimPlot
-    #                        now shows a two-calendar (From/To) dialog first --
-    #                        single-day or multi-day selection, data-day dates
-    #                        marked bold green (weekend red / adjacent-month padding
-    #                        removed), remembers the last range across the new
-    #                        calendar<->Plot navigation loop, main window blanked
-    #                        behind it, incremental "please wait" progress through
-    #                        both CSV loading and matplotlib figure-building.
-    #                        Multi-day CSV loading concatenates days sorted by
-    #                        timestamp, tags every row with its source date for
-    #                        correct per-day AVI lookup (segment numbers reset
-    #                        daily), and re-accumulates cumulative_distance_miles
-    #                        across day boundaries. CSV/perspective-AVI reading and
-    #                        writing moved to /home/poolwind/poolwind/CSV Vault
-    #                        (raw Raw_*.mp4 videos stay with the code, unmoved).
-    #                        Archive.
-    #
-    # poolwindAI_v7.32   -- SwimPlot video-scrub fix: the perspective-video AVI
-    #                        segment being actively recorded is never finalized
-    #                        by OpenCV until release(), so opening SwimPlot's
-    #                        video view mid-run and scrubbing read a corrupt
-    #                        frame index (random-looking images); only a full
-    #                        restart (which releases on shutdown) fixed it.
-    #                        _enter_submenu now releases the current perspective
-    #                        segment (any submenu) so it's always safe to read,
-    #                        and _exit_submenu resumes recording into a fresh
-    #                        segment afterward -- but only if it was actually
-    #                        running before the submenu paused it, so an
-    #                        explicit user Pause/Close is never overridden.
-    #                        Record Video dialog: Close button now actually
-    #                        closes the box (was only stopping the streams);
-    #                        Raw/Persp checkbox selection now persists across
-    #                        close/reopen since a fresh dialog instance is
-    #                        built each time. Archive.
-    #
-    # poolwindAI_v7.31   -- Set Swim Area fix: perspective-transform matrix was cached
-    #                        once per run and never invalidated on Save, so new corner
-    #                        points had no effect on perspect_img until restart. Save
-    #                        now clears the cached matrix so it recomputes immediately.
-    #                        OnOff (pump) button fix: mouseReleaseEvent never dispatched
-    #                        to a button handler, so the relay energized on press with
-    #                        no way to de-energize (btn_release was dead code, never
-    #                        called). Rewritten as a timed pulse: press energizes
-    #                        PIN_PUMP, a QTimer releases it automatically after 2s,
-    #                        guarded against re-trigger while a pulse is in progress.
-    #                        Archive.
-    #
-    # poolwindAI_v7.30   -- workplace key in defaults (home/pool/default) overrides
-    #                        capture_device, display_device, and Valve with one edit.
-    #                        Left-click on any plot immediately snaps crosshair to
-    #                        nearest data point (no drag needed). Zoom/pan state shared
-    #                        across all 4 plots and carries over between plot and video
-    #                        modes. Crosshairs restored visible on return from video
-    #                        mode. X-axis summary labels shifted left to clear
-    #                        coordinate boxes. Archive.
-    #
-    # poolwindAI_v7.29   -- NOTES FOR EARLIER VERSION erased here. go back to v7.36 to view them
         
     # just in case VCL gets real sluggish, close and try this in terminal:
     # code --disable-gpu
@@ -786,14 +319,22 @@ class App:
         self.display_device = self.REPdefaults["display_device (work or pool)"]
 
         # Monitor switching between the developer's landscape coding layout
-        # and the poolside portrait layout -- developer only. Users set
-        # their monitor to portrait once, in the desktop's screen settings.
+        # and the poolside portrait layout -- developer only. Users get
+        # portrait at every start (the install runs toggle_monitor.sh
+        # portrait) and turn it with the desktop's Monitor Toggle.
         if self.REPdefaults["developerMode"]:
             last = self.detect_current_mode()
 
             # If mode changed, rotate + restart
             if self.display_device != last:
-                if self.display_device == "pool":
+                # The Monitor Toggle script knows this monitor (its output
+                # name and sizes are set at the top of the script); the
+                # xrandr lines are the fallback without it.
+                toggle = os.path.expanduser("~/.local/bin/toggle_monitor.sh")
+                want = "portrait" if self.display_device == "pool" else "landscape"
+                if os.access(toggle, os.X_OK):
+                    subprocess.run([toggle, want])
+                elif want == "portrait":
                     subprocess.run([
                         "xrandr", "--output", "HDMI-1",
                         "--mode", "800x600",
@@ -840,12 +381,13 @@ class App:
             self.window_h = monitor_h      # e.g., 1280
             self.window_w = monitor_w      # e.g., 800
             if monitor_w > monitor_h:
-                # Monitor still in landscape (users turn it to portrait
-                # themselves; only developerMode switches it): keep the
+                # Monitor still in landscape (left there by the Monitor
+                # Toggle; only developerMode switches it): keep the
                 # portrait shape instead of stretching the picture sideways.
                 self.window_w = int(monitor_h * standard_aspect)
                 print("The monitor is in landscape. PoolWind is meant for a portrait "
-                      "monitor: turn it in the desktop's Screen Configuration.")
+                      "monitor: double-click Monitor Toggle on the desktop, then "
+                      "start PoolWind again.")
         elif self.display_device == "work":
             # Landscape window (fits usable height, leaves room for coding)
             self.window_h = usable_h       # e.g., 694
@@ -947,12 +489,18 @@ class App:
         # handy conversion code:
         #    ffmpeg -i /home/poolwind/poolwind/BillSwim2.mp4 -vf "scale=640:480,fps=30" -c:v libx264 -preset veryfast -crf 18 -c:a copy /home/poolwind/poolwind/BillSwim2a.mp4
         # ---------------------------------------------------------
+
         if self.capture_device == "video":
 
-            self.video_source = "Raw_2026-09-29_15-29-18.mp4"
-            self.startLater_inSeconds = 310
+            self.video_source = "Raw_2026-09-29_15-29-18.mp4" #Raw_2026-10-17_13-05-11.mp4"
+            self.startLater_inSeconds = 0 #310
             self.video_speed = 1.0   # 0.5x, 1x, 2x, etc.
             self.swimAreaPoints = [(141, 151), (475, 146), (377, 608), (190, 585)]
+
+            # self.video_source = "Raw_2026-09-29_15-29-18.mp4"
+            # self.startLater_inSeconds = 310
+            # self.video_speed = 1.0   # 0.5x, 1x, 2x, etc.
+            # self.swimAreaPoints = [(141, 151), (475, 146), (377, 608), (190, 585)]
 
             # self.video_source = "BillSwim2.mp4"  
             # self.startLater_inSeconds = 400 # 90 #400
@@ -2735,8 +2283,8 @@ class App:
         for line in out.splitlines():
             line = line.strip()
 
-            # Look for the HDMI-1 primary line
-            if line.startswith("HDMI-1 connected primary"):
+            # The first connected monitor (HDMI-1 on the author's Pi)
+            if current_mode is None and rotation is None and re.match(r"\S+ connected", line):
                 parts = line.split()
 
                 # Extract mode (the token containing "x" and "+")
