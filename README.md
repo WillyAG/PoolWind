@@ -1,4 +1,4 @@
-# PoolWind
+# PoolWind™
 
 **Swimmer-sensing jet control for swim-in-place pools.**
 
