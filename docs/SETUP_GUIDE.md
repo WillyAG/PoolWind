@@ -323,7 +323,7 @@ PoolWind to be closed and started again.
 | `'Sensitivity'` | `5000` | Minimum size, in pixels, of something the camera counts as a swimmer |
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
-| `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.67`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
+| `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.5`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
 | `'WATER_TAU'` | `5.0` | Seconds the water takes to catch up after the jet changes speed. Used **twice**: by the Swimmer Pace estimate, and as the delay of the [zone highlight](USER_MANUAL.md#seeing-the-jets-zone-the-zone-highlight) (with 5, the band moves about 7 seconds after a jet step). Changing it changes both |
 | `'zoneHighlight'` | `False` | Whether the zone highlight is on when PoolWind starts. A tap on the picture turns it on or off either way |
 | `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |

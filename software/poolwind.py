@@ -1,6 +1,19 @@
 
 if True:  # keep this here as an  easy way to skip over all this
-    # poolwindAI_v15.3   -- (to run on PySide6 instead of PyQt5)
+    # poolwindAI_v15.3   -- PYSIDE6 instead of PyQt5 (GPL), so the
+    #                         noncommercial license stands on its own:
+    #                         imports, exec(), QAction in QtGui, matplotlib
+    #                         backend_qtagg, mouse position(), the new-stick
+    #                         checkbox (toggled). Install: apt
+    #                         python3-pyside6.qtwidgets.
+    #                       - poolLength 162 (the swim area: back wall to the
+    #                         jet unit's edge), not 180 (the whole pool):
+    #                         the body-reach correction was ~10% short.
+    #                         DRIFT_SCALE stays 1.5 (1.67 was tried; 1.5
+    #                         felt right in the pool).
+    #                         The setting is renamed 'usablePoolLength'
+    #                         ('poolLength' in older files is still read,
+    #                         and the calibration file is saved renamed).
     #                       - STILLNESS CHECK REMOVED (2026-10-18): on
     #                         Raw_2026-09-29 (cover on) the cover's blob
     #                         moves with the lighting, so it isn't reliable.
@@ -120,32 +133,34 @@ if True:  # keep this here as an  easy way to skip over all this
     # --- GPIO ---
     import lgpio
     import os
-    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/arm-linux-gnueabihf/qt5/plugins/platforms"
+    # Qt for Python: PySide6 (LGPL), since v15.3. matplotlib's Qt canvas
+    # uses the same binding.
+    os.environ.setdefault("QT_API", "pyside6")
 
     import matplotlib
     matplotlib.use("Agg")     
 
     import matplotlib.pyplot as plt
-    from matplotlib.backends.backend_qt5agg import (
+    from matplotlib.backends.backend_qtagg import (
         FigureCanvasQTAgg as FigureCanvas,
         NavigationToolbar2QT as NavigationToolbar
     )
 
 
     import subprocess
-    from PyQt5 import QtWidgets, QtCore
+    from PySide6 import QtWidgets, QtCore
     # Optional: pull specific classes for convenience
-    from PyQt5.QtWidgets import (
+    from PySide6.QtWidgets import (
         QApplication, QMainWindow, QWidget, QLabel, QPushButton,
-        QVBoxLayout, QHBoxLayout, QDialog, QMenu, QAction,
+        QVBoxLayout, QHBoxLayout, QDialog, QMenu,
         QSizePolicy, QCheckBox, QMessageBox, QFrame,
         QCalendarWidget, QTableView
     )
-    from PyQt5.QtGui import (
-        QPixmap, QImage, QPainter, QPen, QBrush, QColor, QFont, QCursor, QPalette,
+    from PySide6.QtGui import (
+        QAction, QPixmap, QImage, QPainter, QPen, QBrush, QColor, QFont, QCursor, QPalette,
         QTextCharFormat
     )
-    from PyQt5.QtCore import Qt, QTimer, QEvent, QPoint, QObject, QDate
+    from PySide6.QtCore import Qt, QTimer, QEvent, QPoint, QObject, QDate
 
     import stat, textwrap
     import collections
@@ -492,8 +507,9 @@ class App:
 
         if self.capture_device == "video":
 
-            self.video_source = "Raw_2026-09-29_15-29-18.mp4" #Raw_2026-10-17_13-05-11.mp4"
-            self.startLater_inSeconds = 0 #310
+            self.video_source = "Raw_2026-10-17_13-05-11.mp4"
+            #self.video_source = "Raw_2026-09-29_15-29-18.mp4" #Raw_2026-10-17_13-05-11.mp4"
+            self.startLater_inSeconds = 310
             self.video_speed = 1.0   # 0.5x, 1x, 2x, etc.
             self.swimAreaPoints = [(141, 151), (475, 146), (377, 608), (190, 585)]
 
@@ -900,7 +916,7 @@ class App:
             erase_btn = box.addButton("Erase Oldest Video", QMessageBox.DestructiveRole)
             eject_btn = box.addButton("Eject && Replace", QMessageBox.RejectRole)
             box.setDefaultButton(log_btn)
-            box.exec_()
+            box.exec()
             clicked = box.clickedButton()
 
             if clicked is log_btn:
@@ -1026,7 +1042,7 @@ class App:
         btn_layout.addWidget(cancel_btn)
         layout.addLayout(btn_layout)
 
-        return dlg.exec_() == QDialog.Accepted
+        return dlg.exec() == QDialog.Accepted
 
     def _delete_planned_usb_video(self, plan):
         """Deletes exactly the files a prior _plan_oldest_usb_video_deletion
@@ -1143,7 +1159,7 @@ class App:
 
         slow_pace, fast_pace = self.REPdefaults["PaceLimitsDec"]
         dlg = USBDriveSetupDialog(mount_path, size_bytes, default_min_pace=fast_pace, default_max_pace=slow_pace)
-        if dlg.exec_() != QDialog.Accepted:
+        if dlg.exec() != QDialog.Accepted:
             return
 
         name, height, min_pace, max_pace = dlg.get_values()
@@ -1232,20 +1248,21 @@ class App:
     # file and on a swimmer's USB stick; the stick's values win.
     #   'swimmersHeight': 72                        (inches)
     #   'paceMin, Max': ('5:00', '1:42')            (min/100 yd, either order)
-    #   'poolLength': 180                           (inches; main file only --
-    #                                                it belongs to the pool)
+    #   'usablePoolLength': 162     (inches, back wall to the jet unit's edge;
+    #                                calibration file only -- it belongs to
+    #                                the pool; was 'poolLength' until v15.3)
     #   'recordTrainingVideo': False
     #   'algorithm (basic or swimmerPace)': 'swimmerPace'
     #   'logRate': 5        (rows + video frames per second, read at start)
     # The program works with internal keys DERIVED from these after every
     # load / reload: REPdefaults['PaceLimitsDec'] = (slow, fast) decimal
-    # minutes and REPdefaults['swimmersHeight,poolLength'] = (height, length).
+    # minutes and REPdefaults['swimmersHeight,usablePoolLength'] = (height, length).
     # Older names are still accepted (OLD_SETTING_NAMES). The program never
     # writes the main defaults file, so comments in it are kept.
     # ---------------------------------------------------------------
     KEY_PACE        = "paceMin, Max"
     KEY_HEIGHT      = "swimmersHeight"
-    KEY_POOL_LENGTH = "poolLength"
+    KEY_POOL_LENGTH = "usablePoolLength"
     KEY_RECORD      = "recordTrainingVideo"
     KEY_ALGO        = "algorithm (basic or swimmerPace)"
     KEY_LOGRATE     = "logRate"         # built in: 5
@@ -1261,6 +1278,7 @@ class App:
         "Algorithm (basic or swimmerPace)": KEY_ALGO,
         "defLogRate":                       KEY_LOGRATE,   # briefly used in v15.1
         "log recs per sec":                 KEY_LOGRATE,
+        "poolLength":                       KEY_POOL_LENGTH,   # until v15.3
     }
 
     @classmethod
@@ -1299,8 +1317,8 @@ class App:
         """Returns REPdefaults: the settings plus the derived internal keys."""
         rep = dict(defaults)
         rep["PaceLimitsDec"] = self._pace_limits(defaults[self.KEY_PACE])
-        rep["swimmersHeight,poolLength"] = (defaults.get(self.KEY_HEIGHT, 72),
-                                            defaults.get(self.KEY_POOL_LENGTH, 180))
+        rep["swimmersHeight,usablePoolLength"] = (defaults.get(self.KEY_HEIGHT, 72),
+                                            defaults.get(self.KEY_POOL_LENGTH, 162))
         rep[self.KEY_RECORD] = bool(defaults.get(self.KEY_RECORD, False))
         return rep
 
@@ -1308,16 +1326,16 @@ class App:
         """Overlay one swimmer's USB-stick settings onto REPdefaults."""
         ind = self._rename_old_settings(ind_defaults)
         if self.KEY_POOL_LENGTH in ind:
-            print("poolLength on the USB stick is ignored (it belongs to the pool: calibration file)")
+            print("usablePoolLength on the USB stick is ignored (it belongs to the pool: calibration file)")
         if self.KEY_PACE in ind:
             self.REPdefaults[self.KEY_PACE] = ind[self.KEY_PACE]
             self.REPdefaults["PaceLimitsDec"] = self._pace_limits(ind[self.KEY_PACE])
             if hasattr(self, "PaceLimitsDec"):      # after startup: keep the cached copy in step
                 self.PaceLimitsDec = self.REPdefaults["PaceLimitsDec"]
         if self.KEY_HEIGHT in ind:
-            _, poolLength = self.REPdefaults["swimmersHeight,poolLength"]
+            _, usablePoolLength = self.REPdefaults["swimmersHeight,usablePoolLength"]
             self.REPdefaults[self.KEY_HEIGHT] = ind[self.KEY_HEIGHT]
-            self.REPdefaults["swimmersHeight,poolLength"] = (ind[self.KEY_HEIGHT], poolLength)
+            self.REPdefaults["swimmersHeight,usablePoolLength"] = (ind[self.KEY_HEIGHT], usablePoolLength)
         if self.KEY_RECORD in ind:
             self.REPdefaults[self.KEY_RECORD] = bool(ind[self.KEY_RECORD])
         if self.KEY_ALGO in ind:
@@ -1339,12 +1357,13 @@ class App:
     # the defaults file.
     # ---------------------------------------------------------------
     CAL_KEYS = ("pace_voltage", "SafetyVoltageLimits", "swimAreaPoints",
-                "poolLength", "middleSwimZone %", "recordRawVideo")
+                "usablePoolLength", "middleSwimZone %", "recordRawVideo")
     # Entries added after the file format first appeared: taken over from
     # the defaults file (where they lived before) or these values.
-    CAL_FALLBACKS = {"poolLength": 180, "middleSwimZone %": 35, "recordRawVideo": False}
+    CAL_FALLBACKS = {"usablePoolLength": 162, "middleSwimZone %": 35, "recordRawVideo": False}
     CAL_REQUIRED = ("pace_voltage", "SafetyVoltageLimits", "swimAreaPoints")
     OLD_CAL_KEYS = ("cameraSwimAreaPoints", "videoSwimAreaPoints")   # before v7.44: one per source
+    OLD_CAL_NAMES = {"poolLength": "usablePoolLength"}               # renamed in v15.3
 
     def _load_calibration(self):
         """
@@ -1361,6 +1380,7 @@ class App:
                 print("Error loading calibration file:", self.calibration_path, e)
                 sys.exit()
             changed = self._convert_old_swim_area(cal)
+            changed = self._rename_old_cal_keys(cal) or changed
             for key, fallback in self.CAL_FALLBACKS.items():
                 if key not in cal:           # was in the defaults file (or built in) before
                     cal[key] = self._defaults_file_value(key, fallback)
@@ -1374,7 +1394,9 @@ class App:
                     old = ast.literal_eval(f.read())
             except Exception:
                 old = {}
-            cal = {k: old[k] for k in self.CAL_KEYS + self.OLD_CAL_KEYS if k in old}
+            cal = {k: old[k] for k in self.CAL_KEYS + self.OLD_CAL_KEYS
+                   + tuple(self.OLD_CAL_NAMES) if k in old}
+            self._rename_old_cal_keys(cal)
             self._convert_old_swim_area(cal)
             for key, fallback in self.CAL_FALLBACKS.items():
                 cal.setdefault(key, fallback)
@@ -1397,6 +1419,17 @@ class App:
         except Exception:
             return fallback
 
+    def _rename_old_cal_keys(self, cal):
+        """Older calibration names changed to the current ones (the file
+        is then saved with the new name). Returns True if anything changed."""
+        changed = False
+        for old, new in self.OLD_CAL_NAMES.items():
+            if old in cal:
+                value = cal.pop(old)
+                cal.setdefault(new, value)
+                changed = True
+        return changed
+
     def _convert_old_swim_area(self, cal):
         """The camera's area becomes swimAreaPoints; the video one is
         dropped. Returns True if anything changed."""
@@ -1417,7 +1450,8 @@ class App:
             "# pace_voltage: (pace min/100 yd, Pace Display volts) measured on this",
             "# pool. SafetyVoltageLimits: the jet is never driven outside these volts.",
             "# swimAreaPoints: the swim area's corners in the camera picture (Set",
-            "# Swim Area). poolLength: inches, front to back. middleSwimZone %: the",
+            "# Swim Area). usablePoolLength: the swim area's length in inches, from the back",
+            "# wall to the jet unit's edge (not the whole pool). middleSwimZone %: the",
             "# center lane's width, side to side, as a percent of the swim area.",
             "# recordRawVideo: record the camera's full, uncorrected video (large",
             "# files) -- developer tool, used only when developerMode is on.",
@@ -1813,7 +1847,7 @@ class App:
         box.setText("Are you sure? This will turn the pool's pump on or off.")
         box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         box.setDefaultButton(QMessageBox.Cancel)
-        if box.exec_() == QMessageBox.Ok:
+        if box.exec() == QMessageBox.Ok:
             self.OnOff_btn_press()
 
     def OnOff_btn_press(self):
@@ -2137,7 +2171,7 @@ class App:
         # stick falls back to the main default). Everything else in
         # REPdefaults is left alone -- e.g. an unsaved Set Swim Area.
         base = self._derive_internal_defaults(self.original_defaults)
-        for key in ("PaceLimitsDec", "swimmersHeight,poolLength") + self.STICK_KEYS:
+        for key in ("PaceLimitsDec", "swimmersHeight,usablePoolLength") + self.STICK_KEYS:
             if key in base:
                 self.REPdefaults[key] = base[key]
         self._apply_individual_defaults(ind_defaults)
@@ -2684,8 +2718,8 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         w_ok = left <= self.CoM_w <= right
 
         FRONT_BACK_MARGIN_FT = 0.5
-        _, poolLength = self.app.REPdefaults["swimmersHeight,poolLength"]
-        margin_h = (FRONT_BACK_MARGIN_FT * 12.0 / poolLength) * self.app.CoM_size_h
+        _, usablePoolLength = self.app.REPdefaults["swimmersHeight,usablePoolLength"]
+        margin_h = (FRONT_BACK_MARGIN_FT * 12.0 / usablePoolLength) * self.app.CoM_size_h
         h_ok = margin_h <= self.CoM_h_raw <= (self.app.CoM_size_h - margin_h)
 
         self.swimmerFound = w_ok and h_ok and (self.blob_CoM_w is not None)
@@ -3154,8 +3188,8 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         return self.blob_CoM_w, self.blob_CoM_h, corridor_mask
 
     def BodyCoMCorrection(self, CoM):
-        height, poolLength = self.app.REPdefaults["swimmersHeight,poolLength"]
-        back_corr, front_corr = body_corr_spans(height, poolLength)
+        height, usablePoolLength = self.app.REPdefaults["swimmersHeight,usablePoolLength"]
+        back_corr, front_corr = body_corr_spans(height, usablePoolLength)
 
         # Piecewise-linear stretch (2026-08-27): the raw (measured) CoM
         # range the body-center can physically occupy while both toes
@@ -3195,8 +3229,8 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
         # PRESS ---------------------------------------------------------
         if event_type == "press":
-            x_w = event.x()
-            y_h = event.y()
+            x_w = int(event.position().x())
+            y_h = int(event.position().y())
             if x_w is None:
                 return
             self.mouseDown = True
@@ -3588,7 +3622,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         self.app.leave_main_screen()
         self._enter_submenu()
         dlg = PlacePointsWindow(self.app, self)
-        dlg.exec_()
+        dlg.exec()
         self._exit_submenu()
         self.app.return_to_main_screen()
         self.app.pause_update_loop = False
@@ -3604,7 +3638,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # set that flag above still runs to completion, repainting one more
         # live (button-laden) frame onto display_canvas. That queued call
         # only gets a chance to run once we start pumping events again
-        # (e.g. inside the calendar's exec_() below), which would repaint
+        # (e.g. inside the calendar's exec() below), which would repaint
         # right over our clear() and undo it. Flush it out now so it's
         # already done before we ever call clear().
         QApplication.processEvents()
@@ -3621,7 +3655,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             # dialog covering the same geometry as this window, blank the
             # main display before showing it anyway -- clear() only
             # schedules a repaint (update()), it doesn't paint
-            # synchronously, and the dialog's own exec_() starts a nested
+            # synchronously, and the dialog's own exec() starts a nested
             # event loop right on the next line. Without forcing that
             # repaint through first, a sliver of the actual last-rendered
             # frame (CoM bar, wherever it happened to be) can stay stuck
@@ -3631,11 +3665,11 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             self.display_canvas.clear()
             QApplication.processEvents()
             range_dlg = SwimDateRangeDialog(self.app, self, from_date, to_date)
-            if range_dlg.exec_() != QDialog.Accepted:
+            if range_dlg.exec() != QDialog.Accepted:
                 break
             from_date, to_date = range_dlg.get_range()
             dlg = SwimPlotWindow(self.app, self, from_date, to_date)
-            dlg.exec_()
+            dlg.exec()
 
         self._exit_submenu()
         self.app.return_to_main_screen()
@@ -4094,7 +4128,7 @@ class DisplayCanvas(QWidget):
             painter = QPainter(self)
             painter.drawPixmap(0, 0, self._pixmap)
 
-def body_corr_spans(height, poolLength):
+def body_corr_spans(height, usablePoolLength):
     """
     BodyCoMCorrection's reach, in CoM units (0-1000 = the pool's length):
     (back_corr, front_corr) = back-center to toes, back-center to
@@ -4109,7 +4143,7 @@ def body_corr_spans(height, poolLength):
     L = height * 1.29                 # full body length
     front_len = L * (35 / 91)         # back-center -> fingertips
     back_len  = L * (56 / 91)         # back-center -> toes
-    return (back_len / poolLength) * 1000, (front_len / poolLength) * 1000
+    return (back_len / usablePoolLength) * 1000, (front_len / usablePoolLength) * 1000
 
 
 def draw_zone_band_on(frame, zone, zones, level):
@@ -4427,7 +4461,7 @@ class SwimController:
         - drift_speed: swimmer's speed across the pool floor, from the RAW
           blob position (blob_CoM_h, NOT the height-compensated CoM_h --
           that one is stretched 1.66x-2.74x by BodyCoMCorrection and would
-          distort the drift), converted to real inches via poolLength,
+          distort the drift), converted to real inches via usablePoolLength,
           smoothed with DRIFT_TAU seconds. Moving toward the fast end
           (higher CoM_h) = swimming faster than the water, so it lowers
           pace. Only used while swimmerFound.
@@ -4459,8 +4493,8 @@ class SwimController:
         found = getattr(app.window, "swimmerFound", False)
         v_drift = 0.0
         if found and blob_h is not None:
-            _, poolLength = app.REPdefaults["swimmersHeight,poolLength"]
-            pos_in = blob_h / app.CoM_size_h * poolLength      # inches
+            _, usablePoolLength = app.REPdefaults["swimmersHeight,usablePoolLength"]
+            pos_in = blob_h / app.CoM_size_h * usablePoolLength      # inches
             if getattr(self, "_est_pos_s", None) is None:
                 self._est_pos_s = pos_in
             else:
@@ -4801,8 +4835,8 @@ class PlacePointsCanvas(QWidget):
         win_w = self.width()
         win_h = self.height()
 
-        fw = int(event.x() * (self.app.work_size_w / win_w))
-        fh = int(event.y() * (self.app.work_size_h / win_h))
+        fw = int(event.position().x() * (self.app.work_size_w / win_w))
+        fh = int(event.position().y() * (self.app.work_size_h / win_h))
 
         fw = max(0, min(479, fw))
         fh = max(0, min(639, fh))
@@ -5017,7 +5051,7 @@ class PlacePointsWindow(QDialog):
                         "line into the program next to the video's file name\n"
                         "(also printed in the terminal):\n\n" + line)
             box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            box.exec_()
+            box.exec()
 
         self.accept()
 
@@ -5135,12 +5169,11 @@ class _MonthOnlyCalendar(QCalendarWidget):
             font.setPointSize(max(6, font.pointSize() - 3))
             painter.setFont(font)
             painter.setPen(QColor("blue"))
-            # Bottom-aligned text sits flush against rect's bottom edge --
-            # nudge the whole rect (top AND bottom) down a bit so it
-            # clears the day number above it without clipping into the
-            # row below.
-            nudge = painter.fontMetrics().height() // 4 + 1
-            pace_rect = rect.adjusted(0, nudge, 0, nudge)
+            # Bottom-aligned, inside the cell: Qt 6 (PySide6) clips each
+            # cell's painting to its rect, so the old nudge below the
+            # bottom edge cut the numbers off. The cell is tall enough
+            # for the day number above it.
+            pace_rect = rect.adjusted(0, 0, 0, -1)
             painter.drawText(pace_rect, Qt.AlignHCenter | Qt.AlignBottom, pace_txt)
             painter.restore()
 
@@ -5208,9 +5241,7 @@ class USBDriveSetupDialog(QDialog):
         )
         self.ok_button = buttons.button(QtWidgets.QDialogButtonBox.Ok)
         self.ok_button.setEnabled(False)
-        self.confirm_check.stateChanged.connect(
-            lambda state: self.ok_button.setEnabled(state == Qt.Checked)
-        )
+        self.confirm_check.toggled.connect(self.ok_button.setEnabled)
         buttons.accepted.connect(self._on_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -6501,7 +6532,7 @@ class _LeftClickFilter(QObject):
         t = event.type()
         if t in (QEvent.MouseButtonPress, QEvent.MouseButtonDblClick, QEvent.MouseButtonRelease) \
                 and event.button() == Qt.LeftButton:
-            if self._exclude is not None and self._exclude(event.pos()):
+            if self._exclude is not None and self._exclude(event.position().toPoint()):
                 return False
             if t != QEvent.MouseButtonRelease:
                 self._cb()
@@ -6592,13 +6623,13 @@ class DraggableOverlay(QFrame):
         super().resizeEvent(event)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton and event.pos().y() <= 24:
+        if event.button() == Qt.LeftButton and event.position().toPoint().y() <= 24:
             self._drag_active = True
-            self._drag_offset = event.pos()
+            self._drag_offset = event.position().toPoint()
 
     def mouseMoveEvent(self, event):
         if self._drag_active:
-            new_pos = self.mapToParent(event.pos() - self._drag_offset)
+            new_pos = self.mapToParent(event.position().toPoint() - self._drag_offset)
             self.move(new_pos)
 
     def mouseReleaseEvent(self, event):
@@ -6639,7 +6670,7 @@ if __name__ == "__main__":
     qt_app.aboutToQuit.connect(app.shutdown)
     
     # Start Qt event loop and exit Python when it finishes
-    sys.exit(qt_app.exec_())
+    sys.exit(qt_app.exec())
 
 """
 ===============================================================
