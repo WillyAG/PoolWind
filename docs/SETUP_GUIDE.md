@@ -56,16 +56,22 @@ pool's jet. Do them with nobody in the pool.
 ## 3. Installing PoolWind
 
 Open a terminal on the Pi: click the **Terminal** icon (a black screen
-with `>_`) on the bar at the top of the desktop. Type these two lines,
+with `>_`) on the bar at the top of the desktop. Type these three lines,
 pressing Enter after each:
 
 ```
-git clone https://github.com/WillyAG/PoolWind.git ~/PoolWind-download
-bash ~/PoolWind-download/install.sh
+git clone https://github.com/WillyAG/PoolWind.git PoolWind-download
+cd PoolWind-download
+bash install.sh
 ```
 
-The first line downloads PoolWind into a `PoolWind-download` folder. The
-second runs the install script.
+The first line downloads PoolWind into a `PoolWind-download` folder in your
+home folder (where a new terminal starts). The second goes into that
+folder, and the third runs the install script. Capitals and the `-` matter.
+
+If the third line says "No such file or directory", open the
+`PoolWind-download` folder in the File Manager instead, press **F4**
+(Open Current Folder in Terminal) and type `bash install.sh` there.
 
 **It asks for your password once:** the password you chose in Raspberry Pi
 Imager (section 2). Nothing shows on the screen while you type it, not even
@@ -407,10 +413,12 @@ terminal. Updating PoolWind keeps these settings.
 Download the new version and run the install script again:
 
 ```
-cd ~/PoolWind-download
+cd PoolWind-download
 git pull
 bash install.sh
 ```
+
+(In a new terminal, which starts in your home folder.)
 
 Your settings, calibration, swim logs and videos are kept.
 

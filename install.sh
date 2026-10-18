@@ -1,8 +1,9 @@
 #!/bin/bash
 # PoolWind install script.
 #
-#   git clone https://github.com/WillyAG/PoolWind.git ~/PoolWind-download
-#   bash ~/PoolWind-download/install.sh
+#   git clone https://github.com/WillyAG/PoolWind.git PoolWind-download
+#   cd PoolWind-download
+#   bash install.sh
 #
 # Sets up a Raspberry Pi 5 running Raspberry Pi OS (64-bit, with desktop)
 # for PoolWind. See docs/SETUP_GUIDE.md, section 3. Safe to run again: it
