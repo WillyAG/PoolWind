@@ -92,8 +92,6 @@ if True:  # keep this here as an  easy way to skip over all this
     # “Make a Mermaid flowchart in the simple‑compatible style 
     # (no slashes, no HTML, no double brackets).”
 
-    # Pace display manual: 
-    # https://manualzz.com/doc/80503213/endless-pools-digital-pace-display-guide?utm_source=copilot.com&p=2
 
     """
     This program was conceived and written by William A. Gorlitz.
@@ -4308,7 +4306,7 @@ class SwimController:
           - only voltages the jet may actually reach (<= the safety max), so
             no part of the pool asks for a speed it can't get;
           - entries within 0.01 V of the previous kept one are treated as
-            the same step (e.g. 1.185 / 1.186).
+            the same step (two readings of one step, e.g. 1.200 / 1.201).
         Cached; recomputed if PaceLimitsDec or SafetyVoltageLimits change
         (e.g. a swimmer's USB stick is set up mid-session).
         """
@@ -4372,7 +4370,7 @@ class SwimController:
         and moves to a neighbour only when the voltage is past the halfway
         point plus JET_ZONE_HYSTERESIS of the gap, so it can't flicker on
         an edge. Zones come from _zone_steps, which already treats
-        near-duplicate steps (1.185 / 1.186 V) as one.
+        near-duplicate steps (e.g. 1.200 / 1.201 V) as one.
         """
         # Smoothed first with the WATER LAG, WATER_TAU seconds (the same lag
         # the Swimmer Pace estimator gives the water after a jet step), so

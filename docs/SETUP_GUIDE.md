@@ -169,16 +169,20 @@ gives the same voltage. To turn a voltage into a pace, PoolWind needs a
 table of pairs: the pace, and the voltage at that pace.
 
 **The table that comes with PoolWind was measured on the author's pool, a
-Standard Endless Pool.** It hasn't been checked on any other pool.
+Standard Endless Pool, with the calibration program's PingPong mode:
+ping-pong balls timed by the camera.** The factor that turns the balls'
+surface speed into swimming pace was set by the author. The table hasn't
+been checked on any other pool.
 
 **Does it fit your pool?** Measure the Pace Display port voltage with a
 multimeter (the build guide's
 [second check](BUILD_GUIDE.md#before-you-buy-anything-three-checks)) while
 you change the jet speed. If it goes from about **1.2 V** at the slowest to
 about **3.2 V** at very fast, the table that comes with PoolWind should
-work. Take care at high speeds, and stop if the pool shows too much
-stress. Above about 2.6 V the Pace Display stays at its fastest reading,
-1:00. If your pool's range is different, you'll need your own table.
+work (it covers 1.22 V to 2.44 V; the safety limits keep the jet well
+inside that). Take care at high speeds, and stop if the pool shows too
+much stress. If your pool's range is different, you'll need your own
+table.
 
 **To measure your own table,** use the PoolWind calibration program
 (planned). It will build the table automatically, reading each voltage
@@ -188,11 +192,11 @@ you have one, or drop ping-pong balls in the water for it to time.
 
 ```
 'pace_voltage': [
-    (7.0, 1.185),
-    (6.85, 1.186),
+    (5.2067, 1.22),
+    (4.9933, 1.294),
     ...
-    (1.46, 2.43),
-    (1, 2.5)
+    (1.4839, 2.397),
+    (1.4297, 2.435)
 ]
 ```
 
@@ -212,7 +216,7 @@ Each pair is (pace in minutes per 100 yards as a decimal, volts). For example
   willing to let PoolWind reach in your pool.
 
 With the author's pace table, `(1.46, 2.15)` keeps the jet between about
-4:49 and 1:49 per 100 yards.
+4:17 and 1:46 per 100 yards.
 
 Changes to the calibration file take effect at the next start.
 

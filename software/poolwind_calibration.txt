@@ -10,43 +10,45 @@
 # files) -- developer tool, used only when developerMode is on.
 # Read at program start.
 #
-# THIS FILE HOLDS THE AUTHOR'S POOL, AS AN EXAMPLE. The pace table should
-# be close for a pool of the same model; set the swim area for your own camera
-# (Set Swim Area) and check the safety limits. See the setup guide, section 5.
+# THIS FILE HOLDS THE AUTHOR'S POOL, AS AN EXAMPLE. The pace table was
+# measured with the calibration program's PingPong mode: ping-pong balls
+# timed by the camera. The factor that turns the balls' surface speed into
+# swimming pace was set by the author. It should be close for a pool of the
+# same model; set the swim area for your own camera (Set Swim Area) and
+# check the safety limits. See the setup guide, section 5.
 {
 'pace_voltage': [
-    (7.0, 1.185),
-    (6.85, 1.186),
-    (6.7, 1.249),
-    (6.4, 1.288),
-    (6.1167, 1.324),
-    (5.8167, 1.366),
-    (5.4, 1.4),
-    (4.9833, 1.442),
-    (4.5667, 1.489),
-    (4.15, 1.524),
-    (3.825, 1.562),
-    (3.5, 1.6),
-    (3.25, 1.643),
-    (3.0, 1.677),
-    (2.75, 1.73),
-    (2.5, 1.76),
-    (2.4333, 1.796),
-    (2.3, 1.826),
-    (2.2667, 1.876),
-    (2.1667, 1.915),
-    (2.1167, 1.953),
-    (2.0333, 1.994),
-    (1.9833, 2.037),
-    (1.9167, 2.078),
-    (1.8667, 2.115),
-    (1.8167, 2.149),
-    (1.7667, 2.188),
-    (1.7417, 2.233),
-    (1.7167, 2.274),
-    (1.6667, 2.304),
-    (1.46, 2.43),
-    (1, 2.5)
+    (5.2067, 1.22),
+    (4.9933, 1.294),
+    (4.8877, 1.333),
+    (4.784, 1.373),
+    (4.544, 1.412),
+    (4.3269, 1.451),
+    (4.1248, 1.491),
+    (3.917, 1.53),
+    (3.7246, 1.57),
+    (3.5544, 1.609),
+    (3.2598, 1.648),
+    (3.0103, 1.687),
+    (2.7963, 1.726),
+    (2.6018, 1.766),
+    (2.4326, 1.806),
+    (2.284, 1.846),
+    (2.2414, 1.885),
+    (2.2004, 1.924),
+    (2.1608, 1.963),
+    (2.0684, 2.002),
+    (1.9815, 2.042),
+    (1.9035, 2.081),
+    (1.8212, 2.12),
+    (1.7439, 2.16),
+    (1.6746, 2.199),
+    (1.6536, 2.238),
+    (1.6326, 2.278),
+    (1.6126, 2.317),
+    (1.5456, 2.357),
+    (1.4839, 2.397),
+    (1.4297, 2.435)
 ]
 
 ,'SafetyVoltageLimits': (1.46, 2.15)
