@@ -20,8 +20,9 @@ pool are covered in the build guide and the setup and calibration guide.
 
 ## 1. Before you swim
 
-- **Use your own USB stick.** It holds your personal Pace limits, so the jet
-  never goes faster than you've chosen. Never use someone else's stick,
+- **Use your own USB stick.** It holds your personal zone limits (your
+  slowest and fastest zone), so the jet never goes faster than you've
+  chosen. Never use someone else's stick,
   especially a stronger swimmer's.
 - **Insert your stick before starting PoolWind.** A stick inserted while
   PoolWind is running isn't used until the next start.
@@ -48,6 +49,13 @@ today's distance and average Pace carry on from your earlier session.
 
 **A blank or new USB stick?** PoolWind offers to set it up as a new
 swimmer's stick (see [Setting up a new stick](#setting-up-a-new-stick)).
+
+**"Camera moved?"** A few seconds after the start, PoolWind checks that the
+camera still sees the pool the way it did when the swim area was set. If
+it has moved (knocked, or moved for cleaning), PoolWind asks. Choose
+**Adjust** to move the swim area with the picture, unless you know better:
+**Keep** leaves it (it asks again next time), **Set Swim Area** lets you
+set the corners yourself.
 
 ## 3. The pool screen
 
@@ -80,7 +88,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
 | **OnOff** (light red) | Turns the pool's pump on or off, at one touch |
-| **≡** (top left) | Menu: **Set Swim Area...** and **Swim Plot...** |
+| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...**, **Calibrate pool...** and **Pace correction...** (the pool's calibration, for the technician), **Swimmer limits...**, then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
 A button looks pressed in while you touch it.
@@ -91,7 +99,8 @@ sees, in black and white. They help when checking that PoolWind is
 detecting you properly. Press View until the camera view returns.
 
 **Tap the picture** (anywhere off the buttons) to light up the zone that
-matches the jet's speed; tap again to turn it off. See
+matches the jet's speed and show the lines between the zones; tap again to
+turn them off. See
 [Seeing the jet's zone](#seeing-the-jets-zone-the-zone-highlight).
 
 ## 4. Swimming with PoolWind
@@ -106,8 +115,9 @@ its own jet speed, slowest at the back and fastest at the front.
   relaxes again to balance your slower stroke.
 - **Swim steadily**, and you settle in one zone with a steady jet flow.
 
-The fastest zone is set by the top Pace on your USB stick, so the jet never
-goes faster than that.
+Your slowest and fastest zone are set on your USB stick (see
+[Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone)), so the jet
+never goes faster than your fastest zone.
 
 You can change strokes, speed up, and slow down to rest without running into
 the front or the back of the pool. But a **sprint** will put you into the wall.
@@ -117,8 +127,9 @@ take a few seconds. Give the system a little time to work.
 ### Seeing the jet's zone: the zone highlight
 
 **Tap the picture** (anywhere off the buttons) to light up the zone that
-matches the jet's speed right now, as a faint band across the screen. Tap
-again to turn it off. It is turned off when PoolWind starts.
+matches the jet's speed right now, as a faint band across the screen, with
+thin yellow lines between all the zones. Tap again to turn them off. They
+are turned off when PoolWind starts.
 
 - The band is the **jet's** zone, not yours: It is not a physical zone but it represents the rate the water is moving.  You can think of the band as the readout of a jet speed meter, slowest at the bottom of the screen (the back of the pool), fastest at the top.
   For how the zones work, see
@@ -126,10 +137,10 @@ again to turn it off. It is turned off when PoolWind starts.
 - It stays put while the jet holds a speed, so it's a **stationary
   reference**: you can see a stronger or easier stroke carry you forward or
   let you drift back against it.
-- It moves a few seconds after you do, once the water has caught up. That
-  same delay is why a sprint can run you into the wall: you can watch it
-  happen.
-- Don't blame the program for the slow movement of the band, it only reflects built in pool delays of setting the jet speed (moving the valve) and moving the mass of the water. Nothing can speed that up.
+- It moves as soon as the jet changes speed, a moment after you move. The
+  water then takes a few more seconds to catch up. Those delays are why a
+  sprint can run you into the wall: you can watch it happen.
+- Don't blame the program for the slow movement of the band, it only reflects built in pool delays of setting the jet speed (moving the valve). Moving the mass of the water takes a few seconds more. Nothing can speed that up.
 
 The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
 
@@ -195,6 +206,26 @@ the jet doesn't slow down if you fall back, get out of the swim zone, or even le
 pool's remote. PoolWind briefly stops adjusting the speed while it does
 this, giving OnOff top priority.
 
+### Pace correction: when the Paces don't feel right
+
+Pace is only an estimate (body type, stroke, how deep you swim). If the
+Paces PoolWind shows don't match Paces you know from a regular pool,
+correct them once for the pool:
+
+1. Open the menu (**≡**) and choose **Pace correction...**. A small box
+   opens over the pool screen; drag it out of the way if you like.
+2. Swim until the current feels like a Pace you know, then move aside. The
+   box shows the Pace PoolWind reads for that speed.
+3. Type the Pace it should be (`1:45`, or just `145`, on the keyboard or the
+   box's number pad) and press **Add**.
+4. Do it again at other speeds: slow, medium, fast. Then press **Save**.
+
+After saving, each of those speeds shows the Pace you typed; between them
+the correction is blended, and past the slowest and fastest it carries on
+the same way. Only the Paces shown change, not the jet speeds or anyone's
+zones. Use one correction for everyone who swims in this pool, so swimmers
+can be compared.
+
 ## 5. Finishing a swim
 
 > **Close PoolWind before putting on a pool cover.** A cover changes what
@@ -241,7 +272,7 @@ Once PoolWind is closed, the pool works normally with its own remote.
 
 Each swimmer has their own USB stick. It holds:
 
-- **your settings**: height, Pace limits, logRate (optional) and whether to record training video (see [Your settings](#8-your-settings));
+- **your settings**: height, zone limits, logRate (optional) and whether to record training video (see [Your settings](#8-your-settings));
 - **your swims**: a log of every swim and its training video, in a folder
   called `CSV Vault`.
 
@@ -279,13 +310,43 @@ offers to set it up as a new swimmer's stick. You enter:
 
 - the swimmer's **name** (it becomes the stick's name),
 - their **height**, and
-- their **Pace limits**: the slowest and fastest Pace the jet may run at.
+- their **slowest and fastest zone** (the Pace is shown beside each). Set
+  them better later by swimming, with [Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone).
 
 **Setting up a stick erases everything on it.** PoolWind asks you to tick a
 box confirming this before it continues.
 
-For children and weaker swimmers, choose a **slow top Pace**, for example
-3:00 per 100 yards.
+For children and weaker swimmers, choose a **low fastest zone**, for
+example one at about 3:00 per 100 yards.
+
+### Swimmer limits: your slowest and fastest zone
+
+Your USB stick holds your **slowest** and **fastest zone**: the jet never
+goes slower or faster than these. Open the menu (**≡**, top left) and
+choose **Swimmer limits...**. A small box opens over the pool screen; drag
+it out of the way if you want to see the swimmer. It shows both zones,
+with the Pace beside each.
+
+**By hand (a coach can do this without the swimmer swimming):** tap
+Slowest or Fastest, then press **+** or **-** (or the + and - keys on the
+keyboard). Press **Save**.
+
+**By swimming:**
+
+1. Press **Start**. The zones open up to the pool's whole safe range.
+2. Swim near the back of the pool: the jet slows as you drift back. When
+   it is as slow as you want (almost treading water), leave the swim area
+   at once: the jet speed when you were last seen is recorded. Then press
+   **Low limit reached**. Or the coach presses it while you stay in the
+   swim area for the next step.
+3. Now swim as hard as you can toward the jet: it speeds up as you move
+   forward. At the fastest speed you can hold, leave the swim area, or the
+   coach presses **High limit reached**.
+4. Press **Save**.
+
+Save writes them to your USB stick. With no stick in, it saves them in the
+main settings file, for everyone who swims without a stick. **Cancel**
+closes the box without changing anything.
 
 ## 7. Reviewing your swims: Swim Plot
 
@@ -374,7 +435,8 @@ The same user settings live in two places:
 | Setting | Example | Meaning |
 |---|---|---|
 | `'swimmersHeight'` | `66` | Your height in inches. Helps PoolWind judge your position |
-| `'paceMin, Max'` | `('5:00', '3:00')` | Slowest and fastest Pace the jet may run at, in minutes per 100 yards |
+| `'zoneMin, Max'` | `(8, 22)` | Your slowest and fastest zone (zone 1 is the jet's slowest speed). Set them with [Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone) |
+| `'paceMin, Max'` | `('5:00', '3:00')` | Instead of zones (the main settings file, as shipped): the slowest and fastest Pace, in minutes per 100 yards, turned into zones by PoolWind. `'zoneMin, Max'` wins if both are there |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
 | `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes, so it's safe to remove (it can also stay in for the next start). `False` leaves it open, so its files still show in the File Manager after PoolWind closes. Eject it with the eject icon (⏏) before removing it. See [Which setting suits you?](#5-finishing-a-swim) |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |

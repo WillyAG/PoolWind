@@ -51,7 +51,7 @@ pattern and his speed improved noticeably as a result.
 
 ## Features
 
-- Automatic jet speed from swimmer position, within pace limits you choose.
+- Automatic jet speed from swimmer position, within the slowest and fastest zone each swimmer sets by swimming (Swimmer limits).
 
 - "Swimmer Pace" estimate (your pace through the water, not just the jet setting)
 
@@ -61,9 +61,15 @@ pattern and his speed improved noticeably as a result.
 
 - Hold mode: freeze the current speed, vary it with Up and Dn screen buttons
 
+- Built-in calibration: a voltage scan fits PoolWind to your pool, then Pace Entry (read from a Pace Display) or PingPong (ping-pong balls timed by the camera); Pace correction while swimming
+
+- Zone highlight: the jet's zone as a light band, with thin lines between the zones
+
+- Camera check at each start: if the camera has moved, PoolWind offers to move the swim area with it
+
 - Automatic detection if swimmer leaves the center swim zone, pausing data collection and lowering the jet flow to its lowest setting
 
-- Per-swimmer USB sticks: personal settings (height, pace limits, video recording switch) and swim data. Months of data can be collected depending on the size of the USB stick
+- Per-swimmer USB sticks: personal settings (height, zone limits, video recording switch) and swim data. Months of data can be collected depending on the size of the USB stick
 (Approx 70 hours on a 32 GB stick) 
 
 - Safety voltage limits
@@ -76,7 +82,7 @@ pattern and his speed improved noticeably as a result.
 
 - Tested on:  Endless Pools, Standard Endless Pool (purchased February 2012). The controller board was later replaced after a lightning strike, and PoolWind works with the replacement.
 
-- Other models: Untested. Other remotes may have similar buttons which can be used. But a feedback voltage is essential and a relationship between voltage and Pace must be measured in the form of data points.
+- Other models: Untested. Other remotes may have similar buttons which can be used. But a feedback voltage is essential and a relationship between voltage and Pace must be measured in the form of data points (the built-in calibration does this).
 
 - Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
 
@@ -88,7 +94,7 @@ pattern and his speed improved noticeably as a result.
 
 ## What's in this repository
 
-- The PoolWind program (poolwind.py)
+- The PoolWind program (poolwind.py), with its calibration built in
 - Settings files (poolwind_defaults.txt, poolwind_calibration.txt) 
 - Schematics, layout, and PCB Gerber files for the interface board in a [Fritzing](https://fritzing.org) file (a free circuit design program)
 - Parts and source list

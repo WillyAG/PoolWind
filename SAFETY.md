@@ -50,16 +50,22 @@ for the full disclaimer.
 - **Never swim alone** while testing a new build or new settings.
 - **Test with the pool empty of swimmers first.** Watch the jet respond to the
   program before you get in, make sure it goes to the lowest flow.
-- **Set sensible pace limits** for each swimmer's ability (in the defaults
-  file and on each swimmer's USB stick), and **safety voltage limits** for
-  your pool in the calibration file. The program will not command speeds
-  outside them. The calibration file is for technician changes only.
-- **Each swimmer's USB stick is personal.** Its pace limits decide how fast
+- **Set sensible limits** for each swimmer's ability: their slowest and
+  fastest zone on their USB stick (Swimmer limits), and the pace limits in
+  the defaults file for anyone without a stick. The **safety voltage
+  limits** in the calibration file are fitted to your pool by the
+  calibration's scan. The program will not command speeds outside them.
+  The calibration file is for technician changes only.
+- **The calibration moves the jet to fast speeds.** Nobody in the pool
+  while it runs. During the scan, when the pool sounds too fast or
+  strained, press **Stop**, then **Use as top**: PoolWind then never drives
+  the jet faster than that.
+- **Each swimmer's USB stick is personal.** Its zone limits decide how fast
   the jet can go for that swimmer. A child or weak swimmer using a strong
   swimmer's stick could be faced with a current they can't handle. Give
-  every swimmer their own stick with a top pace that suits them, and never
+  every swimmer their own stick with a fastest zone that suits them, and never
   swap sticks.
-- **Children and weak swimmers:** use a slow top pace on their stick, and do
+- **Children and weak swimmers:** use a low fastest zone on their stick, and do
   not let PoolWind control the current for anyone who couldn't handle the
   jet at the fastest pace their stick allows. Supervise them.
 - **Without a USB stick, the defaults file's pace limits apply.** The shipped

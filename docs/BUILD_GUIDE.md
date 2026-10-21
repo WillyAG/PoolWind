@@ -27,7 +27,9 @@ these fails, the rest of this guide won't help, so check all three first.
    voltage on the pool's Pace Display port ranging from about 1.2v to 3.2v (see
    [section 6](#6-the-pace-display-port)). Measure it with a multimeter: it
    should change steadily as you change the jet speed. Without it, PoolWind
-   can't tell how fast the jet is running. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified.
+   can't tell how fast the jet is running. Another range works too, as long
+   as the INA260 sensor can read it (0 to 36 V): after installing, the
+   calibration's voltage scan fits PoolWind to your pool's range. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified.
 3. **Your skills.** PoolWind is a do-it-yourself project, not a product: it
    isn't for sale, and there's no kit. You buy the parts from various
    suppliers, then build, install and set it up yourself, at your own risk

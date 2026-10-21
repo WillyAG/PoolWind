@@ -117,10 +117,10 @@ Before the first start:
   than the author's usually works without changes: see
   [working from home](#9-working-from-home).
 - **Calibration:** the `poolwind_calibration.txt` that comes with PoolWind
-  holds the author's pool. Its pace table should be close for a pool of
-  the same model (section 5.2), but **set the swim area for
-  your own camera** (section 5.1) and check the safety limits (section 5.3)
-  before the first swim.
+  holds the author's pool. Before the first swim, **set the swim area for
+  your own camera** (section 5.1) and **run the calibration** (section
+  5.2): at least its initial voltage scan, which fits PoolWind to your
+  pool's voltages and safety limits.
 
 Double-click the **PoolWind** icon. Then:
 
@@ -140,7 +140,14 @@ Check that:
 ## 5. Calibrating for your pool
 
 These settings fit PoolWind to **your** pool. They're stored in
-`poolwind_calibration.txt`, next to the program.
+`poolwind_calibration.txt`, next to the program. Do them in this order,
+which is also the order of PoolWind's menu:
+
+1. **Set Swim Area** (5.1): where the pool is in the camera's picture.
+2. **Calibrate pool** (5.2): your pool's voltages, safety limits and Pace
+   table.
+3. Each swimmer's **Swimmer limits**: see the
+   [user manual](USER_MANUAL.md#swimmer-limits-your-slowest-and-fastest-zone).
 
 > **The calibration file is safety-critical.** It decides which voltages
 > PoolWind drives the jet to. Only someone who understands the system should
@@ -161,34 +168,110 @@ This tells PoolWind where the pool is in the camera's picture.
 
 Do this again if the camera is ever moved.
 
-### 5.2 The pace table (`pace_voltage`)
+**The camera check.** Saving the swim area also saves the camera's
+picture, as `poolwind_calibration_camera.png` next to the calibration file.
+A few seconds after each start, PoolWind compares the camera's picture with
+it, looking only outside the water (deck, benches, jet unit). If the camera
+has moved, it asks **Camera moved?** and offers:
 
-PoolWind reads the jet speed as a voltage on the pool's Pace Display port.
-The voltage changes steadily with the jet speed: the same jet speed always
-gives the same voltage. To turn a voltage into a pace, PoolWind needs a
-table of pairs: the pace, and the voltage at that pace.
+- **Adjust**: move the swim area with the picture (and save it);
+- **Keep**: leave it as it is (it asks again at the next start);
+- **Set Swim Area**: set the corners again yourself.
 
-**The table that comes with PoolWind was measured on the author's pool, a
-Standard Endless Pool, with the calibration program's PingPong mode:
-ping-pong balls timed by the camera.** The factor that turns the balls'
-surface speed into swimming pace was set by the author. The table hasn't
-been checked on any other pool.
+Changing the swim area on purpose, for example for a jet box extension,
+saves a new picture, so the check never asks then. If the swim area's
+length changed, change `usableSwimLength` too (5.4). In the dark, when
+there isn't enough to compare, the check says nothing.
 
-**Does it fit your pool?** Measure the Pace Display port voltage with a
-multimeter (the build guide's
-[second check](BUILD_GUIDE.md#before-you-buy-anything-three-checks)) while
-you change the jet speed. If it goes from about **1.2 V** at the slowest to
-about **3.2 V** at very fast, the table that comes with PoolWind should
-work (it covers 1.22 V to 2.44 V; the safety limits keep the jet well
-inside that). Take care at high speeds, and stop if the pool shows too
-much stress. If your pool's range is different, you'll need your own
-table.
+### 5.2 The calibration program
 
-**To measure your own table,** use the PoolWind calibration program
-(planned). It will build the table automatically, reading each voltage
-through PoolWind's own voltage sensor. You'll only need to do one of two
-things at each jet speed: type in the pace shown on your Pace Display, if
-you have one, or drop ping-pong balls in the water for it to time.
+PoolWind needs a **Pace table** for your pool: which jet voltage goes with
+which pace. The calibration measures it through PoolWind's own voltage
+sensor and relays.
+
+**Pace here is only an estimate.** It can never be exact due to the
+varying speed of layers as you go from top to bottom. It is different for
+stroke styles and body types depending on how deep you go (your legs
+mostly). But after calibration, it is close and consistent enough for
+training. You can only measure an accurate Pace in a regular pool.
+
+**Before you start**
+
+- **Nobody in the pool.** The jet goes up to fast speeds.
+- The pool's **pump on**, and the swim area set (5.1).
+
+On the pool screen, open the menu (**≡**, top left) and choose
+**Calibrate pool...**. PoolWind winds the jet down and hands it to the
+calibration; when you close the calibration, PoolWind uses the new table
+at once. (On a first install, or if PoolWind won't start, the calibration
+also runs on its own: `python3 poolwind.py --calibrate` in a terminal, in
+the PoolWind folder. Close PoolWind first then: both use the same relays.)
+
+The first screen explains each choice. Only **Begin initial voltage scan**
+can be pressed until the scan is done.
+
+**Step 1: Initial voltage scan (once for each setup)**
+
+Every pool sends different voltages. The scan runs the jet from its
+slowest to its fastest speed, finds your pool's voltage range, and fits
+PoolWind's safety limits, its settings and the shipped Pace table to it.
+Pace Entry and PingPong need this to step your jet; they then replace the
+table's paces with your own.
+
+1. Press **Begin initial voltage scan**, then **Start**. The calibration
+   reads the voltage for a few seconds, takes the jet down to its slowest
+   speed, then steps it up, counting the steps.
+2. **Watch and listen to the pool.** When it sounds too fast or strained,
+   or the Pace Display stops changing, press **Stop**, then **Use as
+   top**: that speed becomes your pool's top speed for PoolWind, and
+   PoolWind never drives the jet faster. Otherwise the scan goes on until
+   the jet stops getting faster.
+3. The jet is taken back down, and the results show your pool's range,
+   its number of steps and the new Pace table: **one row for each jet
+   step**. These rows are PoolWind's **zones**. If your pool is the same
+   as the one the table was made on (same slowest step and step size), the
+   paces stay as they were. On another pool, the table's shape is moved to
+   yours: a starting point, until you measure your own (step 2).
+4. Press **Save scan**. The calibration file is written (the old one is
+   kept as `poolwind_calibration_before_<date>.txt`), and the other choices
+   open. The scan is also kept as `calibration_scan_<date>.csv`.
+
+To scan again later (a new pool, a new controller), change
+`'InitialCalFinished': True` to `False` in the calibration file.
+
+**Step 2: the paces. Choose one:**
+
+- **Pace Entry**, if your pool has a **Pace Display**. The calibration
+  steps the jet up one step at a time; at each step, wait until the
+  display is steady, type the pace it shows on the number pad (`2:15`, or
+  just `215`) and press **Record**. Check the **highest voltage** first:
+  it never steps above it. Press **Finish** when the jet is as fast as you
+  want to go, or when the display stops changing (it offers to finish when
+  the display shows the same pace twice). **Fix row** changes a row: tap
+  it, type the right pace, press Fix row. About 30 steps, 15-20 minutes.
+- **PingPong**, without a Pace Display. You need five **orange** ping-pong
+  balls (bright or fluorescent; white ones don't work). At every 3rd step
+  (you can choose every step), the calibration waits for the water to
+  catch up, then asks for balls: set one gently on the water right at the
+  jet, in the middle, and take your hand out of the picture; drop the next
+  when it reaches the back wall. When 3 drops agree, it steps on by itself.
+  The steps in between are filled in. Collecting the balls is the tedious
+  part. About 25-35 minutes. The ball floats on the fastest water, so its
+  pace is turned into a swimming pace with a factor measured on the
+  author's pool: the new table is only estimated, and you may want to
+  correct it afterwards.
+
+Each ends with a results table, new against current. **Save table** writes
+it (with a backup); **Quit** without saving keeps the current table. Every
+reading is kept in `calibration_session_<date>.csv`. **Stop** lets go of
+the buttons at once, any time; **Finish** takes the jet down to its
+slowest speed and shows the results.
+
+**The Paces don't feel right?** Use **Pace correction...** in PoolWind's
+menu: you swim at a Pace you know and type what it should be (see the
+[user manual](USER_MANUAL.md#pace-correction-when-the-paces-dont-feel-right)).
+
+**The table in the file** looks like this:
 
 ```
 'pace_voltage': [
@@ -201,7 +284,9 @@ you have one, or drop ping-pong balls in the water for it to time.
 ```
 
 Each pair is (pace in minutes per 100 yards as a decimal, volts). For example
-`2.25` means 2:15. List them from slowest to fastest.
+`2.25` means 2:15. After a scan there is one pair per jet step, slowest
+first. The table that comes with PoolWind was measured on the author's
+pool, a Standard Endless Pool, with PingPong.
 
 ### 5.3 Safety voltage limits
 
@@ -212,29 +297,32 @@ Each pair is (pace in minutes per 100 yards as a decimal, volts). For example
 - The **first** number is the jet's lowest voltage. PoolWind winds the jet
   down to this at startup and shutdown.
 - The **second** number is the highest voltage PoolWind may ever drive the
-  jet to, whatever any pace setting says. Set it at the fastest pace you're
-  willing to let PoolWind reach in your pool.
+  jet to, whatever any swimmer's setting says. Set it at the fastest speed
+  you're willing to let PoolWind reach in your pool.
 
-With the author's pace table, `(1.46, 2.15)` keeps the jet between about
-4:17 and 1:46 per 100 yards.
+The calibration's scan fits both to your pool's voltages, and where you
+stopped the scan (**Use as top**) is a ceiling: the second number is never
+above it. Zones outside these limits are never used. With the author's
+pace table, `(1.46, 2.15)` keeps the jet between about 4:17 and 1:46 per
+100 yards.
 
 Changes to the calibration file take effect at the next start.
 
-### 5.4 Usable pool length and the center lane
+### 5.4 Usable swim length and the center lane
 
 ```
-,'usablePoolLength': 162
+,'usableSwimLength': 162
 
 ,'middleSwimZone %': 35
 ```
 
-- **`usablePoolLength`** is the swim area's length in inches: from the back wall
+- **`usableSwimLength`** is the swim area's length in inches: from the back wall
   to the edge of the jet unit, **not** the whole pool. It's the same length
   as the swim area you set in [5.1](#51-the-swim-area). On the author's
   Standard Endless Pool, the pool is 180" long and the jet unit's edge is
-  18" from the front, so `usablePoolLength` is 162. PoolWind uses it to turn
+  18" from the front, so `usableSwimLength` is 162. PoolWind uses it to turn
   positions in the camera picture into distances: how far your fingertips
-  and toes reach toward each end, and how fast you drift forward or back. (Before v15.3 it was called `poolLength`; older files still work.)
+  and toes reach toward each end, and how fast you drift forward or back. (Before v15.5 it was called `usablePoolLength`, before v15.3 `poolLength`; older files still work.)
 - **`middleSwimZone %`** is the width of the center lane where PoolWind
   tracks the swimmer, as a percentage of the swim area's width. Wider
   catches a swimmer who drifts sideways; narrower ignores people standing
@@ -250,6 +338,18 @@ Changes to the calibration file take effect at the next start.
 `'developerMode'` is on. The files are large. It's a tool for developing
 the swimmer detection.
 
+### 5.6 Number of zones
+
+```
+,'# zones or auto': 'auto'
+```
+
+`'auto'` (shipped): one zone for every jet step between the swimmer's
+limits. A number, for example `10`: that many zones, spread evenly between
+the limits, each on the nearest jet step. Fewer zones mean fewer jet
+changes, which is easier on the equipment; try what feels right. A number
+larger than the steps available, or not a number, means `'auto'`.
+
 ## 6. The settings files
 
 PoolWind keeps its settings in plain text files next to the program, all
@@ -258,7 +358,8 @@ starting with the program's name:
 | File | Holds | Who changes it |
 |---|---|---|
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick | The owner |
-| `poolwind_calibration.txt` | Pace table, safety limits, swim area, pool length, center lane, raw video | Technician only |
+| `poolwind_calibration.txt` | Pace table (the zones), safety limits, swim area, swim length, center lane, number of zones, raw video, and the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetSteps`) | The calibration and the technician |
+| `poolwind_calibration_camera.png` | The camera picture the swim area was set on (the camera check, 5.1) | PoolWind, when the swim area is saved |
 | `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | That swimmer |
 
 The swimmer settings use **the same names** in the defaults file and on
@@ -268,6 +369,13 @@ the USB sticks. A stick's value wins while it's inserted. See the
 **The defaults file as shipped** uses a moderate top pace, 3:00 per 100
 yards, and an average height. If you raise the top pace for yourself,
 remember it applies to anyone who swims without their own stick.
+
+**Zones on the sticks.** A swimmer's stick holds their slowest and fastest
+**zone** (`'zoneMin, Max'`), set with Swimmer limits. The defaults file may
+use zones too, or, as shipped, a pace range (`'paceMin, Max'`), which
+PoolWind turns into zones through the Pace table. Zone numbers belong to
+the Pace table they were set on: after a new scan, set the swimmers'
+limits again.
 
 **Recording rate (`'logRate'`).** How many swim log records, and training
 video frames, PoolWind saves per second: 1 to 15, read when PoolWind
@@ -334,7 +442,7 @@ PoolWind to be closed and started again.
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
 | `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.5`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
-| `'WATER_TAU'` | `5.0` | Seconds the water takes to catch up after the jet changes speed. Used **twice**: by the Swimmer Pace estimate, and as the delay of the [zone highlight](USER_MANUAL.md#seeing-the-jets-zone-the-zone-highlight) (with 5, the band moves about 7 seconds after a jet step). Changing it changes both |
+| `'WATER_TAU'` | `5.0` | Seconds the water takes to catch up after the jet changes speed, for the Swimmer Pace estimate. (The [zone highlight](USER_MANUAL.md#seeing-the-jets-zone-the-zone-highlight) follows the jet directly.) |
 | `'zoneHighlight'` | `False` | Whether the zone highlight is on when PoolWind starts. A tap on the picture turns it on or off either way |
 | `'zoneHighlightLevel'` | `0.2` | How bright the zone highlight is: `0.05` is barely seen, `0.3` is strong |
 | `'developerMode'` | `False` | Developer tools: see [Testing at a desk](#8-testing-at-a-desk). Also shows the position bar and the `dIdx`, `V` (jet voltage) and `CoM` readouts on the pool screen, shows the position bar on the Swim Plot video while the zone highlight is on, and allows raw video. Users leave it off: the position bar also moves with swim angle and depth, not just the stroke, which would confuse a swimmer |
@@ -345,8 +453,8 @@ PoolWind to be closed and started again.
 | `'Runtime: hotReloadParameters'` | `True` | Picks up settings changes while running |
 
 The swimmer settings also have built-in fallbacks, used only if the
-defaults file leaves them out: `'paceMin, Max': ('5:00', '1:30')` and
-`'logRate': 5`.
+defaults file leaves them out: every zone inside the safety limits
+(`'zoneMin, Max': None`) and `'logRate': 5`.
 
 **The swim log** (`CSV Vault/<date>.csv`, one line per record, no header):
 time, pace, distance, video segment, frame, position (`CoM_h`), swimmer
@@ -376,6 +484,18 @@ In `'video'` mode, the recorded video and its swim area are set in the
 program code, next to the video's file name.
 
 Before swimming, delete these lines or set `'developerMode': False`.
+
+**The calibration at a desk.** With the simulated valve, **Calibrate
+pool...** and **Pace correction...** are greyed out in the menu. To try the
+calibration screens without the pool:
+
+```
+python3 poolwind.py --calibrate --simulate --window
+```
+
+It uses a simulated jet, Pace Display and ping-pong balls, and saves only
+to `poolwind_calibration_simulated.txt`, never to the real calibration
+file.
 
 ## 9. Working from home
 
