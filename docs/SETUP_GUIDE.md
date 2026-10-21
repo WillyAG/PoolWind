@@ -178,6 +178,16 @@ has moved, it asks **Camera moved?** and offers:
 - **Keep**: leave it as it is (it asks again at the next start);
 - **Set Swim Area**: set the corners again yourself.
 
+**Adjust** moves the swim area's four corners with the picture (sideways,
+up and down, a slight turn, nearer or farther) and saves them, so the next
+start uses them and doesn't ask again.
+
+If the camera has moved **too far to follow** (part of the pool out of the
+picture, or turned or tilted more than a little), or PoolWind **can't
+recognize the pool** although the light is about the same, it says
+**Check the camera** instead: move the camera back so it sees the whole
+pool as before, then start PoolWind again, or press **Set Swim Area**.
+
 Changing the swim area on purpose, for example for a jet box extension,
 saves a new picture, so the check never asks then. If the swim area's
 length changed, change `usableSwimLength` too (5.4). In the dark, when

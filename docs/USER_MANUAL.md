@@ -55,7 +55,9 @@ camera still sees the pool the way it did when the swim area was set. If
 it has moved (knocked, or moved for cleaning), PoolWind asks. Choose
 **Adjust** to move the swim area with the picture, unless you know better:
 **Keep** leaves it (it asks again next time), **Set Swim Area** lets you
-set the corners yourself.
+set the corners yourself. If it says **Check the camera**, the camera has
+moved too far, or the picture isn't the pool it knows: put the camera back
+(or ask the person who set it up) before swimming.
 
 ## 3. The pool screen
 
