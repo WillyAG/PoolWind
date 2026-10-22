@@ -509,10 +509,11 @@ area's four corners in that video:
 
 That is the built-in value, for the sample video. To use your own
 recording, add the line to `poolwind_defaults.txt` with its file name
-(next to the program, or a full path) and corners. To find the corners,
-run it with any corners and use **Set Swim Area**: in video mode it shows
-the whole line, ready to paste. If the file isn't found, PoolWind says so
-and uses the camera.
+(next to the program, or a full path) and start time. For its corners,
+run it and use **Set Swim Area**: in video mode, the corners are saved in
+this line of `poolwind_defaults.txt` (it's added if it isn't there), and
+the pool's own swim area in the calibration file is left as it is. If the
+file isn't found, PoolWind says so and uses the camera.
 
 Before swimming, delete these lines or set `'developerMode': False`.
 
