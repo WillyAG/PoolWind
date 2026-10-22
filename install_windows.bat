@@ -101,7 +101,7 @@ rem --------------------------------------------------------------------
 > "%PW_DIR%\PoolWind.bat" (
     echo @echo off
     echo cd /d "%%~dp0"
-    echo %PY% poolwind.py
+    echo %PY% -X utf8 poolwind.py
     echo if errorlevel 1 pause
 )
 powershell -NoProfile -Command "$s = (New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath('Desktop') + '\PoolWind.lnk'); $s.TargetPath = '%PW_DIR%\PoolWind.bat'; $s.WorkingDirectory = '%PW_DIR%'; $s.Save()" >> "%LOG%" 2>&1
