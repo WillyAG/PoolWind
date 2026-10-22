@@ -108,22 +108,16 @@ When it finishes, **restart the Pi.**
 
 ## 4. First start
 
-Before the first start:
+Suggested before starting:
 
-- **Nobody in the pool.**
-- The pool switched on, with the pool's own remote at hand.
-- **The monitor is in portrait** (taller than wide). The install script
+- Nobody in the pool.
+- The pool switched off
+- the pool's own remote at hand
+- **The monitor is in portrait mode** (taller than wide). The install script
   sets this up, so it happens by itself a few seconds after the desktop
-  appears. If it doesn't, double-click **Monitor Toggle**. Another monitor
-  than the author's usually works without changes: see
-  [working from home](#9-working-from-home).
-- **Calibration:** the `poolwind_calibration.txt` that comes with PoolWind
-  holds the author's pool. Before the first swim, **set the swim area for
-  your own camera** (section 5.1) and **run the calibration** (section
-  5.2): at least its initial voltage scan, which fits PoolWind to your
-  pool's voltages and safety limits.
+  appears. If it doesn't, double-click **Monitor Toggle**. 
 
-Double-click the **PoolWind** icon. Then:
+Double-click the **PoolWind** icon. You will see:
 
 The pool screen appears, showing the camera's view from above.
 
