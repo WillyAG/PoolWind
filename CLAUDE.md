@@ -103,6 +103,9 @@ faster than they can handle.
   calibration file. A missing file gives a message and the camera.
 - Swim logs (CSV) and training video go to the USB stick's `CSV Vault`
   folder, or to `~/PoolWind/CSV Vault` without a stick.
+  A demo writes to `~/PoolWind/Demo Vault` instead, emptied at every start
+  (so it begins at 0) and kept at close for Swim Plot; it leaves USB sticks
+  alone.
 
 ## Hardware facts (measured on the author's pool)
 
