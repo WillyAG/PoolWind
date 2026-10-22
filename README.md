@@ -21,16 +21,25 @@ his movements and seeing their effect on the pace plot, swim after swim, he
 coordinated his legs with the rest of his body into a single, unified stroke
 pattern and his speed improved noticeably as a result.
 
+## Try a demo on your PC 
+  Before you buy or build anything, check out a demo of PoolWind that runs on a Windows PC, with a recorded swim and a simulated jet. See
+[section 13 of the setup guide](docs/SETUP_GUIDE.md#13-trying-poolwind-on-a-pc).
 
-**PoolWind is a do-it-yourself project.** It comes with no warranty. Limited help may be found in [Discussions](../../discussions), where the author takes part at his discretion.
+
+## Compatibility
+
+- Tested on:  Endless Pools, Standard Endless Pool (purchased February 2012). The controller board was later replaced after a lightning strike, and PoolWind works with the replacement.
+
+- Other makes/models: Untested. Other remotes may have similar buttons which can be used. But a feedback voltage is essential and a relationship between voltage and Pace must be measured in the form of data points (the built-in calibration does this).
+The program will probably need modifications. You do not need to be a programmer, AI can help. You will need a paid Claude subscription for Claude Code, which you can cancel once PoolWind is set up and running great. See [section 12 of the setup guide](docs/SETUP_GUIDE.md#12-getting-help).
+
+
+
+**PoolWind is a do-it-yourself project.** It comes with no warranty. Limited help may be found in [Discussions](../../discussions), where the author takes part at his discretion. Anyone can read Discussions; to post, sign up for a free GitHub account.
 
 **Please read [SAFETY.md](SAFETY.md) before building or using PoolWind.**
 
 ## Getting started
-
-**Try it on your PC first:** a demo of PoolWind runs on a Windows PC, with
-a recorded swim and a simulated jet, before you build anything. See
-[section 13 of the setup guide](docs/SETUP_GUIDE.md#13-trying-poolwind-on-a-pc).
 
 1. **Read [SAFETY.md](SAFETY.md).**
 2. **Check first:** [three checks to make before buying anything](docs/BUILD_GUIDE.md#before-you-buy-anything-three-checks): your remote, your pool's Pace Display port, and your skills.
@@ -82,11 +91,6 @@ a recorded swim and a simulated jet, before you build anything. See
 
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
 
-## Compatibility
-
-- Tested on:  Endless Pools, Standard Endless Pool (purchased February 2012). The controller board was later replaced after a lightning strike, and PoolWind works with the replacement.
-
-- Other models: Untested. Other remotes may have similar buttons which can be used. But a feedback voltage is essential and a relationship between voltage and Pace must be measured in the form of data points (the built-in calibration does this).
 
 - Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
 
@@ -112,7 +116,7 @@ a recorded swim and a simulated jet, before you build anything. See
 - Relay board driven by GPIO 17 (Up), GPIO 18 (Down) and GPIO 27 (pump On/Off)
 - A spare pool remote, with wires soldered to its buttons
 
-Full details are in [`hardware/`](hardware/) and the build guide in [`docs/`](docs/).
+Full details are in the [parts list](hardware/PARTS_LIST.md) and the [build guide](docs/BUILD_GUIDE.md); the interface board's files are in the [hardware folder](hardware/).
 
 ## License
 
@@ -132,6 +136,6 @@ PoolWind doesn't include other people's software. The install script fetches the
 
 ## Acknowledgments
 
-- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, CoPilot, finishing with Anthropic's Claude Code).
+- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, CoPilot, finishing with Anthropic's Claude Code). Claude Code is an absolutely unbelievable code editor/writer. It is responsible for writing my newer ideas into code, transforming the program into something that can be shared, and for writing most of this manual.
 
 
