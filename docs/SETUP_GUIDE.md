@@ -21,6 +21,7 @@ pool's jet. Do them with nobody in the pool.
 10. [Updating PoolWind](#10-updating-poolwind)
 11. [Backups](#11-backups)
 12. [Getting help](#12-getting-help)
+13. [Trying PoolWind on a PC](#13-trying-poolwind-on-a-pc)
 
 ---
 
@@ -666,3 +667,54 @@ has: Claude runs on the Pi, and the PC only shows its terminal.
 (`cd PoolWind-download`, then `claude -c` to carry on the same
 conversation). Finish with `/exit` on the PC first: two windows working on
 the same conversation get in each other's way.
+
+## 13. Trying PoolWind on a PC
+
+You can try PoolWind on a Windows PC before building anything. It runs as
+a **demo**: a recorded swim plays on the pool screen, and the jet is
+simulated, so you can see how PoolWind follows a swimmer, how the zones
+and the Pace work, and try Swim Plot. A PC can't control a pool: that
+needs the Raspberry Pi build.
+
+**You need:** Windows 10 or 11, an internet connection, and about 1 GB of
+free space (most of it for Python and its libraries).
+
+### Installing the demo
+
+1. **Download the install script.** On PoolWind's GitHub page, click
+   `install_windows.bat`, then the **Download raw file** button (a
+   downward arrow at the top right of the file). Clicking the file name
+   alone only shows its text.
+2. **Your browser may warn** that the file "isn't commonly downloaded" or
+   "could harm your device". In Edge: click **…** next to the download,
+   then **Keep**, then **Show more → Keep anyway**. Chrome: **Keep**.
+3. **Double-click** the downloaded `install_windows.bat` (in your
+   **Downloads** folder).
+4. **Windows will probably say "Windows protected your PC"** (a blue
+   window). Click **More info**, then **Run anyway**.
+5. The script installs, in a black window:
+   - **Python**, if it isn't on the PC already, with Windows' own
+     installer. Windows may ask you to allow it;
+   - the libraries PoolWind uses (OpenCV, PySide6, NumPy, SciPy,
+     matplotlib). This takes a few minutes the first time;
+   - PoolWind itself and the sample video, in a `PoolWind` folder in your
+     user folder;
+   - a **PoolWind** icon on the desktop.
+
+   Everything it does is written to `install.log` in that folder. When it
+   says **Done**, press a key to close it.
+6. **Double-click PoolWind** on the desktop. **DEMO** shows on the pool
+   screen.
+
+**Why the warnings?** Windows and the browsers warn about any program or
+script from the internet that isn't signed by a known publisher, and
+PoolWind is a hobby project without one. The script is plain text: to see
+what it does before running it, right-click it and choose **Edit** (or
+**Open with → Notepad**). Run it again at any time to update PoolWind:
+your settings are kept.
+
+### Removing it
+
+Delete the `PoolWind` folder in your user folder and the PoolWind icon on
+the desktop. If the script installed Python and you don't need it, remove
+**Python 3.13** in **Settings → Apps**.
