@@ -574,8 +574,65 @@ PoolWind has no support, but you're not on your own:
 - **An AI assistant** such as [Claude Code](https://claude.com/claude-code),
   run in the `PoolWind-download` folder (section 3). The folder's
   `CLAUDE.md` gives it PoolWind's background: how the program works, the
-  hardware, the safety rules and known problems. It can read PoolWind's
+  hardware, the safety rules and known problems. Claude Code reads it by
+  itself, so there's nothing to copy or paste. It can read PoolWind's
   messages with you, explain settings, and help change the program for a
   pool or camera that differs from the author's, such as a pool whose
   speed voltage drops to zero while the pump is off. Test any change with
   nobody in the pool first.
+
+### Using Claude Code
+
+Claude Code needs a paid Claude account. It runs on the Pi itself, in a
+terminal.
+
+1. **Install it** (once). In a terminal on the Pi, type:
+   ```
+   curl -fsSL https://claude.ai/install.sh | bash
+   ```
+2. **Start it in the downloaded folder:**
+   ```
+   cd PoolWind-download
+   claude
+   ```
+   The first time, it asks you to sign in: it shows a link to open in a
+   web browser.
+3. **Describe the problem in your own words**, for example "the jet
+   doesn't move when I press UP" or "my pool reads zero volts when it's
+   off". It asks before reading files outside the folder (such as the
+   installed `PoolWind` folder) or running anything.
+
+To go back to your last conversation later, start it with `claude -c`
+instead of `claude`. To finish, type `/exit`.
+
+### The author's setup: Claude on a PC, the Pi at the pool
+
+The author talks to Claude from a PC in the house, in its own window, while
+the Pi stays at the pool. The PC needs nothing more than the Pi already
+has: Claude runs on the Pi, and the PC only shows its terminal.
+
+1. **SSH must be on** in the Pi (section 2). If you didn't turn it on
+   there: Pi menu → **Preferences → Control Centre** (older versions:
+   **Raspberry Pi Configuration**) → **Interfaces → SSH** on.
+2. **On the PC, open a terminal window.** Windows: **Terminal** or
+   **PowerShell** from the Start menu (SSH is built into Windows 10 and
+   11). Mac: **Terminal**.
+3. **Connect to the Pi**, with the username and hostname you chose in
+   section 2:
+   ```
+   ssh yourname@poolwind.local
+   ```
+   The first time, answer **yes** to the question about the Pi's key, then
+   type the Pi's password. The window is now a terminal on the Pi.
+4. **Start Claude** in it, as above:
+   ```
+   cd PoolWind-download
+   claude
+   ```
+5. **To see the Pi's screen** at the same time, use RealVNC Viewer
+   (section 9) in another window, or on a second monitor.
+
+**At the pool**, open a terminal on the Pi and type the same commands
+(`cd PoolWind-download`, then `claude -c` to carry on the same
+conversation). Finish with `/exit` on the PC first: two windows working on
+the same conversation get in each other's way.
