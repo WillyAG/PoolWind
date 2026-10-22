@@ -38,9 +38,7 @@ pool are covered in the build guide and the setup and calibration guide.
 
 1. Insert your USB stick.
 2. Start PoolWind with its **desktop icon**. 
-3. **"Starting Up: Please wait for voltage wind down"**: PoolWind first brings
-   the jet down to its lowest setting. Wait for this message to close.
-4. The pool screen appears. Press **Begin** (or **Resume**, see below) when
+3. The pool screen appears. Press **Begin** (or **Resume**, see below) when
    you're ready to swim. Until then, the jet stays at its lowest setting.
 
 **Begin or Resume?** If you've already swum today, the big button says
@@ -205,8 +203,11 @@ the jet doesn't slow down if you fall back, get out of the swim zone, or even le
 ### OnOff: the pump
 
 **OnOff** turns the pool's pump on or off, the same as the button on the
-pool's remote. PoolWind briefly stops adjusting the speed while it does
-this, giving OnOff top priority.
+pool's remote. PoolWind first winds the jet down to its lowest setting
+(**"Pump On/Off: Please wait for voltage wind down"**), then switches the
+pump, so you feel the jet slow down before it stops, and it always starts
+slow. PoolWind stops adjusting the speed while it does this, giving OnOff
+top priority.
 
 ### Pace correction: when the Paces don't feel right
 
@@ -234,12 +235,13 @@ can be compared.
 > the camera sees, and PoolWind may take part of it for a swimmer and adjust
 > the jet when nobody is swimming.
 
-Press **X** at the top right of the screen to close PoolWind. It then:
+Press **OnOff** to turn the pump off: the jet winds down first. Then press
+**X** at the top right of the screen to close PoolWind. It then:
 
-1. winds the jet down to its lowest setting,
-2. releases its control of the pool's remote,
-3. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
-4. **ejects your USB stick**, so it's safe to remove (unless your stick's
+1. releases its control of the pool's remote (closing doesn't slow the
+   jet: if the pump is still running, the jet stays at its speed),
+2. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
+3. **ejects your USB stick**, so it's safe to remove (unless your stick's
    `'ejectStickOnClose'` setting is `False`: see below).
 
 There's no message: once PoolWind has closed, you can remove your stick,

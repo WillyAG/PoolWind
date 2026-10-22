@@ -74,7 +74,7 @@ pattern and his speed improved noticeably as a result.
 
 - Safety voltage limits
 
-- Jet flow winds down automatically at startup and shutdown to lowest level
+- Jet flow winds down to its lowest level before PoolWind turns the pump on or off
 
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
 
@@ -122,6 +122,8 @@ PoolWind doesn't include other people's software. The install script fetches the
 ## Support
 
 - No support is provided:  You're welcome to share builds, questions and answers with other users in [Discussions](../../discussions) in which the author may participate.
+
+- An AI assistant such as Claude Code, run in the downloaded PoolWind folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background.
 
 
 ## Acknowledgments

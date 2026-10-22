@@ -20,6 +20,7 @@ pool's jet. Do them with nobody in the pool.
 9. [Working from home](#9-working-from-home)
 10. [Updating PoolWind](#10-updating-poolwind)
 11. [Backups](#11-backups)
+12. [Getting help](#12-getting-help)
 
 ---
 
@@ -124,9 +125,7 @@ Before the first start:
 
 Double-click the **PoolWind** icon. Then:
 
-1. **"Starting Up: Please wait for voltage wind down"**: with a real valve,
-   PoolWind first brings the jet to its lowest setting.
-2. The pool screen appears, showing the camera's view from above.
+The pool screen appears, showing the camera's view from above.
 
 Check that:
 
@@ -134,8 +133,10 @@ Check that:
 - the large pace, average and distance are readable from the water;
 - **the jet answers.** With nobody in the pool, press **Hold**, then
   **UP** a few times and **DN** a few times (one jet step per press, see
-  the [user manual](USER_MANUAL.md)), and watch the jet change. Then close
-  PoolWind: it winds the jet back down.
+  the [user manual](USER_MANUAL.md)), and watch the jet change.
+- **OnOff winds the jet down.** Press **OnOff**: the jet winds down to its
+  lowest setting first, then the pump turns off. Press it again to turn the
+  pump back on.
 
 ## 5. Calibrating for your pool
 
@@ -305,7 +306,7 @@ pool, a Standard Endless Pool, with PingPong.
 ```
 
 - The **first** number is the jet's lowest voltage. PoolWind winds the jet
-  down to this at startup and shutdown.
+  down to this when **OnOff** is pressed, before it switches the pump.
 - The **second** number is the highest voltage PoolWind may ever drive the
   jet to, whatever any swimmer's setting says. Set it at the fastest speed
   you're willing to let PoolWind reach in your pool.
@@ -568,3 +569,18 @@ rebuild is yours, so back it up:
 
 Copy them to a PC or another USB stick now and then, and always before
 changing the SD card.
+
+## 12. Getting help
+
+PoolWind has no support, but you're not on your own:
+
+- **Discussions** on the PoolWind GitHub page, where builders share their
+  builds, questions and answers.
+- **An AI assistant** such as [Claude Code](https://claude.com/claude-code),
+  run in the `PoolWind-download` folder (section 3). The folder's
+  `CLAUDE.md` gives it PoolWind's background: how the program works, the
+  hardware, the safety rules and known problems. It can read PoolWind's
+  messages with you, explain settings, and help change the program for a
+  pool or camera that differs from the author's, such as a pool whose
+  speed voltage drops to zero while the pump is off. Test any change with
+  nobody in the pool first.

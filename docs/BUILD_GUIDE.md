@@ -29,7 +29,7 @@ these fails, the rest of this guide won't help, so check all three first.
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. Another range works too, as long
    as the INA260 sensor can read it (0 to 36 V): after installing, the
-   calibration's voltage scan fits PoolWind to your pool's range. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified.
+   calibration's voltage scan fits PoolWind to your pool's range. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified. On the author's pool the voltage is there whether the pump is running or not; if yours drops to zero while the pump is off, PoolWind may need changes too. An AI assistant such as Claude Code can help with them (setup guide, [section 12](SETUP_GUIDE.md#12-getting-help)).
 3. **Your skills.** PoolWind is a do-it-yourself project, not a product: it
    isn't for sale, and there's no kit. You buy the parts from various
    suppliers, then build, install and set it up yourself, at your own risk
