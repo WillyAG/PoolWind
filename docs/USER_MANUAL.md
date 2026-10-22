@@ -204,10 +204,13 @@ the jet doesn't slow down if you fall back, get out of the swim zone, or even le
 
 **OnOff** turns the pool's pump on or off, the same as the button on the
 pool's remote. PoolWind first winds the jet down to its lowest setting
-(**"Pump On/Off: Please wait for voltage wind down"**), then switches the
+(**"Winding the jet down before switching the pump…"**), then switches the
 pump, so you feel the jet slow down before it stops, and it always starts
 slow. PoolWind stops adjusting the speed while it does this, giving OnOff
 top priority.
+
+**In an emergency**, press **On/Off now** in that message: the wind-down
+stops and the pump is switched at once.
 
 ### Pace correction: when the Paces don't feel right
 

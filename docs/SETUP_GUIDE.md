@@ -136,7 +136,8 @@ Check that:
   the [user manual](USER_MANUAL.md)), and watch the jet change.
 - **OnOff winds the jet down.** Press **OnOff**: the jet winds down to its
   lowest setting first, then the pump turns off. Press it again to turn the
-  pump back on.
+  pump back on. While it winds down, **On/Off now** in the message switches
+  the pump at once, for emergencies: try it once.
 
 ## 5. Calibrating for your pool
 
