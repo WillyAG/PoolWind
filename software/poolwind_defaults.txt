@@ -11,7 +11,12 @@
 # PoolWind never rewrites this file, so your comments stay.
 {
 
-'swimmersHeight': 66
+# 'Demo': True runs PoolWind as a demo -- a recorded swim and a simulated
+# jet; nothing at the pool moves. Set it to False once PoolWind is built,
+# installed and checked (setup guide), to control the pool.
+'Demo': True
+
+,'swimmersHeight': 66
 
 ,'paceMin, Max': ('5:00', '3:00')
 
