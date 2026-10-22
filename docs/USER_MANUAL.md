@@ -26,9 +26,11 @@ pool are covered in the build guide and the setup and calibration guide.
   especially a stronger swimmer's.
 - **Insert your stick before starting PoolWind.** A stick inserted while
   PoolWind is running isn't used until the next start.
-- **Know how to take manual control:** close PoolWind (see
-  [Finishing a swim](#5-finishing-a-swim)). PoolWind fights against any change
-  the pool's own remote makes.
+- **Know how to take manual control:** press **OnOff** to wind the jet down
+  and stop the pump, or close PoolWind (see
+  [Finishing a swim](#5-finishing-a-swim)) and use the pool's own remote.
+  Closing PoolWind doesn't slow the jet. While PoolWind runs, it fights
+  against any change the pool's own remote makes.
 - **Take any pool cover off before starting PoolWind,** and close PoolWind
   before putting it back on. A cover changes what the camera sees: PoolWind
   may take part of it for a swimmer and adjust the jet when nobody is
@@ -44,6 +46,9 @@ pool are covered in the build guide and the setup and calibration guide.
 **Begin or Resume?** If you've already swum today, the big button says
 **Resume** (in red) instead of Begin. Your swim continues where it left off:
 today's distance and average Pace carry on from your earlier session.
+
+**DEMO on the screen?** PoolWind is set up as a demo and doesn't control
+the jet. Ask whoever set it up.
 
 **A blank or new USB stick?** PoolWind offers to set it up as a new
 swimmer's stick (see [Setting up a new stick](#setting-up-a-new-stick)).
@@ -87,7 +92,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **Vary** (yellow) | Shown while Hold is on. Use **UP** and **DN** to vary the held speed, and press **Vary** to go back to automatic control |
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
-| **OnOff** (light red) | Turns the pool's pump on or off, at one touch |
+| **OnOff** (light red) | Turns the pool's pump on or off, at one touch. The jet winds down first (see [OnOff](#onoff-the-pump)) |
 | **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...**, **Calibrate pool...** and **Pace correction...** (the pool's calibration, for the technician), **Swimmer limits...**, then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
@@ -140,7 +145,7 @@ are turned off when PoolWind starts.
 - It moves as soon as the jet changes speed, a moment after you move. The
   water then takes a few more seconds to catch up. Those delays are why a
   sprint can run you into the wall: you can watch it happen.
-- Don't blame the program for the slow movement of the band, it only reflects built in pool delays of setting the jet speed (moving the valve). Moving the mass of the water takes a few seconds more. Nothing can speed that up.
+- Don't blame the program for the slow movement of the band: it only reflects built in pool delays of setting the jet speed (moving the valve). Moving the mass of the water takes a few seconds more. Nothing can speed that up.
 
 The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
 
@@ -163,6 +168,7 @@ PoolWind turns on dataTracking only if you are in the swimZone but allows you to
 
 - if you leave the swimZone and stand next to it, dataTracking is suspended and the jet winds down to its lowest setting after a few (3) seconds
 - if you leave the pool and the camera can't see you, dataTracking stops within a fraction of a second, and the jet starts winding down at once, stepping down to its lowest setting over several seconds (there's no 3-second wait)
+- if you stop moving in the swimZone (standing or floating), after 15 seconds PoolWind treats you as gone and the jet winds down; after 3 more minutes it presses **Suspend** by itself (the button turns red)
 - dataTracking is re-enabled when you re-enter the swimZone
 
 ### Pausing: Suspend and Resume
@@ -368,7 +374,7 @@ While you're away from the pool screen, PoolWind doesn't adjust the jet:
   "Are you sure?" first: press **OK** to turn the pump on or off, or
   **Cancel**.
 - **"Back to the pool screen"**: when you return, the jet winds down
-  again and starts from its lowest setting, as at startup.
+  again and starts from its lowest setting.
 
 The same happens with **Set Swim Area...**.
 
@@ -393,9 +399,9 @@ The swim's training video plays together with a plot of your swim:
 - A **cursor** on the plot follows the video, frame by frame. Move the
   cursor and the video jumps to that moment.
 - A **swim date** is shown centered and under the top header that represents the date of the plot where the cursor is positioned. If multiple days were selected, that date will change as the cursor moves through the plot.
-- The **zoneHighlight** is turned on, shown by the lighter band
+- The **zone highlight** shows as a lighter band when it's on: click the video to turn it on or off
 - The **plot window** can be moved out of the way by click and drag on the top header.
-- Note the **Avg** (average Pace of swim to the moment). **Pace** (the current pace at the moment), **Dist** (total distance to the moment) are part of the video, which also show when played on a seperate video player.
+- Note the **Avg** (average Pace of swim to the moment), **Pace** (the current pace at the moment) and **Dist** (total distance to the moment) are part of the video, which also shows them when played on a separate video player.
 
 **Controls:**
 
