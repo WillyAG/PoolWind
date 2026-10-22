@@ -93,8 +93,10 @@ The install script:
   password;
 - copies PoolWind into a **`PoolWind` folder** in your home folder. This is
   where the program, its settings files and the `CSV Vault` live;
-- adds two icons to the desktop: **PoolWind**, and **Monitor Toggle** for
-  [working from home](#9-working-from-home);
+- downloads the **sample video**, a recorded swim for the demo;
+- adds three icons to the desktop: **PoolWind**, **Monitor Toggle** for
+  [working from home](#9-working-from-home), and **Claude**
+  ([getting help](#12-getting-help));
 - turns the monitor to **portrait** (taller than wide) every time the Pi
   starts, ready for swimming.
 
@@ -107,27 +109,30 @@ as `poolwind.py.previous`.
 
 When it finishes, **restart the Pi.**
 
-When the screen comes back, there will be a "PoolWind" icon. WHen you press it, it will come up in demo mode.
+When the screen comes back, there will be a "PoolWind" icon. When you double-click it, PoolWind comes up in demo mode.
 
 ## 4. First start
+
+**Turn the demo off first.** PoolWind is installed as a demo: a recorded
+swim and a simulated jet, so nothing at the pool moves. To control the
+pool, open `poolwind_defaults.txt` in the `PoolWind` folder (double-click
+it), change `'Demo': True` to `'Demo': False`, and save it.
 
 Suggested before starting:
 
 - Nobody in the pool
-- The pool is switched off
+- The pool switched off at first; you'll turn it on for the jet check
 - the pool's own remote at hand
 - **The monitor is in portrait mode** (taller than wide). The install script
   sets this up, so it happens by itself a few seconds after the desktop
   appears. If it doesn't, double-click **Monitor Toggle**. 
 
-Double-click the **PoolWind** icon. You will see:
-
-The pool screen appears, showing the camera's view from above.
+Double-click the **PoolWind** icon. The pool screen appears, showing the
+camera's view from above.
 
 Check that:
 
 - the camera shows some of the pool from above (will set the correct view later)
-- 
 - **the jet answers.** With nobody in the pool, press **Hold**, then
   **UP** a few times and **DN** a few times (one jet step per press, see
   the [user manual](USER_MANUAL.md)), and watch the jet change.
@@ -433,7 +438,9 @@ If the defaults or calibration file can't be read when PoolWind starts, it
 says why in the terminal and doesn't start. If you make a mistake while it's
 running, it says so and keeps the last good settings.
 
-The program never rewrites the defaults file, so your comments stay.
+PoolWind only ever changes single lines in the defaults file (Swimmer
+limits without a stick, Set Swim Area in video mode), so your comments
+stay.
 
 ## 7. Built-in settings
 
@@ -447,10 +454,13 @@ PoolWind to be closed and started again.
 
 | Setting | Built-in value | What it does |
 |---|---|---|
-| `'Demo'` | `True` | Runs the program in demo mode. Does not further hardware including pool. Most routines are functional.|
+| `'Demo'` | `True` | Runs the program in demo mode. Does not need further hardware including pool. Most routines are functional.|
 | `'Sensitivity'` | `5000` | Minimum size, in pixels, of something the camera counts as a swimmer |
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
+| `'stillSeconds'` | `15` | Seconds without movement before a swimmer in the lane counts as gone (someone standing or floating) |
+| `'stillMotion'` | `0.25` | How much of the swimmer's shape must change to count as movement for `'stillSeconds'` |
+| `'autoSuspendMinutes'` | `3` | Minutes after that before PoolWind suspends the swim by itself. `0` never does |
 | `'DRIFT_SCALE'`, `'DRIFT_TAU'`, `'DRIFT_MAX'` | `1.5`, `5.0`, `25.0` | The Swimmer Pace estimate. Leave these alone unless you're developing |
 | `'WATER_TAU'` | `5.0` | Seconds the water takes to catch up after the jet changes speed, for the Swimmer Pace estimate. (The [zone highlight](USER_MANUAL.md#seeing-the-jets-zone-the-zone-highlight) follows the jet directly.) |
 | `'zoneHighlight'` | `False` | Whether the zone highlight is on when PoolWind starts. A tap on the picture turns it on or off either way |
@@ -475,9 +485,11 @@ columns replay without the highlight.
 ## 8. Testing at a desk
 
 These developer settings let you run PoolWind without the pool. They only
-work with `'developerMode': True` in `poolwind_defaults.txt`. With it off,
-PoolWind always runs the real pool setup, whatever the file says. Add them
-to `poolwind_defaults.txt`; they all need a **restart**.
+work with `'developerMode': True` and `'Demo': False` in
+`poolwind_defaults.txt`: a demo always plays the sample video with a
+simulated jet, and with `developerMode` off PoolWind always runs the real
+pool setup, whatever the file says. Add them to `poolwind_defaults.txt`;
+they all need a **restart**.
 
 | Setting | Normal | Meaning |
 |---|---|---|
@@ -485,9 +497,7 @@ to `poolwind_defaults.txt`; they all need a **restart**.
 | `'capture_device (camera or video)'` | `'camera'` | `'video'` plays a recorded swim instead of the live camera |
 | `'display_device (work or pool)'` | `'pool'` | `'work'` switches the monitor to landscape for programming, and `'pool'` back to portrait (monitor mode set in the program code) |
 | `'workplace (home or pool or default)'` | `'pool'` | Sets all three above at once: `'home'` = video, work, simulate; `'pool'` = camera, pool, real; `'default'` = use the three lines as written |
-|`'video file'` | video filename | PoolWind plays the recorded swim named in this setting, starting the given number of seconds in, with the swim area's four corners of that video.|
-
-
+| `'video file, start (sec), corners'` | `'poolwind_sample.mp4'`, `0`, the sample's corners | The recorded swim `'video'` (and the demo) plays: its file, the number of seconds in to start, and the swim area's four corners in that video |
 
 To add them, copy these lines into `poolwind_defaults.txt`, just before
 the closing `}`. They're set for pool use, so nothing changes until you
@@ -501,15 +511,13 @@ change a value: for a desk test, change `'pool'` on the workplace line to
 ,'display_device (work or pool)': 'pool'
 ,'Valve (real or simulate)': 'real'
 ,'video file, start (sec), corners': ('poolwind_sample.mp4', 0, [(141, 151), (475, 146), (377, 608), (190, 585)])
-
 ```
 
 The pump relay is only connected when the workplace is `'pool'`. So
 `'default'` with `'Valve (real or simulate)': 'real'` tests the speed
 relays at a desk with no chance of starting the pool's pump.
 
-The sample video:
-That is the built-in value. To use your own
+The last line is the built-in value, for the sample video. To use your own
 recording, add the line to `poolwind_defaults.txt` with its file name
 (next to the program, or a full path), the seconds in to start, and corners. For its corners, run it and use **Set Swim Area**: in video mode,
 the corners are saved in this line of `poolwind_defaults.txt`, and the
@@ -606,12 +614,15 @@ PoolWind has no support, but you're not on your own:
 Claude Code is Anthropic's AI assistant for working with programs. It runs
 in a terminal on the Pi, where it can see PoolWind's files. It needs a paid
 Claude account.
-The author (mostly AI) has provided a detatiled description that will be sent to Claude automatically after subscribing.`CLAUDE.md` gives it PoolWind's background: how the program works, the  hardware, the safety rules and known problems. Claude Code reads it by
-  itself, so there's nothing to copy or paste. It can read PoolWind's
-  messages with you, explain settings, and help change the program for a
-  pool or camera that differs from the author's, such as a pool whose
-  speed voltage drops to zero while the pump is off. Test any change with
-  nobody in the pool first.
+
+The download includes `CLAUDE.md`, a detailed description of PoolWind
+written for Claude: how the program works, the hardware, the safety rules
+and known problems. Claude Code reads it by itself whenever it starts in
+the `PoolWind-download` folder, so there's nothing to copy or paste. It can
+read PoolWind's messages with you, explain settings, and help change the
+program for a pool or camera that differs from the author's, such as a
+pool whose speed voltage drops to zero while the pump is off. Test any
+change with nobody in the pool first.
 
 
 **The easy way: the Claude icon** on the Pi's desktop, which the install
@@ -636,7 +647,10 @@ script adds. Double-click it:
    ```
    The first time, it asks you to sign in: it shows a link to open in a
    web browser.
-3. **Describe the problem in your own words.** Claude Code has already
+
+Either way, once you're signed in:
+
+**Describe the problem in your own words.** Claude Code has already
    read `CLAUDE.md` as it started, so it knows PoolWind's background. For
    example: "the jet doesn't move when I press UP" or "my pool reads zero
    volts when it's off". It asks before reading files outside the folder (such as the

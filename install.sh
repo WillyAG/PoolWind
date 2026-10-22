@@ -157,6 +157,17 @@ run cp "$SOFTWARE/poolwind.py" "$PW_DIR/poolwind.py"
 say "   installed poolwind.py"
 copy_if_missing "$SOFTWARE/poolwind_defaults.txt"    "$PW_DIR/poolwind_defaults.txt"
 copy_if_missing "$SOFTWARE/poolwind_calibration.txt" "$PW_DIR/poolwind_calibration.txt"
+# The demo's recorded swim ('Demo': True), from the latest GitHub Release.
+# Not needed at the pool, so a failed download doesn't stop the install.
+if [ -f "$PW_DIR/poolwind_sample.mp4" ]; then
+    say "   kept poolwind_sample.mp4"
+elif curl -L -f -o "$PW_DIR/poolwind_sample.mp4" \
+        "https://github.com/WillyAG/PoolWind/releases/latest/download/poolwind_sample.mp4" >> "$LOG" 2>&1; then
+    say "   installed poolwind_sample.mp4 (the demo's recorded swim)"
+else
+    rm -f "$PW_DIR/poolwind_sample.mp4"
+    say "   the sample video couldn't be downloaded: the demo will say so"
+fi
 run mkdir -p "$HOME/.local/bin"
 # The Monitor Toggle script: always the new version, but keeping the monitor
 # settings at its top (OUTPUT, PORTRAIT_SIZE, LANDSCAPE_SIZE) if already set.
