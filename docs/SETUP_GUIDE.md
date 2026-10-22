@@ -583,8 +583,9 @@ PoolWind has no support, but you're not on your own:
 
 ### Using Claude Code
 
-Claude Code needs a paid Claude account. It runs on the Pi itself, in a
-terminal.
+Claude Code is Anthropic's AI assistant for working with programs. It runs
+in a terminal on the Pi, where it can see PoolWind's files. It needs a paid
+Claude account.
 
 1. **Install it** (once). In a terminal on the Pi, type:
    ```
@@ -597,10 +598,16 @@ terminal.
    ```
    The first time, it asks you to sign in: it shows a link to open in a
    web browser.
-3. **Describe the problem in your own words**, for example "the jet
-   doesn't move when I press UP" or "my pool reads zero volts when it's
-   off". It asks before reading files outside the folder (such as the
+3. **Describe the problem in your own words.** Claude Code has already
+   read `CLAUDE.md` as it started, so it knows PoolWind's background. For
+   example: "the jet doesn't move when I press UP" or "my pool reads zero
+   volts when it's off". It asks before reading files outside the folder (such as the
    installed `PoolWind` folder) or running anything.
+
+**To check that it has the background**, type `/memory`: it lists the
+`CLAUDE.md` files it has loaded, and `PoolWind-download/CLAUDE.md` should
+be among them. If it isn't, Claude Code was started in another folder:
+type `/exit`, then start it again with step 2.
 
 To go back to your last conversation later, start it with `claude -c`
 instead of `claude`. To finish, type `/exit`.
