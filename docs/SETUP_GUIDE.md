@@ -611,6 +611,17 @@ The author (mostly AI) has provided a detatiled description that will be sent to
   nobody in the pool first.
 
 
+**The easy way: the Claude icon** on the Pi's desktop, which the install
+script adds. Double-click it:
+
+- the first time, it explains Claude Code and offers to install it, then
+  Claude Code asks you to sign in (or to create an account) through a
+  link to open in a web browser;
+- after that, it opens Claude Code in the `PoolWind-download` folder,
+  carrying on your last conversation.
+
+**By hand** (for example over SSH from a PC, below):
+
 1. **Install it** (once). In a terminal on the Pi, type:
    ```
    curl -fsSL https://claude.ai/install.sh | bash

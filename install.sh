@@ -207,6 +207,59 @@ EOF
 run chmod +x "$DESKTOP/PoolWind.desktop" "$DESKTOP/Monitor_Toggle.desktop"
 say "   added PoolWind and Monitor Toggle"
 
+# The Claude icon: Claude Code (an AI assistant, setup guide section 12)
+# in this downloaded folder, which holds CLAUDE.md. The first time, it
+# offers to install Claude Code; Claude Code then asks the user to sign in.
+CLAUDE_SH="$HOME/.local/bin/poolwind_claude.sh"
+cat > "$CLAUDE_SH" << EOF
+#!/bin/bash
+# PoolWind's Claude icon (written by install.sh): Claude Code in the
+# PoolWind download folder, where CLAUDE.md gives it PoolWind's background.
+cd "$SRC_DIR" || { echo "The folder $SRC_DIR is missing."; read -r -p "Press Enter to close."; exit 1; }
+export PATH="\$HOME/.local/bin:\$PATH"
+if ! command -v claude > /dev/null; then
+    echo "Claude Code isn't installed yet."
+    echo
+    echo "Claude Code is an AI assistant that can help you set up, fix or"
+    echo "change PoolWind (setup guide, section 12). It needs a paid Claude"
+    echo "account; you can create one when it asks you to sign in."
+    echo
+    read -r -p "Install Claude Code now? (y/n) " answer
+    case "\$answer" in [Yy]*) ;; *) exit 0 ;; esac
+    if ! curl -fsSL https://claude.ai/install.sh | bash; then
+        echo "The install didn't work. Check the internet connection and try again."
+        read -r -p "Press Enter to close."
+        exit 1
+    fi
+    echo
+    echo "Installed. Claude Code now asks you to sign in: it shows a link to"
+    echo "open in a web browser."
+    echo
+fi
+# Carry on the last conversation in this folder, if there is one
+if ls "\$HOME/.claude/projects/\$(pwd | sed 's/[^A-Za-z0-9]/-/g')"/*.jsonl > /dev/null 2>&1; then
+    claude -c
+else
+    claude
+fi
+EOF
+run chmod +x "$CLAUDE_SH"
+# Written beside the desktop and moved in, so the file manager shows its name
+tmp="$(mktemp)"
+cat > "$tmp" << EOF
+[Desktop Entry]
+Type=Application
+Name=Claude
+Comment=Claude Code, an AI assistant for PoolWind (setup guide, section 12)
+Exec=x-terminal-emulator -e $CLAUDE_SH
+Path=$SRC_DIR
+Icon=utilities-terminal
+Terminal=false
+EOF
+chmod +x "$tmp"
+run mv "$tmp" "$DESKTOP/Claude.desktop"
+say "   added Claude (Claude Code, offered the first time it's opened)"
+
 # Turn the monitor to portrait every time the desktop starts, so it's
 # always ready for swimming. (The Monitor Toggle icon still switches to
 # landscape for working.)
