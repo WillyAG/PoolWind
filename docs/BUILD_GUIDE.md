@@ -11,6 +11,9 @@ Display port. *(You will have to open the control box once to plug in the Pace D
 
 ## Before you buy anything: three checks
 
+Before buying parts, you can try PoolWind on a Windows PC as a demo
+([setup guide, section 13](SETUP_GUIDE.md#13-trying-poolwind-on-a-pc)).
+
 PoolWind depends on two things about your pool that the author could only
 check on his own pool, and on the skills of whoever builds it. If any of
 these fails, the rest of this guide won't help, so check all three first.
@@ -24,7 +27,7 @@ these fails, the rest of this guide won't help, so check all three first.
    button and it can run on about 5 V. Open yours and compare it with the
    photos before buying parts.
 2. **The Pace Display port voltage.** PoolWind reads the jet speed as a
-   voltage on the pool's Pace Display port ranging from about 1.2v to 3.2v (see
+   voltage on the pool's Pace Display port ranging from about 1.2 V to 3.2 V (see
    [section 6](#6-the-pace-display-port)). Measure it with a multimeter: it
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. Another range works too, as long
@@ -518,16 +521,14 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
 - **Cable:** a 10 ft USB extension reaches the Raspberry Pi. A longer run
   may need an active (repeater) USB extension.
 
-- **Lighting:** see the README's notes on lighting and outdoor pools.
+- **Lighting:** see the [README](../README.md)'s notes on lighting and outdoor pools.
 
 ## 8. The poolside station
 
 The Raspberry Pi, the control interface board, and the monitor sit together in a waterproof case with a clear door, beside the pool. The case used worked perfectly although the clear door came with an injection-molding spot right in the middle that was not polished down. Polishing with a Dremel tool worked but was tedious and the plastic tried to melt. 
 
-Build as you see fit. For instance, the Raspberry Pi could sit further away from the pool and the monitor and mouse could be at the pool's edge. **Emphasizing waterproof** Or find a waterproof touchscreen: that would be ideal if there is such a thing. You could use two monitors and set up a work station further away from the pool (the Raspberry Pi has two HDMI ports).
+Build as you see fit. For instance, the Raspberry Pi could sit further away from the pool and the monitor and mouse could be at the pool's edge. Whatever you choose, keep everything **waterproof**. Or find a waterproof touchscreen: that would be ideal if there is such a thing. You could use two monitors and set up a work station further away from the pool (the Raspberry Pi has two HDMI ports).
 The keyboard is rarely used and is not needed at the pool edge. It is used for changing default settings, setting up the USB stick, for moving or deleting files, and general computer stuff. 
-
-**Please read [SAFETY.md](../SAFETY.md) first.**
 
 - **Monitor:** the 10-inch Eyoyo only just fits the case, partially within the clear door. Its control buttons had to be removed. Mount it in **portrait** mode (taller than wide).
 
@@ -556,7 +557,7 @@ the case wall.*
 
 - **Power:** a proper power supply for the Raspberry Pi and one for the
   monitor, plugged into a **GFCI-protected outlet** away from splashing
-  water. Only use the low voltage cables, never run 125V power anywhere near the pool!
+  water. Only use the low voltage cables, never run mains power (120 V) anywhere near the pool!
 
 - **Cabling:** many cables run out of the case: two low voltage power cables (Raspberry Pi and monitor), keyboard, mouse, camera, remote control, pool voltage feedback, and USB (for the user's USB stick) cables. Bundle them, and seal them where they leave the case with waterproof cable glands. Let each cable sag in a drip loop below the case, so water runs off instead of following the cable in. The USB extension lets the swimmer plug in their USB stick outside the closed case.
 
@@ -568,13 +569,15 @@ Before connecting anything to the pool:
 1. **Check the wiring** against the board, especially the ribbon cable's
    orientation.
 2. **Power up the Raspberry Pi** and install the software (setup guide,
-   section 3).
-3. **Setup the camera** 
+   section 3). PoolWind starts as a demo. Before steps 5 and 6, turn the
+   demo off ([setup guide, section 4](SETUP_GUIDE.md#4-first-start)).
+3. **Set up the camera** 
    To see what the camera sees, use the Raspberry Pi VLC Media Player and select 'Open Capture Device' -> 'Video Device Name' -> '/dev/video0' -> 'Play'. You should orient the camera so that it displays the pool with the **pool front to the left**. Don't try to correct the orientation with the program. Once you see the entire swim area in view you're done.
 4. **Check that the INA260 is found:** in a terminal, `i2cdetect -y 1`
    should show `40` in its table.
 5. **Check the On/Off relay clicks**, with the remote not yet connected:
-   start PoolWind and press **OnOff**. You should hear one short click.
+   start PoolWind and press **OnOff**. You should hear a click, and another
+   2 seconds later.
    The Up and Down relays are checked once everything is connected (step
    6): without the Pace Display cable PoolWind reads no voltage and, for
    safety, won't press Down.
