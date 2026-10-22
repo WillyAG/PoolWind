@@ -482,6 +482,19 @@ to `poolwind_defaults.txt`; they all need a **restart**.
 | `'display_device (work or pool)'` | `'pool'` | `'work'` switches the monitor to landscape for programming, and `'pool'` back to portrait (monitor mode set in the program code) |
 | `'workplace (home or pool or default)'` | `'pool'` | Sets all three above at once: `'home'` = video, work, simulate; `'pool'` = camera, pool, real; `'default'` = use the three lines as written |
 
+To add them, copy these lines into `poolwind_defaults.txt`, just before
+the closing `}`. They're set for pool use, so nothing changes until you
+change a value: for a desk test, change `'pool'` on the workplace line to
+`'home'`.
+
+```
+,'developerMode': True
+,'workplace (home or pool or default)': 'pool'
+,'capture_device (camera or video)': 'camera'
+,'display_device (work or pool)': 'pool'
+,'Valve (real or simulate)': 'real'
+```
+
 The pump relay is only connected when the workplace is `'pool'`. So
 `'default'` with `'Valve (real or simulate)': 'real'` tests the speed
 relays at a desk with no chance of starting the pool's pump.
