@@ -110,8 +110,8 @@ When it finishes, **restart the Pi.**
 
 Suggested before starting:
 
-- Nobody in the pool.
-- The pool switched off
+- Nobody in the pool
+- The pool is switched off
 - the pool's own remote at hand
 - **The monitor is in portrait mode** (taller than wide). The install script
   sets this up, so it happens by itself a few seconds after the desktop
@@ -123,8 +123,8 @@ The pool screen appears, showing the camera's view from above.
 
 Check that:
 
-- the camera shows the whole pool, from above;
-- the large pace, average and distance are readable from the water;
+- the camera shows some of the pool from above (will set the correct view later)
+- 
 - **the jet answers.** With nobody in the pool, press **Hold**, then
   **UP** a few times and **DN** a few times (one jet step per press, see
   the [user manual](USER_MANUAL.md)), and watch the jet change.
@@ -481,6 +481,9 @@ to `poolwind_defaults.txt`; they all need a **restart**.
 | `'capture_device (camera or video)'` | `'camera'` | `'video'` plays a recorded swim instead of the live camera |
 | `'display_device (work or pool)'` | `'pool'` | `'work'` switches the monitor to landscape for programming, and `'pool'` back to portrait (monitor mode set in the program code) |
 | `'workplace (home or pool or default)'` | `'pool'` | Sets all three above at once: `'home'` = video, work, simulate; `'pool'` = camera, pool, real; `'default'` = use the three lines as written |
+|`'video'` | video filename | PoolWind plays the recorded swim named in this setting, starting the given number of seconds in, with the swim area's four corners in that video.|
+
+
 
 To add them, copy these lines into `poolwind_defaults.txt`, just before
 the closing `}`. They're set for pool use, so nothing changes until you
@@ -493,27 +496,21 @@ change a value: for a desk test, change `'pool'` on the workplace line to
 ,'capture_device (camera or video)': 'camera'
 ,'display_device (work or pool)': 'pool'
 ,'Valve (real or simulate)': 'real'
+,'video file, start (sec), corners': ('poolwind_sample.mp4', 0, [(141, 151), (475, 146), (377, 608), (190, 585)])
+
 ```
 
 The pump relay is only connected when the workplace is `'pool'`. So
 `'default'` with `'Valve (real or simulate)': 'real'` tests the speed
 relays at a desk with no chance of starting the pool's pump.
 
-**The video.** In `'video'` mode, PoolWind plays the recorded swim named
-in this setting, starting the given number of seconds in, with the swim
-area's four corners in that video:
-
-```
-,'video file, start (sec), corners': ('poolwind_sample.mp4', 0, [(141, 151), (475, 146), (377, 608), (190, 585)])
-```
-
-That is the built-in value, for the sample video. To use your own
+The sample video:
+That is the built-in value. To use your own
 recording, add the line to `poolwind_defaults.txt` with its file name
-(next to the program, or a full path) and start time. For its corners,
-run it and use **Set Swim Area**: in video mode, the corners are saved in
-this line of `poolwind_defaults.txt` (it's added if it isn't there), and
-the pool's own swim area in the calibration file is left as it is. If the
-file isn't found, PoolWind says so and uses the camera.
+(next to the program, or a full path), the seconds in to start, and corners. For its corners, run it and use **Set Swim Area**: in video mode,
+the corners are saved in this line of `poolwind_defaults.txt`, and the
+pool's own swim area in the calibration file is left as it is. If the file
+isn't found, PoolWind says so and uses the camera.
 
 Before swimming, delete these lines or set `'developerMode': False`.
 
@@ -598,20 +595,20 @@ PoolWind has no support, but you're not on your own:
 - **Discussions** on the PoolWind GitHub page, where builders share their
   builds, questions and answers.
 - **An AI assistant** such as [Claude Code](https://claude.com/claude-code),
-  run in the `PoolWind-download` folder (section 3). The folder's
-  `CLAUDE.md` gives it PoolWind's background: how the program works, the
-  hardware, the safety rules and known problems. Claude Code reads it by
+  run in the `PoolWind-download` folder (section 3). 
+  
+### Using Claude Code
+
+Claude Code is Anthropic's AI assistant for working with programs. It runs
+in a terminal on the Pi, where it can see PoolWind's files. It needs a paid
+Claude account.
+The author (mostly AI) has provided a detatiled description that will be sent to Claude automatically after subscribing.`CLAUDE.md` gives it PoolWind's background: how the program works, the  hardware, the safety rules and known problems. Claude Code reads it by
   itself, so there's nothing to copy or paste. It can read PoolWind's
   messages with you, explain settings, and help change the program for a
   pool or camera that differs from the author's, such as a pool whose
   speed voltage drops to zero while the pump is off. Test any change with
   nobody in the pool first.
 
-### Using Claude Code
-
-Claude Code is Anthropic's AI assistant for working with programs. It runs
-in a terminal on the Pi, where it can see PoolWind's files. It needs a paid
-Claude account.
 
 1. **Install it** (once). In a terminal on the Pi, type:
    ```
