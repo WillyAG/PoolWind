@@ -38,6 +38,10 @@ for the full disclaimer.
 
 ## Using the pool
 
+- **PoolWind starts as a demo,** with a recorded swim and a simulated jet:
+  nothing at the pool moves. Set `'Demo': False` only once the build is
+  checked (setup guide, section 4). On a PC, PoolWind can never control a
+  pool.
 - **To control the pool by hand, close PoolWind.** While PoolWind is running
   it keeps setting the jet speed itself: if you change the speed with the
   pool's own remote, PoolWind changes it back. Hold and Suspend don't stop
@@ -47,6 +51,10 @@ for the full disclaimer.
   slow the jet:** it stays at the speed it had. PoolWind winds the jet down
   to its lowest setting when its **OnOff** button is pressed, before it
   turns the pump on or off.
+- **In an emergency, press OnOff, then On/Off now** in its message: the
+  pump switches at once, without waiting for the jet to wind down.
+- **Close PoolWind before putting on a pool cover:** it can take the cover
+  for a swimmer and move the jet.
 - **Before relying on PoolWind, confirm the pool's own remote works** to slow
   down and stop the jet after PoolWind is closed.
 - **Never swim alone** while testing a new build or new settings.

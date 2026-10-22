@@ -33,6 +33,10 @@ pattern and his speed improved noticeably as a result.
 - Other makes/models: Untested. Other remotes may have similar buttons which can be used. But a feedback voltage is essential and a relationship between voltage and Pace must be measured in the form of data points (the built-in calibration does this).
 The program will probably need modifications. You do not need to be a programmer, AI can help. You will need a paid Claude subscription for Claude Code, which you can cancel once PoolWind is set up and running great. See [section 12 of the setup guide](docs/SETUP_GUIDE.md#12-getting-help).
 
+- Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
+
+- Outdoor use:  Untested, especially in direct sun. Surface glare, moving light patterns on the pool floor, and sharp shadows (including the swimmer's own) can confuse the camera's swimmer detection. Shade over the pool and a polarizing filter on the camera should help; full outdoor support may need further development.
+
 
 
 **PoolWind is a do-it-yourself project.** It comes with no warranty. Limited help may be found in [Discussions](../../discussions), where the author takes part at his discretion. Anyone can read Discussions; to post, sign up for a free GitHub account.
@@ -60,7 +64,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Vision: a camera above the pool tracks where the swimmer is.
 
-- The pool's own controls keep working as when manufactured. Without the PoolWind running, the pool operates normally using the other remote (usually supplied).
+- The pool's own controls keep working as when manufactured. Without PoolWind running, the pool operates normally using the other remote (usually supplied).
 
 ## Features
 
@@ -91,10 +95,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
 
-
-- Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
-
-- Outdoor use:  Untested, especially in direct sun. Surface glare, moving light patterns on the pool floor, and sharp shadows (including the swimmer's own) can confuse the camera's swimmer detection. Shade over the pool and a polarizing filter on the camera should help; full outdoor support may need further development.
+- Demo mode: try PoolWind with a recorded swim and a simulated jet, on the Pi or a Windows PC
 
 
 *PoolWind is an independent project. It is not affiliated with or endorsed by Endless Pools. "Endless Pools" is used only to describe compatibility.*
@@ -104,6 +105,8 @@ The program will probably need modifications. You do not need to be a programmer
 
 - The PoolWind program (poolwind.py), with its calibration built in
 - Settings files (poolwind_defaults.txt, poolwind_calibration.txt) 
+- Install scripts: install.sh for the Raspberry Pi, and install_windows.bat for the demo on a Windows PC
+- CLAUDE.md: PoolWind's background for an AI assistant such as Claude Code
 - Schematics, layout, and PCB Gerber files for the interface board in a [Fritzing](https://fritzing.org) file (a free circuit design program)
 - Parts and source list
 - Build guide, setup and calibration, user manual
@@ -124,18 +127,18 @@ PoolWind is a shared hobby project, free for personal, hobby and other noncommer
 
 Copyright © William A. Gorlitz. U.S. Copyright Registration TXu 2-304-621.
 
-PoolWind doesn't include other people's software. The install script fetches the libraries it uses, each under its own license: for example PySide6 (Qt for Python) under the LGPL v3, and OpenCV under the Apache 2.0 license.
+PoolWind doesn't include other people's software. The install scripts fetch the libraries PoolWind uses, each under its own license: for example PySide6 (Qt for Python) under the LGPL v3, and OpenCV under the Apache 2.0 license.
 
 
 ## Support
 
 - No support is provided:  You're welcome to share builds, questions and answers with other users in [Discussions](../../discussions) in which the author may participate.
 
-- An AI assistant such as Claude Code, run in the downloaded PoolWind folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background.
+- An AI assistant such as Claude Code, run in the downloaded PoolWind folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background. See [Getting help](docs/SETUP_GUIDE.md#12-getting-help) in the setup guide.
 
 
 ## Acknowledgments
 
-- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, CoPilot, finishing with Anthropic's Claude Code). Claude Code is an absolutely unbelievable code editor/writer. It is responsible for writing my newer ideas into code, transforming the program into something that can be shared, and for writing most of this manual.
+- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, Copilot, finishing with Anthropic's Claude Code). Claude Code is an absolutely unbelievable code editor/writer. It is responsible for writing the author's newer ideas into code, transforming the program into something that can be shared, and for writing most of the guides.
 
 
