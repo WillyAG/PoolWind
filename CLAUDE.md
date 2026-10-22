@@ -1,6 +1,7 @@
 # CLAUDE.md: notes for an AI assistant helping a PoolWind builder
 
-You are probably helping someone who built PoolWind and has a problem. These
+You are probably helping someone who built PoolWind and has a problem, or
+someone trying the demo (on the Pi, or on a Windows PC) before building. These
 notes give you the background the author's own development sessions built
 up, so you don't have to rediscover it. Read the relevant guide in `docs/`
 too; it is written for the builder and is the authority on how things are
@@ -30,10 +31,17 @@ PoolWind drives a real swimming current. A mistake can put someone in a jet
 faster than they can handle.
 
 - **Never run anything that drives the relays** (PoolWind with
-  `'Valve (real or simulate)': 'real'`, or any script using GPIO 17, 18 or
-  27) without the user's go-ahead, and only when they confirm **nobody is in
-  the pool**. For code and screen problems, use desk testing (setup guide,
-  section 8): simulated valve, recorded video.
+  `'Demo': False` and a real valve, or any script using GPIO 17, 18 or 27)
+  without the user's go-ahead, and only when they confirm **nobody is in
+  the pool**. For code and screen problems, use the demo (`'Demo': True`)
+  or desk testing (setup guide, section 8): simulated valve, recorded video.
+- **Demo is the fail-safe default.** `'Demo'` is built in as `True`, and
+  anything but `False` (a missing or misspelled line) means a demo: the
+  sample video, the pool screen and a simulated jet, no relay connected,
+  whatever else the files say (`App._read_defaults_file`). Only the main
+  defaults file can set it, not a USB stick. Keep all of that. Don't change
+  the user's `'Demo'` to `False` for them unless they ask and confirm the
+  build has been checked (setup guide, section 4).
 - **Never energize UP and DN at the same time.** The program always turns
   one off before turning the other on; keep it that way.
 - **The calibration file is safety-critical.** `SafetyVoltageLimits` is the
@@ -42,11 +50,12 @@ faster than they can handle.
 - **The pump relay (GPIO 27) turns the pool's pump on and off.** Don't
   pulse it in tests.
 - **PoolWind winds the jet down when OnOff is pressed**, before it pulses
-  the pump relay (`OnOff_btn_press`), and when leaving the pool screen. Any
-  change you make must keep this, along with the relay watchdog
-  (`RELAY_WATCHDOG_S`): if the loop stalls, it lets go of UP and DN.
-  Closing PoolWind does **not** wind the jet down; it only lets go of the
-  relays.
+  the pump relay (`OnOff_btn_press`, `initial_voltage_winddown`), and when
+  leaving the pool screen. The wind-down message's **On/Off now** button
+  stops it so the pump switches at once, for emergencies. Any change you
+  make must keep both, along with the relay watchdog (`RELAY_WATCHDOG_S`):
+  if the loop stalls, it lets go of UP and DN. Closing PoolWind does
+  **not** wind the jet down; it only lets go of the relays.
 - Changes that affect jet speed (zones, pace limits, the pace table, relay
   timing) must be tested with the pool empty, watching the jet, before
   anyone swims. Say so to the user.
@@ -62,10 +71,21 @@ faster than they can handle.
   shipped one is the author's pool, an example only).
 - `install.sh`: sets up a fresh Raspberry Pi OS and copies the program to
   `~/PoolWind/` (`poolwind.py`, `poolwind_defaults.txt`,
-  `poolwind_calibration.txt`, `install.log`), with a desktop icon. It also
-  switches the desktop to X11, turns on I2C and RealVNC, adds the user to the
-  `gpio`, `i2c` and `video` groups, and allows the four sudo commands used to
-  set up USB sticks.
+  `poolwind_calibration.txt`, `install.log`), and downloads the demo's
+  `poolwind_sample.mp4` from the latest GitHub Release (a failed download
+  doesn't stop the install). Desktop icons: **PoolWind**, **Monitor
+  Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: offers to
+  install Claude Code the first time, then opens it in this download folder,
+  continuing the last conversation). It also switches the desktop to X11,
+  turns on I2C and RealVNC, adds the user to the `gpio`, `i2c` and `video`
+  groups, and allows the four sudo commands used to set up USB sticks.
+- `install_windows.bat`: the demo on a Windows PC. Installs Python 3.13
+  with `winget` if needed, the tested packages with pip (no Pi hardware
+  libraries), PoolWind into `%USERPROFILE%\PoolWind` with the sample video,
+  and a desktop icon (`PoolWind.bat`, run with `-X utf8`). With
+  `poolwind.py` next to the script, it installs the files from its own
+  folder instead of downloading. Logs to `install.log` there. Kept CRLF by
+  `.gitattributes`.
 - `docs/`: build guide, setup and calibration guide, user manual.
   `hardware/`: interface board (Fritzing file, Gerbers), parts list.
 - Settings files are Python dict literals read with `ast.literal_eval`, and
@@ -73,13 +93,23 @@ faster than they can handle.
   the built-in values (`BUILT_IN_DEFAULTS` near the top of `poolwind.py`),
   then `poolwind_defaults.txt`, then the swimmer's USB stick
   (`poolwind_ind_defaults.txt` at the stick's root). The calibration file
-  is separate and read once at start.
+  is separate and read once at start. `'Demo'` is applied last and
+  overrides the device settings.
+- The recorded video for the demo and for desk tests is the setting
+  `'video file, start (sec), corners'` (built in: `poolwind_sample.mp4`,
+  0, the sample's swim-area corners). A developer points it at another
+  recording in the defaults file. In video mode, Set Swim Area saves the
+  corners into that line (`App.save_video_corners`), never into the
+  calibration file. A missing file gives a message and the camera.
 - Swim logs (CSV) and training video go to the USB stick's `CSV Vault`
   folder, or to `~/PoolWind/CSV Vault` without a stick.
 
 ## Hardware facts (measured on the author's pool)
 
 - Raspberry Pi 5, Raspberry Pi OS (Debian 13 trixie), Python 3.13, X11.
+  The same `poolwind.py` runs on Windows as a demo: the Pi libraries
+  (`lgpio`, `board`, `adafruit_ina260`) are optional, and without them a
+  real valve falls back to the simulated jet with a message.
 - Relays on GPIO 17 (UP), 18 (DN), 27 (pump On/Off), **active low**: writing
   0 turns a relay on. They "press" the buttons of a spare pool remote.
 - The jet speed is read as a voltage from the pool's Pace Display port by an
@@ -118,16 +148,28 @@ faster than they can handle.
   and the safety limits. The calibration's `'# zones or auto'` can ask for
   fewer zones, spread evenly by voltage. `_index_for_CoM` maps the position
   to a zone, and so to a target jet step. The pool is controlled by jet
-  steps; Pace is for display and the swim log only.
+  steps; Pace is for display and the swim log only. In a demo, and while
+  Swimmer limits runs, the zones open to the whole safety range
+  (`App.zone_limits`).
 - Swim pace estimate: water speed from the voltage (through the pace table),
   plus the swimmer's drift, weighted by `DRIFT_SCALE` (1.5).
-- `SimulatedValve`: the jet for desk tests. `SwimPlotWindow`: swim review
-  with synchronized video. `USBDriveSetupDialog`: new swimmer sticks.
+- `SimulatedValve`: the jet for desk tests and the demo. `SwimPlotWindow`:
+  swim review with synchronized video. `USBDriveSetupDialog`: new swimmer
+  sticks. `SwimmerLimitsPanel` and `PaceCorrectionPanel`: the small boxes
+  over the pool screen (menu). `QtMainWindow.check_camera_moved`: the
+  camera check a few seconds after start, against
+  `poolwind_calibration_camera.png`.
+- The calibration (`CalibrateWindow`, the voltage scan, Pace Entry,
+  PingPong) is a section of the same file: menu **Calibrate pool...**
+  (real valve only), or `python3 poolwind.py --calibrate`
+  (`calibration_main`; `--simulate --window` at a desk, and always
+  simulated while Demo is on).
 
 ## Finding out what's wrong
 
 - **Run PoolWind from a terminal** to see its messages; the desktop icon
-  hides them: `cd ~/PoolWind && python3 poolwind.py`.
+  hides them: `cd ~/PoolWind && python3 poolwind.py`. On Windows, in
+  PowerShell: `cd $HOME\PoolWind` then `py -X utf8 poolwind.py`.
 - **The install log:** `~/PoolWind/install.log` records every install step
   and its output.
 - **Desk testing** (setup guide, section 8): `'developerMode': True` plus a
@@ -162,7 +204,17 @@ faster than they can handle.
   lighting (outdoor sun, glare and sharp shadows are untested), or the
   center lane (`middleSwimZone %`). The zone highlight and the
   developer readouts show what PoolWind sees.
-- **Jet doesn't move.** Check the voltage is read at all (a reading near 0 V
+- **DEMO on the screen, the jet doesn't respond.** `'Demo'` isn't
+  `False` in `poolwind_defaults.txt` (setup guide, section 4).
+- **"Video file not found".** The sample video didn't download (it's a
+  GitHub Release file, `poolwind_sample.mp4`), or a
+  `'video file, start (sec), corners'` line names a missing file.
+  PoolWind then uses the camera. Running the install script again retries
+  the download.
+- **Windows: "Windows protected your PC" or a browser warning** for
+  `install_windows.bat`: expected for an unsigned script (setup guide,
+  section 13): **More info → Run anyway**.
+- **Jet doesn't move.** Check that the demo is off, that the voltage is read at all (a reading near 0 V
   means the Pace cable is unplugged, or, on some pools, the pump is off), that the remote
   works by hand, and the relay wiring (build guide, section 9, first
   power-up checks).
