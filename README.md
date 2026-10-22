@@ -28,6 +28,10 @@ pattern and his speed improved noticeably as a result.
 
 ## Getting started
 
+**Try it on your PC first:** a demo of PoolWind runs on a Windows PC, with
+a recorded swim and a simulated jet, before you build anything. See
+[section 13 of the setup guide](docs/SETUP_GUIDE.md#13-trying-poolwind-on-a-pc).
+
 1. **Read [SAFETY.md](SAFETY.md).**
 2. **Check first:** [three checks to make before buying anything](docs/BUILD_GUIDE.md#before-you-buy-anything-three-checks): your remote, your pool's Pace Display port, and your skills.
    They take a few minutes and tell you whether PoolWind can work with your pool.
