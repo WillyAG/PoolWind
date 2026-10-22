@@ -499,8 +499,20 @@ The pump relay is only connected when the workplace is `'pool'`. So
 `'default'` with `'Valve (real or simulate)': 'real'` tests the speed
 relays at a desk with no chance of starting the pool's pump.
 
-In `'video'` mode, the recorded video and its swim area are set in the
-program code, next to the video's file name.
+**The video.** In `'video'` mode, PoolWind plays the recorded swim named
+in this setting, starting the given number of seconds in, with the swim
+area's four corners in that video:
+
+```
+,'video file, start (sec), corners': ('poolwind_sample.mp4', 0, [(141, 151), (475, 146), (377, 608), (190, 585)])
+```
+
+That is the built-in value, for the sample video. To use your own
+recording, add the line to `poolwind_defaults.txt` with its file name
+(next to the program, or a full path) and corners. To find the corners,
+run it with any corners and use **Set Swim Area**: in video mode it shows
+the whole line, ready to paste. If the file isn't found, PoolWind says so
+and uses the camera.
 
 Before swimming, delete these lines or set `'developerMode': False`.
 
