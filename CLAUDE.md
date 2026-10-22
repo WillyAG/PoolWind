@@ -72,7 +72,7 @@ faster than they can handle.
 - `install.sh`: sets up a fresh Raspberry Pi OS and copies the program to
   `~/PoolWind/` (`poolwind.py`, `poolwind_defaults.txt`,
   `poolwind_calibration.txt`, `install.log`), and downloads the demo's
-  `poolwind_sample.mp4` from the latest GitHub Release (a failed download
+  `PoolWind_demo.mp4` from the latest GitHub Release (a failed download
   doesn't stop the install). Desktop icons: **PoolWind**, **Monitor
   Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: offers to
   install Claude Code the first time, then opens it in this download folder,
@@ -96,7 +96,7 @@ faster than they can handle.
   is separate and read once at start. `'Demo'` is applied last and
   overrides the device settings.
 - The recorded video for the demo and for desk tests is the setting
-  `'video file, start (sec), corners'` (built in: `poolwind_sample.mp4`,
+  `'video file, start (sec), corners'` (built in: `PoolWind_demo.mp4`,
   0, the sample's swim-area corners). A developer points it at another
   recording in the defaults file. In video mode, Set Swim Area saves the
   corners into that line (`App.save_video_corners`), never into the
@@ -207,7 +207,7 @@ faster than they can handle.
 - **DEMO on the screen, the jet doesn't respond.** `'Demo'` isn't
   `False` in `poolwind_defaults.txt` (setup guide, section 4).
 - **"Video file not found".** The sample video didn't download (it's a
-  GitHub Release file, `poolwind_sample.mp4`), or a
+  GitHub Release file, `PoolWind_demo.mp4`), or a
   `'video file, start (sec), corners'` line names a missing file.
   PoolWind then uses the camera. Running the install script again retries
   the download.

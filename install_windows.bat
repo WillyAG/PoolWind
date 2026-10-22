@@ -10,7 +10,7 @@ rem %USERPROFILE%\PoolWind\install.log.
 rem
 rem With poolwind.py in the same folder as this script, it installs the
 rem files from that folder (poolwind.py, and poolwind_defaults.txt,
-rem poolwind_calibration.txt and poolwind_sample.mp4 if they are there)
+rem poolwind_calibration.txt and PoolWind_demo.mp4 if they are there)
 rem instead of downloading them.
 rem
 rem License: see LICENSE.md.
@@ -93,19 +93,19 @@ for %%f in (poolwind_defaults.txt poolwind_calibration.txt) do (
         echo      %%f is missing: put it next to this script and run it again
     )
 )
-if exist "%PW_DIR%\poolwind_sample.mp4" (
-    echo      kept poolwind_sample.mp4
-) else if exist "%SOFTWARE%\poolwind_sample.mp4" (
-    copy "%SOFTWARE%\poolwind_sample.mp4" "%PW_DIR%\poolwind_sample.mp4" >> "%LOG%" 2>&1
-    echo      installed poolwind_sample.mp4
+if exist "%PW_DIR%\PoolWind_demo.mp4" (
+    echo      kept PoolWind_demo.mp4
+) else if exist "%SOFTWARE%\PoolWind_demo.mp4" (
+    copy "%SOFTWARE%\PoolWind_demo.mp4" "%PW_DIR%\PoolWind_demo.mp4" >> "%LOG%" 2>&1
+    echo      installed PoolWind_demo.mp4
 ) else (
     echo      downloading the sample video...
-    curl.exe -L -f -o "%PW_DIR%\poolwind_sample.mp4" "%REPO%/releases/latest/download/poolwind_sample.mp4" >> "%LOG%" 2>&1
+    curl.exe -L -f -o "%PW_DIR%\PoolWind_demo.mp4" "%REPO%/releases/latest/download/PoolWind_demo.mp4" >> "%LOG%" 2>&1
     if errorlevel 1 (
-        del "%PW_DIR%\poolwind_sample.mp4" >nul 2>&1
+        del "%PW_DIR%\PoolWind_demo.mp4" >nul 2>&1
         echo      the sample video couldn't be downloaded: PoolWind will say so
     ) else (
-        echo      installed poolwind_sample.mp4
+        echo      installed PoolWind_demo.mp4
     )
 )
 rmdir /s /q "%SRC%" >nul 2>&1

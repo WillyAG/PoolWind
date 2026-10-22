@@ -497,7 +497,7 @@ they all need a **restart**.
 | `'capture_device (camera or video)'` | `'camera'` | `'video'` plays a recorded swim instead of the live camera |
 | `'display_device (work or pool)'` | `'pool'` | `'work'` switches the monitor to landscape for programming, and `'pool'` back to portrait (monitor mode set in the program code) |
 | `'workplace (home or pool or default)'` | `'pool'` | Sets all three above at once: `'home'` = video, work, simulate; `'pool'` = camera, pool, real; `'default'` = use the three lines as written |
-| `'video file, start (sec), corners'` | `'poolwind_sample.mp4'`, `0`, the sample's corners | The recorded swim `'video'` (and the demo) plays: its file, the number of seconds in to start, and the swim area's four corners in that video |
+| `'video file, start (sec), corners'` | `'PoolWind_demo.mp4'`, `0`, the sample's corners | The recorded swim `'video'` (and the demo) plays: its file, the number of seconds in to start, and the swim area's four corners in that video |
 
 To add them, copy these lines into `poolwind_defaults.txt`, just before
 the closing `}`. They're set for pool use, so nothing changes until you
@@ -510,7 +510,7 @@ change a value: for a desk test, change `'pool'` on the workplace line to
 ,'capture_device (camera or video)': 'camera'
 ,'display_device (work or pool)': 'pool'
 ,'Valve (real or simulate)': 'real'
-,'video file, start (sec), corners': ('poolwind_sample.mp4', 0, [(141, 151), (475, 146), (377, 608), (190, 585)])
+,'video file, start (sec), corners': ('PoolWind_demo.mp4', 0, [(153, 148), (479, 151), (384, 601), (184, 583)])
 ```
 
 The pump relay is only connected when the workplace is `'pool'`. So
