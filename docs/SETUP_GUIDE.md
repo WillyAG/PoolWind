@@ -107,6 +107,8 @@ as `poolwind.py.previous`.
 
 When it finishes, **restart the Pi.**
 
+When the screen comes back, there will be a "PoolWind" icon. WHen you press it, it will come up in demo mode.
+
 ## 4. First start
 
 Suggested before starting:
@@ -445,6 +447,7 @@ PoolWind to be closed and started again.
 
 | Setting | Built-in value | What it does |
 |---|---|---|
+| `'Demo'` | `True` | Runs the program in demo mode. Does not further hardware including pool. Most routines are functional.|
 | `'Sensitivity'` | `5000` | Minimum size, in pixels, of something the camera counts as a swimmer |
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
