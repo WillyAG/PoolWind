@@ -8,6 +8,11 @@ rem run again: it updates the program but never overwrites settings or
 rem calibration. Everything it does is written to
 rem %USERPROFILE%\PoolWind\install.log.
 rem
+rem With poolwind.py in the same folder as this script, it installs the
+rem files from that folder (poolwind.py, and poolwind_defaults.txt,
+rem poolwind_calibration.txt and poolwind_sample.mp4 if they are there)
+rem instead of downloading them.
+rem
 rem License: see LICENSE.md.
 
 setlocal
@@ -53,8 +58,13 @@ rem --------------------------------------------------------------------
 echo      installed
 
 rem --------------------------------------------------------------------
-echo 3/5  Downloading PoolWind
+echo 3/5  Getting PoolWind
 rem --------------------------------------------------------------------
+if exist "%~dp0poolwind.py" (
+    set "SOFTWARE=%~dp0."
+    echo      using the files in %~dp0
+    goto have_files
+)
 curl.exe -L -f -o "%ZIP%" "%REPO%/archive/refs/heads/main.zip" >> "%LOG%" 2>&1 || goto fail
 if exist "%SRC%" rmdir /s /q "%SRC%"
 mkdir "%SRC%"
@@ -62,6 +72,7 @@ tar -xf "%ZIP%" -C "%SRC%" >> "%LOG%" 2>&1 || goto fail
 set "SOFTWARE=%SRC%\PoolWind-main\software"
 if not exist "%SOFTWARE%\poolwind.py" goto fail
 echo      downloaded
+:have_files
 
 rem --------------------------------------------------------------------
 echo 4/5  Copying PoolWind to %PW_DIR%
@@ -75,13 +86,18 @@ echo      installed poolwind.py
 for %%f in (poolwind_defaults.txt poolwind_calibration.txt) do (
     if exist "%PW_DIR%\%%f" (
         echo      kept your %%f
-    ) else (
+    ) else if exist "%SOFTWARE%\%%f" (
         copy "%SOFTWARE%\%%f" "%PW_DIR%\%%f" >> "%LOG%" 2>&1
         echo      installed %%f
+    ) else (
+        echo      %%f is missing: put it next to this script and run it again
     )
 )
 if exist "%PW_DIR%\poolwind_sample.mp4" (
     echo      kept poolwind_sample.mp4
+) else if exist "%SOFTWARE%\poolwind_sample.mp4" (
+    copy "%SOFTWARE%\poolwind_sample.mp4" "%PW_DIR%\poolwind_sample.mp4" >> "%LOG%" 2>&1
+    echo      installed poolwind_sample.mp4
 ) else (
     echo      downloading the sample video...
     curl.exe -L -f -o "%PW_DIR%\poolwind_sample.mp4" "%REPO%/releases/latest/download/poolwind_sample.mp4" >> "%LOG%" 2>&1
