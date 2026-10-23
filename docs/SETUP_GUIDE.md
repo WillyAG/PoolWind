@@ -710,10 +710,8 @@ free space (most of it for Python and its libraries).
 
 ### Installing the demo
 
-1. **Download the install script.** On PoolWind's GitHub page, click
-   `install_windows.bat`, then the **Download raw file** button (a
-   downward arrow at the top right of the file). Clicking the file name
-   alone only shows its text.
+1. **Click [Download the PoolWind demo](https://github.com/WillyAG/PoolWind/releases/latest/download/install_windows.bat).**
+   This downloads the install script, `install_windows.bat`.
 2. **Your browser may warn** that the file "isn't commonly downloaded" or
    "could harm your device". In Edge: click **…** next to the download,
    then **Keep**, then **Show more → Keep anyway**. Chrome: **Keep**.
