@@ -85,7 +85,8 @@ faster than they can handle.
   then opens the demo tour (user manual 9) in the browser and starts
   `PoolWind.bat` (`-X utf8`). No desktop icon: running the script again
   is how to watch the demo again (it skips pip when the libraries load,
-  and keeps the video). With
+  and downloads the video again). The video is hidden (`attrib +h`) and
+  `PoolWind.bat` deletes it when PoolWind closes (Bill, 2026-10-23). With
   `poolwind.py` next to the script, it installs the files from its own
   folder instead of downloading. Logs to `install.log` there. Kept CRLF by
   `.gitattributes`.

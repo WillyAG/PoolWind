@@ -5,10 +5,12 @@ rem Runs PoolWind on a PC as a demo: a recorded swim and a simulated jet.
 rem A PC can't control a pool (that needs the Raspberry Pi build). See
 rem docs/SETUP_GUIDE.md. Download this file and double-click it: it
 rem installs PoolWind, opens the demo tour in the browser and starts the
-rem demo. Run it again to watch the demo again: Python, the libraries and
-rem the video are already there, so it only gets the latest program (it
-rem never overwrites settings or calibration). Everything it does is
-rem written to %USERPROFILE%\PoolWind\install.log.
+rem demo. Run it again to watch the demo again: Python and the libraries
+rem are already there, so it gets the latest program (it never overwrites
+rem settings or calibration) and the sample video. The video is hidden and
+rem is deleted when PoolWind closes (Bill, 2026-10-23: "I can lower the
+rem number of PC's that have it"). Everything it does is written to
+rem %USERPROFILE%\PoolWind\install.log.
 rem
 rem With poolwind.py in the same folder as this script, it installs the
 rem files from that folder (poolwind.py, and poolwind_defaults.txt,
@@ -102,9 +104,10 @@ for %%f in (poolwind_defaults.txt poolwind_calibration.txt) do (
         echo      %%f is missing: put it next to this script and run it again
     )
 )
-if exist "%PW_DIR%\PoolWind_demo.mp4" (
-    echo      kept PoolWind_demo.mp4
-) else if exist "%SOFTWARE%\PoolWind_demo.mp4" (
+rem A fresh copy each time: a hidden file can't be overwritten, and an
+rem older copy may be an older video.
+if exist "%PW_DIR%\PoolWind_demo.mp4" del /f /a "%PW_DIR%\PoolWind_demo.mp4" >> "%LOG%" 2>&1
+if exist "%SOFTWARE%\PoolWind_demo.mp4" (
     copy "%SOFTWARE%\PoolWind_demo.mp4" "%PW_DIR%\PoolWind_demo.mp4" >> "%LOG%" 2>&1
     echo      installed PoolWind_demo.mp4
 ) else (
@@ -117,6 +120,7 @@ if exist "%PW_DIR%\PoolWind_demo.mp4" (
         echo      installed PoolWind_demo.mp4
     )
 )
+if exist "%PW_DIR%\PoolWind_demo.mp4" attrib +h "%PW_DIR%\PoolWind_demo.mp4"
 rmdir /s /q "%SRC%" >nul 2>&1
 del "%ZIP%" >nul 2>&1
 
@@ -124,12 +128,14 @@ rem --------------------------------------------------------------------
 echo 5/5  Starting the demo
 rem --------------------------------------------------------------------
 rem No desktop icon (Bill, 2026-10-23): the demo starts from here, next to
-rem the demo tour in the browser, every time the script is run.
+rem the demo tour in the browser, every time the script is run. The video
+rem is deleted when PoolWind closes.
 > "%PW_DIR%\PoolWind.bat" (
     echo @echo off
     echo cd /d "%%~dp0"
     echo %PY% -X utf8 poolwind.py
     echo if errorlevel 1 pause
+    echo if exist PoolWind_demo.mp4 del /f /a PoolWind_demo.mp4
 )
 echo      opening the demo tour in your browser
 start "" "%TOUR%"

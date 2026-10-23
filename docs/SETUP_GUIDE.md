@@ -725,7 +725,8 @@ free space (most of it for Python and its libraries).
    - the libraries PoolWind uses (OpenCV, PySide6, NumPy, SciPy,
      matplotlib). This takes a few minutes the first time;
    - PoolWind itself and the sample video, in a `PoolWind` folder in your
-     user folder.
+     user folder. The video is a hidden file, and it's deleted when you
+     close PoolWind.
 
    Everything it does is written to `install.log` in that folder.
 6. **When it says Done,** [the demo tour](USER_MANUAL.md#9-the-demo-tour)
@@ -737,9 +738,9 @@ free space (most of it for Python and its libraries).
 ### Watching it again
 
 Run `install_windows.bat` again (it's still in your **Downloads** folder).
-Python, the libraries and the video are already there, so after a few
-seconds the tour opens and the demo starts. It also brings you the latest
-PoolWind, and your settings are kept.
+Python and the libraries are already there, so it only downloads the
+sample video again, then the tour opens and the demo starts. It also
+brings you the latest PoolWind, and your settings are kept.
 
 **Why the warnings?** Windows and the browsers warn about any program or
 script from the internet that isn't signed by a known publisher, and
