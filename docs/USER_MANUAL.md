@@ -367,9 +367,7 @@ closes the box without changing anything.
 
 Open the menu (**≡**, top left) and choose **Swim Plot...**.
 
-While you're away from the pool screen, PoolWind doesn't adjust the jet:
-
-- **"Leaving the pool screen"**: the jet first winds down to its lowest
+- **"Navigating away from the main pool screen"**: the jet first winds down to its lowest
   setting, and PoolWind lets go of the pool's UP and DN controls.
 - **OnOff** still works: the calendar and the plot screen each have a
   light red button for the pump. To prevent an accidental press, it asks
