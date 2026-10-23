@@ -489,14 +489,15 @@ and builders, not for day-to-day swimming.
 ## 9. The demo tour
 
 In a demo, PoolWind plays a recorded swim and simulates the jet, so you can
-see how it follows a swimmer without a pool. Press **Begin** and follow
+see how it follows a swimmer without a pool. Press **Begin** as soon as
+the pool screen appears, so the distances below match yours, and follow
 along by the distance on the pool screen (in miles). In the video the
 swimmer tries the buttons, but in the demo only your clicks count, so
 click along where the table says.
 
 | Distance | In the video | What you do |
 |---|---|---|
-| 0.000 | The swim begins; PoolWind runs normally. | Press **Begin**. |
+| 0.000 | The swim begins; PoolWind runs normally. | Press **Begin** right away. |
 | 0.041 | The swimmer leaves the swimZone; the jet winds down. | |
 | 0.048 | The swimmer leaves the swimZone and clicks the screen to show the swim zones. | Click the pool picture to see the zones too (optional). |
 | 0.054 | The swimmer gets out of the pool; the jet winds down to its slowest speed. | |
