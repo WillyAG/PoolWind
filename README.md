@@ -23,7 +23,8 @@ pattern and his speed improved noticeably as a result.
 
 ## Try a demo on your PC 
   Before you buy or build anything, check out a demo of PoolWind that runs on a Windows PC, with a recorded swim and a simulated jet. See
-[section 13 of the setup guide](docs/SETUP_GUIDE.md#13-trying-poolwind-on-a-pc).
+[section 13 of the setup guide](docs/SETUP_GUIDE.md#13-trying-poolwind-on-a-pc). What happens in the recorded swim, and when to click, is in
+[the demo tour](docs/USER_MANUAL.md#9-the-demo-tour).
 
 
 ## Compatibility

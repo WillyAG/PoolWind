@@ -15,6 +15,7 @@ pool are covered in the build guide and the setup and calibration guide.
 6. [Your USB stick](#6-your-usb-stick)
 7. [Reviewing your swims: Swim Plot](#7-reviewing-your-swims-swim-plot)
 8. [Your settings](#8-your-settings)
+9. [The demo tour](#9-the-demo-tour)
 
 ---
 
@@ -48,7 +49,8 @@ pool are covered in the build guide and the setup and calibration guide.
 today's distance and average Pace carry on from your earlier session.
 
 **DEMO on the screen?** PoolWind is set up as a demo and doesn't control
-the jet. Ask whoever set it up.
+the jet. Ask whoever set it up. To follow the recorded swim, see
+[The demo tour](#9-the-demo-tour).
 
 **A blank or new USB stick?** PoolWind offers to set it up as a new
 swimmer's stick (see [Setting up a new stick](#setting-up-a-new-stick)).
@@ -481,3 +483,33 @@ times as fast. Lower than 5 saves more space but makes the video jumpy.
 **Other settings** (the pool's calibration, safety limits and advanced tuning)
 are covered in the setup and calibration guide. They're for technicians
 and builders, not for day-to-day swimming.
+
+---
+
+## 9. The demo tour
+
+In a demo, PoolWind plays a recorded swim and simulates the jet, so you can
+see how it follows a swimmer without a pool. Press **Begin** and follow
+along by the distance on the pool screen (in miles). In the video the
+swimmer tries the buttons, but in the demo only your clicks count, so
+click along where the table says.
+
+| Distance | In the video | What you do |
+|---|---|---|
+| 0.000 | The swim begins; PoolWind runs normally. | Press **Begin**. |
+| 0.041 | The swimmer leaves the swimZone; the jet winds down. | |
+| 0.048 | The swimmer leaves the swimZone and clicks the screen to show the swim zones. | Click the pool picture to see the zones too (optional). |
+| 0.054 | The swimmer gets out of the pool; the jet winds down to its slowest speed. | |
+| 0.062 | The swimmer leaves the swimZone at medium speed and clicks **Hold**; the jet returns to the exit speed and stays there. | Click **Hold**. |
+| 0.068 | The swimmer leaves the swimZone and clicks **Vary**; the jet winds down and PoolWind runs normally again. | Click **Vary**. |
+| 0.073 | The swimmer leaves the swimZone at fast speed and clicks **Hold**; the jet returns to the exit speed and stays there. | Click **Hold**. |
+| 0.087 | The swimmer keeps swimming against the steady fast jet. The video ends and starts over. | Click **Vary** to return to normal operation. |
+
+Between these points the swimmer is simply swimming. Each time the video
+starts over, the same steps repeat and the distance keeps adding up. The
+swim log keeps growing, and you can view it with **Swim Plot** in the menu
+(see [Reviewing your swims](#7-reviewing-your-swims-swim-plot)).
+
+A demo keeps its swims in a `Demo Vault` folder in the `PoolWind` folder,
+not on a USB stick. Closing PoolWind and starting it again erases them,
+and the distance starts again at 0.000.

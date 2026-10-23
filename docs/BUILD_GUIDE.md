@@ -12,7 +12,8 @@ Display port. *(You will have to open the control box once to plug in the Pace D
 ## Before you buy anything: three checks
 
 Before buying parts, you can try PoolWind on a Windows PC as a demo
-([setup guide, section 13](SETUP_GUIDE.md#13-trying-poolwind-on-a-pc)).
+([setup guide, section 13](SETUP_GUIDE.md#13-trying-poolwind-on-a-pc)) and
+follow [the demo tour](USER_MANUAL.md#9-the-demo-tour).
 
 PoolWind depends on two things about your pool that the author could only
 check on his own pool, and on the skills of whoever builds it. If any of

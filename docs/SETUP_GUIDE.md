@@ -109,7 +109,8 @@ as `poolwind.py.previous`.
 
 When it finishes, **restart the Pi.**
 
-When the screen comes back, there will be a "PoolWind" icon. When you double-click it, PoolWind comes up in demo mode.
+When the screen comes back, there will be a "PoolWind" icon. When you double-click it, PoolWind comes up in demo mode
+([the demo tour](USER_MANUAL.md#9-the-demo-tour) explains what it shows).
 
 ## 4. First start
 
@@ -732,7 +733,8 @@ free space (most of it for Python and its libraries).
    Everything it does is written to `install.log` in that folder. When it
    says **Done**, press a key to close it.
 6. **Double-click PoolWind** on the desktop. **DEMO** shows on the pool
-   screen.
+   screen. Press **Begin** and follow
+   [the demo tour](USER_MANUAL.md#9-the-demo-tour).
 
 **Why the warnings?** Windows and the browsers warn about any program or
 script from the internet that isn't signed by a known publisher, and
