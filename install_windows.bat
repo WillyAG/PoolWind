@@ -3,10 +3,12 @@ rem PoolWind install script for Windows.
 rem
 rem Runs PoolWind on a PC as a demo: a recorded swim and a simulated jet.
 rem A PC can't control a pool (that needs the Raspberry Pi build). See
-rem docs/SETUP_GUIDE.md. Download this file and double-click it. Safe to
-rem run again: it updates the program but never overwrites settings or
-rem calibration. Everything it does is written to
-rem %USERPROFILE%\PoolWind\install.log.
+rem docs/SETUP_GUIDE.md. Download this file and double-click it: it
+rem installs PoolWind, opens the demo tour in the browser and starts the
+rem demo. Run it again to watch the demo again: Python, the libraries and
+rem the video are already there, so it only gets the latest program (it
+rem never overwrites settings or calibration). Everything it does is
+rem written to %USERPROFILE%\PoolWind\install.log.
 rem
 rem With poolwind.py in the same folder as this script, it installs the
 rem files from that folder (poolwind.py, and poolwind_defaults.txt,
@@ -21,6 +23,7 @@ set "LOG=%PW_DIR%\install.log"
 set "REPO=https://github.com/WillyAG/PoolWind"
 set "ZIP=%TEMP%\PoolWind-download.zip"
 set "SRC=%TEMP%\PoolWind-download"
+set "TOUR=%REPO%/blob/main/docs/USER_MANUAL.md#9-the-demo-tour"
 
 rem Python packages, at the versions PoolWind was tested with (the Pi's).
 set "PIP_PACKAGES=opencv-python==4.13.0.92 scipy==1.17.1 numpy~=2.2.0 matplotlib~=3.10.0 PySide6~=6.8.0"
@@ -53,9 +56,15 @@ set "PY="%PY%""
 rem --------------------------------------------------------------------
 echo 2/5  Python packages (a few minutes the first time)
 rem --------------------------------------------------------------------
+%PY% -c "import cv2, PySide6, scipy, numpy, matplotlib" >nul 2>&1
+if not errorlevel 1 (
+    echo      already installed
+    goto have_packages
+)
 %PY% -m pip install --upgrade pip >> "%LOG%" 2>&1
 %PY% -m pip install %PIP_PACKAGES% >> "%LOG%" 2>&1 || goto fail
 echo      installed
+:have_packages
 
 rem --------------------------------------------------------------------
 echo 3/5  Getting PoolWind
@@ -112,21 +121,26 @@ rmdir /s /q "%SRC%" >nul 2>&1
 del "%ZIP%" >nul 2>&1
 
 rem --------------------------------------------------------------------
-echo 5/5  Desktop icon
+echo 5/5  Starting the demo
 rem --------------------------------------------------------------------
+rem No desktop icon (Bill, 2026-10-23): the demo starts from here, next to
+rem the demo tour in the browser, every time the script is run.
 > "%PW_DIR%\PoolWind.bat" (
     echo @echo off
     echo cd /d "%%~dp0"
     echo %PY% -X utf8 poolwind.py
     echo if errorlevel 1 pause
 )
-powershell -NoProfile -Command "$s = (New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath('Desktop') + '\PoolWind.lnk'); $s.TargetPath = '%PW_DIR%\PoolWind.bat'; $s.WorkingDirectory = '%PW_DIR%'; $s.Save()" >> "%LOG%" 2>&1
-echo      PoolWind icon on the desktop
+echo      opening the demo tour in your browser
+start "" "%TOUR%"
+echo      starting PoolWind
+start "PoolWind" /min "%PW_DIR%\PoolWind.bat"
 
 echo.
-echo Done. Double-click PoolWind on the desktop to start the demo.
+echo Done. Press Begin on the pool screen and follow the demo tour.
+echo To watch the demo again, run this script again.
 echo ===== done ===== >> "%LOG%"
-pause
+timeout /t 15
 exit /b 0
 
 :no_winget

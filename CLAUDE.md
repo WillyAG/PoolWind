@@ -82,7 +82,10 @@ faster than they can handle.
 - `install_windows.bat`: the demo on a Windows PC. Installs Python 3.13
   with `winget` if needed, the tested packages with pip (no Pi hardware
   libraries), PoolWind into `%USERPROFILE%\PoolWind` with the sample video,
-  and a desktop icon (`PoolWind.bat`, run with `-X utf8`). With
+  then opens the demo tour (user manual 9) in the browser and starts
+  `PoolWind.bat` (`-X utf8`). No desktop icon: running the script again
+  is how to watch the demo again (it skips pip when the libraries load,
+  and keeps the video). With
   `poolwind.py` next to the script, it installs the files from its own
   folder instead of downloading. Logs to `install.log` there. Kept CRLF by
   `.gitattributes`.

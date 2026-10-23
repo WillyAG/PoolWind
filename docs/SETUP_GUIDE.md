@@ -727,24 +727,30 @@ free space (most of it for Python and its libraries).
    - the libraries PoolWind uses (OpenCV, PySide6, NumPy, SciPy,
      matplotlib). This takes a few minutes the first time;
    - PoolWind itself and the sample video, in a `PoolWind` folder in your
-     user folder;
-   - a **PoolWind** icon on the desktop.
+     user folder.
 
-   Everything it does is written to `install.log` in that folder. When it
-   says **Done**, press a key to close it.
-6. **Double-click PoolWind** on the desktop. **DEMO** shows on the pool
-   screen. Press **Begin** and follow
-   [the demo tour](USER_MANUAL.md#9-the-demo-tour).
+   Everything it does is written to `install.log` in that folder.
+6. **When it says Done,** [the demo tour](USER_MANUAL.md#9-the-demo-tour)
+   opens in your browser and PoolWind starts, with **DEMO** on the pool
+   screen. Put the two windows side by side (click one, then press the
+   Windows key and the left or right arrow). Press **Begin** right away
+   and follow the tour.
+
+### Watching it again
+
+Run `install_windows.bat` again (it's still in your **Downloads** folder).
+Python, the libraries and the video are already there, so after a few
+seconds the tour opens and the demo starts. It also brings you the latest
+PoolWind, and your settings are kept.
 
 **Why the warnings?** Windows and the browsers warn about any program or
 script from the internet that isn't signed by a known publisher, and
 PoolWind is a hobby project without one. The script is plain text: to see
 what it does before running it, right-click it and choose **Edit** (or
-**Open with → Notepad**). Run it again at any time to update PoolWind:
-your settings are kept.
+**Open with → Notepad**).
 
 ### Removing it
 
-Delete the `PoolWind` folder in your user folder and the PoolWind icon on
-the desktop. If the script installed Python and you don't need it, remove
+Delete the `PoolWind` folder in your user folder, and `install_windows.bat`
+in **Downloads**. If the script installed Python and you don't need it, remove
 **Python 3.13** in **Settings → Apps**.
