@@ -7,11 +7,12 @@ rem docs/SETUP_GUIDE.md. Download this file and double-click it: it
 rem installs PoolWind, opens the demo tour in the browser and starts the
 rem demo. When it finishes it deletes itself, so Downloads doesn't fill
 rem with copies; to watch the demo again, download it again: Python and
-rem the libraries are already there, so it gets the latest program (it never overwrites
-rem settings or calibration) and the sample video. The video is hidden and
-rem is deleted when PoolWind closes (Bill, 2026-10-23: "I can lower the
-rem number of PC's that have it"). Everything it does is written to
-rem %USERPROFILE%\PoolWind\install.log.
+rem the libraries are already there, so it gets PoolWind and the sample
+rem video again. The video is hidden, and when PoolWind closes the whole
+rem PoolWind folder is deleted (Bill, 2026-10-23: "I can lower the number
+rem of PC's that have it"; 2026-10-24: "Can the entire Poolwind folder be
+rem deleted on demo program exit"). Until then, everything it does is
+rem written to %USERPROFILE%\PoolWind\install.log.
 rem
 rem With poolwind.py in the same folder as this script, it installs the
 rem files from that folder (poolwind.py, and poolwind_defaults.txt,
@@ -129,19 +130,25 @@ rem --------------------------------------------------------------------
 echo 5/5  Starting the demo
 rem --------------------------------------------------------------------
 rem No desktop icon (Bill, 2026-10-23): the demo starts from here, next to
-rem the demo tour in the browser, every time the script is run. The video
-rem is deleted when PoolWind closes.
-> "%PW_DIR%\PoolWind.bat" (
+rem the demo tour in the browser, every time the script is run.
+rem PoolWind.bat is in %TEMP%, not in the PoolWind folder, so that it can
+rem delete the whole folder when PoolWind closes. It runs under cmd /c, so
+rem its window closes too (Bill, 2026-10-24: "opens up a blank titled
+rem Poolwind and leaves it there").
+set "BAT=%TEMP%\PoolWind.bat"
+del "%PW_DIR%\PoolWind.bat" >nul 2>&1
+> "%BAT%" (
     echo @echo off
-    echo cd /d "%%~dp0"
+    echo cd /d "%PW_DIR%"
     echo %PY% -X utf8 poolwind.py
     echo if errorlevel 1 pause
-    echo if exist PoolWind_demo.mp4 del /f /a PoolWind_demo.mp4
+    echo cd /d "%TEMP%"
+    echo if exist "%PW_DIR%\poolwind.py" rmdir /s /q "%PW_DIR%"
 )
 echo      opening the demo tour in your browser
 start "" "%TOUR%"
 echo      starting PoolWind
-start "PoolWind" /min "%PW_DIR%\PoolWind.bat"
+start "PoolWind" /min cmd /c "%BAT%"
 
 echo.
 echo Done. The demo is running: follow the demo tour in your browser.

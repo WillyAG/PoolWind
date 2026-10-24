@@ -86,8 +86,10 @@ faster than they can handle.
   `PoolWind.bat` (`-X utf8`). No desktop icon, and the script deletes
   itself at the end (not when `poolwind.py` is next to it): downloading
   it again is how to watch the demo again (it skips pip when the libraries load,
-  and downloads the video again). The video is hidden (`attrib +h`) and
-  `PoolWind.bat` deletes it when PoolWind closes (Bill, 2026-10-23). With
+  and downloads the video again). The video is hidden (`attrib +h`).
+  `PoolWind.bat` is written to `%TEMP%` and started with `cmd /c` (so its
+  window closes), and when PoolWind closes it deletes the whole PoolWind
+  folder (Bill, 2026-10-24). With
   `poolwind.py` next to the script, it installs the files from its own
   folder instead of downloading. Logs to `install.log` there. Kept CRLF by
   `.gitattributes`.

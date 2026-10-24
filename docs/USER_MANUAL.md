@@ -514,5 +514,5 @@ Between these points the swimmer is simply swimming, watch how jet speed changes
 (see [Reviewing your swims](#7-reviewing-your-swims-swim-plot)).
 
 A demo keeps its swims in a `Demo Vault` folder in the `PoolWind` folder,
-not on a USB stick. Closing PoolWind and starting it again erases them,
-and the distance starts again at 0.000.
+not on a USB stick. On a PC, closing PoolWind deletes the whole
+`PoolWind` folder, Demo Vault and all; a new demo starts again at 0.000.

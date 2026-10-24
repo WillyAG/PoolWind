@@ -725,8 +725,8 @@ free space (most of it for Python and its libraries).
    - the libraries PoolWind uses (OpenCV, PySide6, NumPy, SciPy,
      matplotlib). This takes a few minutes the first time;
    - PoolWind itself and the sample video, in a `PoolWind` folder in your
-     user folder. The video is a hidden file, and it's deleted when you
-     close PoolWind.
+     user folder. The video is a hidden file. When you close PoolWind,
+     the whole `PoolWind` folder is deleted.
 
    Everything it does is written to `install.log` in that folder.
 6. **When it says Done,** [the demo tour](USER_MANUAL.md#9-the-demo-tour)
@@ -745,7 +745,7 @@ deletes itself from **Downloads** when it finishes, so copies don't pile
 up there. Python and the libraries are already there, so it only
 downloads the sample video again, then the tour opens and the demo
 starts. It also
-brings you the latest PoolWind, and your settings are kept.
+brings you the latest PoolWind.
 
 **Why the warnings?** Windows and the browsers warn about any program or
 script from the internet that isn't signed by a known publisher, and
@@ -755,5 +755,7 @@ what it does before running it, right-click it and choose **Edit** (or
 
 ### Removing it
 
-Delete the `PoolWind` folder in your user folder. If the script installed Python and you don't need it, remove
+Closing PoolWind already deletes its `PoolWind` folder (if PoolWind was
+stopped some other way, delete that folder in your user folder yourself).
+If the script installed Python and you don't need it, remove
 **Python 3.13** in **Settings → Apps**.
