@@ -83,8 +83,9 @@ faster than they can handle.
   with `winget` if needed, the tested packages with pip (no Pi hardware
   libraries), PoolWind into `%USERPROFILE%\PoolWind` with the sample video,
   then opens the demo tour (user manual 9) in the browser and starts
-  `PoolWind.bat` (`-X utf8`). No desktop icon: running the script again
-  is how to watch the demo again (it skips pip when the libraries load,
+  `PoolWind.bat` (`-X utf8`). No desktop icon, and the script deletes
+  itself at the end (not when `poolwind.py` is next to it): downloading
+  it again is how to watch the demo again (it skips pip when the libraries load,
   and downloads the video again). The video is hidden (`attrib +h`) and
   `PoolWind.bat` deletes it when PoolWind closes (Bill, 2026-10-23). With
   `poolwind.py` next to the script, it installs the files from its own

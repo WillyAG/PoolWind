@@ -486,27 +486,31 @@ and builders, not for day-to-day swimming.
 
 ## 9. The demo tour
 
+**What to look for**: the swimmer will swim through different zones, starting at the rear of the pool, where he is practically treading water, and then swimming to the front, which he cannot reach because the max jet speed has been set beyond his abilities. The zone boundaries show from the start (a click on the video hides them, another shows them again). The boundary corresponding to the jet speed will be slightly highlighted and you can visualize the screen as a jet speed meter. The highlighted zone will follow the swimmer but not immediately because of pool controller and water mass delays.
+
 In a demo, PoolWind plays a recorded swim and simulates the jet, so you can
-see how it follows a swimmer without a pool. Press **Begin** as soon as
-the pool screen appears, so the distances below match yours, and follow
-along by the distance on the pool screen (in miles). In the video the
+see how it follows a swimmer without a pool. To run it on a Windows PC,
+[download the PoolWind demo](https://github.com/WillyAG/PoolWind/releases/latest/download/install_windows.bat) and see
+[section 13 of the setup guide](SETUP_GUIDE.md#13-trying-poolwind-on-a-pc).
+The demo starts swimming on its own, as if **Begin** were pressed, so the
+distances below match yours: follow along by the distance on the pool
+screen (in miles). Give PoolWind the left third of the screen and this
+page the rest. In the video the
 swimmer tries the buttons, but in the demo only your clicks count, so
 click along where the table says.
 
-| Distance | In the video | What you do |
+| Distance (mi) | In the video | What you do |
 |---|---|---|
-| 0.000 | The swim begins; PoolWind runs normally. | Press **Begin** right away. |
+| 0.000 | The swim begins; PoolWind runs normally. | Nothing: the demo has already begun. |
 | 0.041 | The swimmer leaves the swimZone; the jet winds down. | |
-| 0.048 | The swimmer leaves the swimZone and clicks the screen to show the swim zones. | Click the pool picture to see the zones too (optional). |
+| 0.048 | The swimmer leaves the swimZone and clicks the screen to show the swim zones. | The zones are already showing; a click on the picture hides them (optional). |
 | 0.054 | The swimmer gets out of the pool; the jet winds down to its slowest speed. | |
 | 0.062 | The swimmer leaves the swimZone at medium speed and clicks **Hold**; the jet returns to the exit speed and stays there. | Click **Hold**. |
 | 0.068 | The swimmer leaves the swimZone and clicks **Vary**; the jet winds down and PoolWind runs normally again. | Click **Vary**. |
 | 0.073 | The swimmer leaves the swimZone at fast speed and clicks **Hold**; the jet returns to the exit speed and stays there. | Click **Hold**. |
 | 0.087 | The swimmer keeps swimming against the steady fast jet. The video ends and starts over. | Click **Vary** to return to normal operation. |
 
-Between these points the swimmer is simply swimming. Each time the video
-starts over, the same steps repeat and the distance keeps adding up. The
-swim log keeps growing, and you can view it with **Swim Plot** in the menu
+Between these points the swimmer is simply swimming, watch how jet speed changes. Each time the video starts over, the same steps repeat and the distance keeps adding up. The swim log keeps growing, and you can view it with **Swim Plot** in the menu
 (see [Reviewing your swims](#7-reviewing-your-swims-swim-plot)).
 
 A demo keeps its swims in a `Demo Vault` folder in the `PoolWind` folder,

@@ -563,6 +563,10 @@ class App:
         # --- Determine suspend/resume state based on today's log file ---
         self.todayCsvFile = os.path.join(self.data_dir, f"{date.today()}.csv")
         self.suspendButtonText = "Resume" if os.path.isfile(self.todayCsvFile) else "Begin"
+        if self.REPdefaults["Demo"]:
+            # A demo starts as if Begin were pressed, so its distances match
+            # the demo tour's (Bill, 2026-10-24)
+            self.Suspend_btn_press()
 
         # Load today's CSV
         time_raw, pace_raw, dist_raw, segment_raw, frame_raw = self.load_today_csv()
@@ -2627,10 +2631,12 @@ class App:
     # relay left on while a plot was open ran the jet up to high.)
     # ------------------------------------------------------------------
     # Swim zone highlight on/off, shared by the pool screen and Swim Plot
-    # replay; starts as 'zoneHighlight' says.
+    # replay; starts as 'zoneHighlight' says, and on in a demo (Bill,
+    # 2026-10-24: "open demo with zones showing").
     def zone_highlight_on(self):
         if not hasattr(self, "_zone_highlight"):
-            self._zone_highlight = bool(self.REPdefaults.get("zoneHighlight", True))
+            self._zone_highlight = (bool(self.REPdefaults.get("zoneHighlight", True))
+                                    or bool(self.REPdefaults.get("Demo")))
         return self._zone_highlight
 
     def toggle_zone_highlight(self):

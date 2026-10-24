@@ -5,8 +5,9 @@ rem Runs PoolWind on a PC as a demo: a recorded swim and a simulated jet.
 rem A PC can't control a pool (that needs the Raspberry Pi build). See
 rem docs/SETUP_GUIDE.md. Download this file and double-click it: it
 rem installs PoolWind, opens the demo tour in the browser and starts the
-rem demo. Run it again to watch the demo again: Python and the libraries
-rem are already there, so it gets the latest program (it never overwrites
+rem demo. When it finishes it deletes itself, so Downloads doesn't fill
+rem with copies; to watch the demo again, download it again: Python and
+rem the libraries are already there, so it gets the latest program (it never overwrites
 rem settings or calibration) and the sample video. The video is hidden and
 rem is deleted when PoolWind closes (Bill, 2026-10-23: "I can lower the
 rem number of PC's that have it"). Everything it does is written to
@@ -143,11 +144,15 @@ echo      starting PoolWind
 start "PoolWind" /min "%PW_DIR%\PoolWind.bat"
 
 echo.
-echo Done. Press Begin on the pool screen and follow the demo tour.
-echo To watch the demo again, run this script again.
+echo Done. The demo is running: follow the demo tour in your browser.
+echo To watch the demo again, download it again from PoolWind's GitHub page.
 echo ===== done ===== >> "%LOG%"
 timeout /t 15
-exit /b 0
+rem A downloaded copy deletes itself, so Downloads doesn't fill with
+rem install_windows (1).bat, (2) ... (Bill, 2026-10-24). A copy next to
+rem poolwind.py, for testing, is kept.
+if exist "%~dp0poolwind.py" exit /b 0
+(goto) 2>nul & del "%~f0"
 
 :no_winget
 echo.

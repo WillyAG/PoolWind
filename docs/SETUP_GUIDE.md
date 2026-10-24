@@ -731,15 +731,20 @@ free space (most of it for Python and its libraries).
    Everything it does is written to `install.log` in that folder.
 6. **When it says Done,** [the demo tour](USER_MANUAL.md#9-the-demo-tour)
    opens in your browser and PoolWind starts, with **DEMO** on the pool
-   screen. Put the two windows side by side (click one, then press the
-   Windows key and the left or right arrow). Press **Begin** right away
-   and follow the tour.
+   screen. The tour opens in a new tab: the page you came from is still
+   in the tab next to it. Give PoolWind the left third of the screen and
+   the tour the rest: click PoolWind, press the Windows key and the left
+   arrow, click the browser on the right, then drag the line between them
+   to the left. The demo starts swimming by itself, with the zones
+   showing; follow the tour.
 
 ### Watching it again
 
-Run `install_windows.bat` again (it's still in your **Downloads** folder).
-Python and the libraries are already there, so it only downloads the
-sample video again, then the tour opens and the demo starts. It also
+Click [Download the PoolWind demo](https://github.com/WillyAG/PoolWind/releases/latest/download/install_windows.bat) again and run it. The script
+deletes itself from **Downloads** when it finishes, so copies don't pile
+up there. Python and the libraries are already there, so it only
+downloads the sample video again, then the tour opens and the demo
+starts. It also
 brings you the latest PoolWind, and your settings are kept.
 
 **Why the warnings?** Windows and the browsers warn about any program or
@@ -750,6 +755,5 @@ what it does before running it, right-click it and choose **Edit** (or
 
 ### Removing it
 
-Delete the `PoolWind` folder in your user folder, and `install_windows.bat`
-in **Downloads**. If the script installed Python and you don't need it, remove
+Delete the `PoolWind` folder in your user folder. If the script installed Python and you don't need it, remove
 **Python 3.13** in **Settings → Apps**.
