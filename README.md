@@ -1,9 +1,5 @@
 # PoolWind™
 
-> [!WARNING]
-> **Under construction — please check back regularly.**
-> PoolWind works, but the guides and the demo are still being tested and may change.
-
 **Swimmer-sensing jet control for swim-in-place pools.**
 
 <img src="docs/images/PoolWind_Station_running.jpg" width="400" alt="The PoolWind station beside the pool: a portrait monitor in a waterproof case showing the pace, average pace and distance, with a waterproof keyboard and mouse">
