@@ -385,8 +385,9 @@ the same board should work the same way.
 
    **If your remote is different,** find each of its three buttons' two
    contacts (a multimeter shows them connected while the button is held
-   down) and wire them to the same pins. Ask in the project's Discussions
-   if you're unsure.
+   down) and wire them to the same pins. Ask in the project's
+   [Discussions](https://github.com/WillyAG/PoolWind/discussions) if you're
+   unsure.
 4. **Make sure a battery can't be put back in**, for example by covering or
    blocking the battery compartment (the author used two small blocks of
    foam mounting tape). A battery and the 5 V supply together could
