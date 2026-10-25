@@ -605,8 +605,9 @@ changing the SD card.
 
 PoolWind has no support, but you're not on your own:
 
-- **Discussions** on the PoolWind GitHub page, where builders share their
-  builds, questions and answers.
+- **[Discussions](https://github.com/WillyAG/PoolWind/discussions)** on the
+  PoolWind GitHub page, where builders share their builds, questions and
+  answers. Anyone can read them; to post, sign up for a free GitHub account.
 - **An AI assistant** such as [Claude Code](https://claude.com/claude-code),
   run in the `PoolWind-download` folder (section 3). 
   
