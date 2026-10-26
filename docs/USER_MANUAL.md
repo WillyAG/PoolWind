@@ -226,6 +226,11 @@ Pace is only an estimate (body type, stroke, how deep you swim). If the
 Paces PoolWind shows don't match Paces you know from a regular pool,
 correct them once for the pool:
 
+> On a newly calibrated pool, the Paces start as a rough estimate from the
+> calibration's voltage scan: 7:00 at the slowest jet speed to 1:00 at the
+> fastest (see [The calibration program](SETUP_GUIDE.md#52-the-calibration-program)
+> in the setup guide). Pace correction brings them closer to your own.
+
 1. Open the menu (**≡**) and choose **Pace correction...**. A small box
    opens over the pool screen; drag it out of the way if you like.
 2. Swim until the current feels like a Pace you know, then move aside. The
