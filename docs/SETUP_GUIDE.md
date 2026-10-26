@@ -200,6 +200,9 @@ there isn't enough to compare, the check says nothing.
 
 ### 5.2 The calibration program
 
+**The initialization section of this program must be run as the first step. It is most important that the builder presses "Stop", then "Use as top", when they feel the jet speed is high enough and going further puts unnecessary strain and wear on the pool. PoolWind respects this decision and will never run the jet higher. See Step 1 below.**
+
+
 PoolWind needs a **Pace table** for your pool: which jet voltage goes with
 which pace. The calibration measures it through PoolWind's own voltage
 sensor and relays.
@@ -227,11 +230,9 @@ can be pressed until the scan is done.
 
 **Step 1: Initial voltage scan (first, for each setup)**
 
-Every pool sends different voltages. The scan runs the jet from its
+Every pool sends different voltages. This scan runs the jet from its
 slowest to its fastest speed, finds your pool's voltage range, and fits
-PoolWind's safety limits, its settings and the shipped Pace table to it.
-Pace Entry and PingPong need this to step your jet; they then replace the
-table's paces with your own.
+PoolWind's safety limits to it. This procedure combined with **Swimmer limits** establish the "feel" of the pool, how fast the swimmer swims in the highest zone, how slow in the lowest zone, and how it "feels" to transition through the zones. It does set temporary Pace settings for each zone but those settings have nothing to do with the "feel".
 
 1. Press **Begin initial voltage scan**, then **Start**. The calibration
    reads the voltage for a few seconds, takes the jet down to its slowest
@@ -240,27 +241,25 @@ table's paces with your own.
    or the Pace Display stops changing, press **Stop**, then **Use as
    top**: that speed becomes your pool's top speed for PoolWind, and
    PoolWind never drives the jet faster. Otherwise the scan goes on until
-   the jet stops getting faster.
+   the jet stops at the highest speed, potentially wearing down the pool's equipment.
 3. The jet is taken back down, and the results show your pool's range,
-   its number of steps and the new Pace table: **one row for each jet
+   its number of steps and the Pace table: **one row for each jet
    step**. These rows are PoolWind's **zones**.
 4. Press **Save scan**. The calibration file is written (the old one is
    kept as `poolwind_calibration_before_<date>.txt`), and the other choices
    open. The scan is also kept as `calibration_scan_<date>.csv`.
 
 **The scan's Paces are a first estimate.** The scan measures only your
-pool's voltages, not its speeds, so the Paces it writes are estimated:
+pool's voltages, not its speeds, so the associated Paces it writes are estimated:
 **7:00** at your pool's slowest step, **1:00** at its top (where you
-pressed Stop), and in between a curve that follows the author's Pace
-Display readings. That's realistic enough for PoolWind to run and to start
+pressed Stop, or the jet's fastest speed), and in between an inverse-speed curve. That's realistic enough for PoolWind to run and to start
 step 2 with. **Pace Entry** and **PingPong** replace the estimates with
 Paces measured on your pool, and **Pace correction** in PoolWind's menu
-adjusts them from your own swimming. Once you've done any of these, a
-later scan keeps your Paces.
+adjusts them to what feels right from your own swimming experience.
 
-To scan again later (a new pool, a new controller), press **Begin initial
+To scan again later if necessary, press **Begin initial
 voltage scan** again. It says the scan has already been run and asks
-**Replace** or **Cancel**.
+**Replace** or **Cancel**. If changes to the Pace table had been made, they will be kept, moved to fit the new voltage range.
 
 **Step 2: the paces. Choose one:**
 
