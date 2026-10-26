@@ -225,7 +225,7 @@ the PoolWind folder. Close PoolWind first then: both use the same relays.)
 The first screen explains each choice. Only **Begin initial voltage scan**
 can be pressed until the scan is done.
 
-**Step 1: Initial voltage scan (once for each setup)**
+**Step 1: Initial voltage scan (first, for each setup)**
 
 Every pool sends different voltages. The scan runs the jet from its
 slowest to its fastest speed, finds your pool's voltage range, and fits
@@ -243,16 +243,24 @@ table's paces with your own.
    the jet stops getting faster.
 3. The jet is taken back down, and the results show your pool's range,
    its number of steps and the new Pace table: **one row for each jet
-   step**. These rows are PoolWind's **zones**. If your pool is the same
-   as the one the table was made on (same slowest step and step size), the
-   paces stay as they were. On another pool, the table's shape is moved to
-   yours: a starting point, until you measure your own (step 2).
+   step**. These rows are PoolWind's **zones**.
 4. Press **Save scan**. The calibration file is written (the old one is
    kept as `poolwind_calibration_before_<date>.txt`), and the other choices
    open. The scan is also kept as `calibration_scan_<date>.csv`.
 
-To scan again later (a new pool, a new controller), change
-`'InitialCalFinished': True` to `False` in the calibration file.
+**The scan's Paces are a first estimate.** The scan measures only your
+pool's voltages, not its speeds, so the Paces it writes are estimated:
+**7:00** at your pool's slowest step, **1:00** at its top (where you
+pressed Stop), and in between a curve that follows the author's Pace
+Display readings. That's realistic enough for PoolWind to run and to start
+step 2 with. **Pace Entry** and **PingPong** replace the estimates with
+Paces measured on your pool, and **Pace correction** in PoolWind's menu
+adjusts them from your own swimming. Once you've done any of these, a
+later scan keeps your Paces.
+
+To scan again later (a new pool, a new controller), press **Begin initial
+voltage scan** again. It says the scan has already been run and asks
+**Replace** or **Cancel**.
 
 **Step 2: the paces. Choose one:**
 
