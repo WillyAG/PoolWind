@@ -44,9 +44,13 @@ faster than they can handle.
   build has been checked (setup guide, section 4).
 - **Never energize UP and DN at the same time.** The program always turns
   one off before turning the other on; keep it that way.
-- **The calibration file is safety-critical.** `SafetyVoltageLimits` is the
-  hard ceiling on jet speed, whatever any pace setting says. Never raise it
-  to fix some other problem, and never remove the checks that enforce it.
+- **The calibration file is safety-critical.** The Pace table's first and
+  last rows (`pace_voltage`) are the jet's limits (`App._safety_limits`,
+  since v15.6; an old `SafetyVoltageLimits` line is ignored): the last row
+  is the hard ceiling on jet speed, whatever any pace setting says. Never
+  add rows above it to fix some other problem, and never remove the checks
+  that enforce it. The limits and jet steps always come from the pool's
+  table, never from a swimmer's table on a USB stick.
 - **The pump relay (GPIO 27) turns the pool's pump on and off.** Don't
   pulse it in tests.
 - **PoolWind winds the jet down when OnOff is pressed**, before it pulses
@@ -155,22 +159,34 @@ faster than they can handle.
 - `SwimController`: `_zone_steps` divides the pool into equal zones, **one per
   jet step**: the pace table's rows (rows within 0.01 V count once) that lie
   inside the swimmer's zone limits (`'zoneMin, Max'`, 1-based step numbers)
-  and the safety limits. The calibration's `'# zones or auto'` can ask for
+  and the table's ends. The calibration's `'# zones or auto'` can ask for
   fewer zones, spread evenly by voltage. `_index_for_CoM` maps the position
   to a zone, and so to a target jet step. The pool is controlled by jet
   steps; Pace is for display and the swim log only. In a demo, and while
-  Swimmer limits runs, the zones open to the whole safety range
+  Swimmer limits runs, the zones open to the whole table
   (`App.zone_limits`).
 - Swim pace estimate: water speed from the voltage (through the pace table),
   plus the swimmer's drift, weighted by `DRIFT_SCALE` (1.5).
+- Pace tables (v15.7): the pool's **Master** table is `pace_voltage` in the
+  calibration file. With a swimmer's stick in, the Paces come from their
+  own `poolwind_ind_calibration.txt` on the stick (`App._load_swimmer`,
+  made from the pool's the first time; read onto the pool's jet steps if a
+  scan moved them), only the Paces, never the voltages. The welcome screen
+  (`WelcomeBox`, `App.choose_table`) offers Old (own) or New (the pool's)
+  when the pool's table changed. `App.watch_stick` switches swimmer when a
+  stick is plugged in or pulled while running (`switch_swimmer`).
+  Pace correction's pending changes (`PacesPending`) live in whichever file
+  is in use; Make permanent writes it. Log rows carry the jet's voltage and
+  the table's Pace (columns 10-11) so Swim Plot and the calendar show old
+  swims in today's table (`redo_in_today`).
 - `SimulatedValve`: the jet for desk tests and the demo. `SwimPlotWindow`:
   swim review with synchronized video. `USBDriveSetupDialog`: new swimmer
   sticks. `SwimmerLimitsPanel` and `PaceCorrectionPanel`: the small boxes
   over the pool screen (menu). `QtMainWindow.check_camera_moved`: the
   camera check a few seconds after start, against
   `poolwind_calibration_camera.png`.
-- The calibration (`CalibrateWindow`, the voltage scan, Pace Entry,
-  PingPong) is a section of the same file: menu **Calibrate pool...**
+- The calibration (`CalibrateWindow`, the voltage scan, Pace Entry with its
+  Edit / Scan / Finish screens, PingPong) is a section of the same file: menu **Calibrate pool...**
   (real valve only), or `python3 poolwind.py --calibrate`
   (`calibration_main`; `--simulate --window` at a desk, and always
   simulated while Demo is on).
@@ -243,6 +259,6 @@ faster than they can handle.
   such a pool, with the pump off and a swimmer in the swim area, PoolWind
   sees the jet below the slowest zone and holds UP; if that pool's valve
   can move while it is off, the jet could start fast when it's turned on.
-  A fix: treat a reading far below the safety minimum as "no feedback" and
+  A fix: treat a reading far below the table's first row as "no feedback" and
   press neither UP nor DN until a good reading returns, then wind down
   once.

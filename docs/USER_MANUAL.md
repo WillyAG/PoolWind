@@ -23,10 +23,11 @@ pool are covered in the build guide and the setup and calibration guide.
 
 - **Use your own USB stick.** It holds your personal zone limits (your
   slowest and fastest zone), so the jet never goes faster than you've
-  chosen. Never use someone else's stick,
+  chosen, and your own Pace table. Never use someone else's stick,
   especially a stronger swimmer's.
-- **Insert your stick before starting PoolWind.** A stick inserted while
-  PoolWind is running isn't used until the next start.
+- **Insert your stick before you swim.** Best before starting PoolWind; a
+  stick plugged in while PoolWind runs is picked up within a few seconds
+  (see [Your USB stick](#6-your-usb-stick)).
 - **Know how to take manual control:** press **OnOff** to wind the jet down
   and stop the pump, or close PoolWind (see
   [Finishing a swim](#5-finishing-a-swim)) and use the pool's own remote.
@@ -41,8 +42,23 @@ pool are covered in the build guide and the setup and calibration guide.
 
 1. Insert your USB stick.
 2. Start PoolWind with its **desktop icon**. 
-3. The pool screen appears. Press **Begin** (or **Resume**, see below) when
-   you're ready to swim. Until then, the jet stays at its lowest setting.
+3. The pool screen appears, with the **welcome screen** over it (see
+   below).
+4. Press **Begin** (or **Resume**, see below) when you're ready to swim.
+   Until then, the jet stays at its lowest setting.
+
+**The welcome screen** says **"Welcome to PoolWind, <your stick's name>."**,
+or **"Swimming with default (Master) data"** when no swimmer's stick is in,
+and which Pace table you swim with: your own (**Old**) or the pool's
+calibration (**New**). It closes by itself after 10 seconds; **OK** or
+**Esc** closes it at once. **Change** lets you choose the other table:
+choosing New keeps your own table aside, and Change brings it back later.
+
+If the pool has been calibrated again since you last swam, the welcome
+screen asks instead: **"The pool calibration has changed since you last
+swam here. Do you want to use your old settings or change to the new
+calibration?"** and waits for **Old** or **New**. The pool runs on
+underneath meanwhile.
 
 **Begin or Resume?** If you've already swum today, the big button says
 **Resume** (in red) instead of Begin. Your swim continues where it left off:
@@ -95,7 +111,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
 | **OnOff** (light red) | Turns the pool's pump on or off, at one touch. The jet winds down first (see [OnOff](#onoff-the-pump)) |
-| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...**, **Calibrate pool...** and **Pace correction...** (the pool's calibration, for the technician), **Swimmer limits...**, then **Swim Plot...** |
+| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the technician), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...**, then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
 A button looks pressed in while you touch it.
@@ -224,26 +240,70 @@ stops and the pump is switched at once.
 
 Pace is only an estimate (body type, stroke, how deep you swim). If the
 Paces PoolWind shows don't match Paces you know from a regular pool,
-correct them once for the pool:
+correct them while you swim:
 
 > On a newly calibrated pool, the Paces start as a rough estimate from the
 > calibration's voltage scan: 7:00 at the slowest jet speed to 1:00 at the
 > fastest (see [The calibration program](SETUP_GUIDE.md#52-the-calibration-program)
 > in the setup guide). Pace correction brings them closer to your own.
 
-1. Open the menu (**≡**) and choose **Pace correction...**. A small box
-   opens over the pool screen; drag it out of the way if you like.
-2. Swim until the current feels like a Pace you know, then move aside. The
-   box shows the Pace PoolWind reads for that speed.
-3. Type the Pace it should be (`1:45`, or just `145`, on the keyboard or the
-   box's number pad) and press **Add**.
-4. Do it again at other speeds: slow, medium, fast. Then press **Save**.
+**Whose Paces.** With your USB stick in, you correct **your own Pace
+table**, kept on your stick: other swimmers aren't affected. With no stick,
+you correct the pool's **Master** table, which everyone without a stick
+swims with. The box's title says whose, for example **Pace correction:
+Bill_G** or **Pace correction: Master**. Only the Paces shown change, never
+the jet speeds or anyone's zones.
 
-After saving, each of those speeds shows the Pace you typed; between them
-the correction is blended, and past the slowest and fastest it carries on
-the same way. Only the Paces shown change, not the jet speeds or anyone's
-zones. Use one correction for everyone who swims in this pool, so swimmers
-can be compared.
+1. Open the menu (**≡**) and choose **Pace correction...**. A box opens
+   over the pool screen. It lists every zone, fastest at the top: **Zone**,
+   **Now** (the Pace your table gives), **New** (with your corrections) and
+   an empty box to type in, with a graph of the same beside them (Now grey,
+   New blue). Your own zones are bold.
+2. Swim until the current feels like a Pace you know, then move aside. The
+   zone you were in turns yellow and its box is ready.
+3. Type the Pace it should be: `1 4 8` is 1:48, on the keyboard or the
+   box's number pad; the third digit enters it. New and the graph change
+   as you type, and the pool uses New at once.
+4. Swim again, and do it again at other speeds (slow, medium, fast) as
+   often as you like.
+
+Tap a box, or a zone on the graph, to choose it; drag the graph to scroll.
+**Esc**, or **↺** beside a box, puts it back. **▲** in the top corner hides
+the instructions to give the table more room; **▼** brings them back.
+
+**How New is worked out.** The Paces you type, and the slowest zone
+(always 7:00), stay exactly as typed. Every other zone keeps the shape of
+Now, stretched to pass through them, so one Pace changes almost every zone
+a little. To hold part of the table where it is, type a Pace there too.
+
+**Red** in New is a zone that isn't faster than the one below it; the box
+that causes it is red too. Change the red box. While anything is red,
+**Back** and **Make permanent** wait.
+
+**Swimming with the box open.** PoolWind runs as usual underneath. With
+**Suspend** showing (a copy of the button is at the top of the box) the
+swim counts toward distance and the log as usual, and while you swim a big
+blue Pace display covers the instructions so you can read your Pace. With
+**Begin** or **Resume** showing, the jet stays wound down until you press
+it. While the box is open PoolWind doesn't suspend the swim by itself.
+
+| Button | What it does |
+|---|---|
+| **Back** | Back to the pool screen. Your changes stay in use, **pending** |
+| **Make permanent** | Writes New into your table (Now). It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept |
+| **Switch to 'Now' values** / **'New' values** | Swims the table as it was, to compare. PoolWind starts with New every time |
+| **Clear** | Drops the pending changes, after "Are you sure?": New is Now again |
+| **Details…** | A typical session, and how it all works |
+
+**Pending changes** are kept on your stick (or with the Master table) even
+if PoolWind is closed or the power goes off; **"New Paces"** shows on the
+pool screen while they're in use. Closing PoolWind with changes pending
+asks **Keep pending** or **Make permanent**.
+
+After a **PingPong** calibration, two more numbers are at the top of the
+box, **bodyDrag** and **deltaBodyDrag**: they change the whole table (see
+the [setup guide](SETUP_GUIDE.md#52-the-calibration-program)).
+**Defaults** puts them back to the author's pool's.
 
 ## 5. Finishing a swim
 
@@ -293,18 +353,29 @@ Once PoolWind is closed, the pool works normally with its own remote.
 Each swimmer has their own USB stick. It holds:
 
 - **your settings**: height, zone limits, logRate (optional) and whether to record training video (see [Your settings](#8-your-settings));
+- **your Pace table** (`poolwind_ind_calibration.txt`): made from the
+  pool's table the first time your stick is used, then corrected by you
+  with [Pace correction](#pace-correction-when-the-paces-dont-feel-right).
+  The jet's speeds and limits are always the pool's;
 - **your swims**: a log of every swim and its training video, in a folder
   called `CSV Vault`.
 
-Swimmers without a stick all share one log on the Pi, so their swims can't be told apart.
+Swimmers without a stick all share one log and the pool's Master Pace table
+on the Pi, so their swims can't be told apart.
 
 ### Insert USB stick before, remove after
 
 > **Insert your USB stick before starting PoolWind, and remove it only after
 > PoolWind has closed and ejected it** (see
 > [Finishing a swim](#5-finishing-a-swim)). Pulling it out during a swim won't
-> affect the jet, but the rest of that swim won't be recorded. A stick
-> inserted while PoolWind is running isn't used until the next start.
+> affect the jet, but the rest of that swim won't be recorded.
+
+**A stick plugged in or pulled out while PoolWind runs** is noticed within
+a few seconds. A swim in progress is suspended (the button turns red),
+Pace correction and Swimmer limits close, and PoolWind starts again with
+that swimmer's settings, swims, today's totals and Pace table, or with
+the Master data when the stick was pulled. The welcome screen shows who is
+swimming now.
 
 ### How much it holds depends on **logRate**
 
@@ -383,13 +454,23 @@ Open the menu (**≡**, top left) and choose **Swim Plot...**.
 
 The same happens with **Set Swim Area...**.
 
+### Paces in today's table
+
+Swim Plot and the calendar's average Paces show every swim in the Pace
+table you swim with **now**. Correct your Paces today, and your old swims
+read in the corrected table too, so they can be compared with today's.
+(Each line of your swim log keeps the jet's voltage and the Pace your table
+gave it then; PoolWind works the Pace and the distance out again from
+those.) Days logged before PoolWind v15.7 don't have them: their average
+Paces on the calendar are **grey**, and they show as they were swum.
+
 ### Choosing the days
 
 A window with two calendars appears: **From** and **To**. Both start on
 today. Days with swims are marked in green, and each shows that day's
 average Pace. Pick a single day or a range, then press **OK**. If none of the
 chosen days has a swim, PoolWind says so and stays on the calendars: pick a
-green date. **Close** returns to the pool screen. **Pump On/Off** turns the
+green date (a grey average: see [Paces in today's table](#paces-in-todays-table)). **Close** returns to the pool screen. **Pump On/Off** turns the
 pool's pump on or off and is there for emergency purposes.
 
 ### The plot and video
@@ -440,7 +521,8 @@ The same user settings live in two places:
 - **Your USB stick** (`/media/<username>/<stick name>/poolwind_ind_defaults.txt`):
   your personal settings. They replace the main settings file's while the
   stick is in. A setting missing from the stick comes from the main
-  settings file.
+  settings file. Next to it, `poolwind_ind_calibration.txt` is your Pace
+  table: leave that file to Pace correction and the welcome screen.
 - To edit either file, find it with the File Manager and double-click it.
   After PoolWind has closed, your stick is ejected and doesn't show in the
   File Manager: pull it out and plug it back in first. Keep the quote marks, commas and brackets exactly as they
@@ -483,7 +565,7 @@ times as fast. Lower than 5 saves more space but makes the video jumpy.
 ,'logRate': 15
 ```
 
-**Other settings** (the pool's calibration, safety limits and advanced tuning)
+**Other settings** (the pool's calibration, the jet's limits and advanced tuning)
 are covered in the setup and calibration guide. They're for technicians
 and builders, not for day-to-day swimming.
 

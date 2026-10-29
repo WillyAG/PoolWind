@@ -10,7 +10,7 @@ Required Notice: Copyright (c) William A. Gorlitz. U.S. Copyright Registration T
 |---|---|
 | `poolwind.py` | The program, with the calibration built in (menu **Calibrate pool...**, or `python3 poolwind.py --calibrate`) |
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick |
-| `poolwind_calibration.txt` | Your pool's calibration: Pace table (the zones), safety limits, swim area, swim length, center lane, number of zones. **The one here is the author's pool**: the calibration's scan fits it to yours (setup guide, section 5) |
+| `poolwind_calibration.txt` | Your pool's calibration: the Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, number of zones. **The one here is the author's pool**: the calibration's scan fits it to yours (setup guide, section 5) |
 | `toggle_monitor.sh` | The Monitor Toggle: turns the pool monitor between portrait and landscape (setup guide, section 9) |
 
 The settings files must sit next to the program and start with its name.
@@ -23,7 +23,7 @@ Follow the [setup and calibration guide](../docs/SETUP_GUIDE.md). The install
 script, [`install.sh`](../install.sh), sets up everything on a fresh
 Raspberry Pi OS and copies these files to a `PoolWind` folder in your home
 folder. The guide then covers fitting PoolWind to your pool (swim area,
-the calibration, safety limits) and explains every setting.
+the calibration, the jet's limits) and explains every setting.
 
 ## Tested platform
 

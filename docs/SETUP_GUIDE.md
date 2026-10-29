@@ -149,8 +149,8 @@ These settings fit PoolWind to **your** pool. They're stored in
 which is also the order of PoolWind's menu:
 
 1. **Set Swim Area** (5.1): where the pool is in the camera's picture.
-2. **Calibrate pool** (5.2): your pool's voltages, safety limits and Pace
-   table.
+2. **Calibrate pool** (5.2): your pool's voltages, the jet's limits and
+   the pool's Pace table (the **Master** table).
 3. Each swimmer's **Swimmer limits**: see the
    [user manual](USER_MANUAL.md#swimmer-limits-your-slowest-and-fastest-zone).
 
@@ -221,9 +221,11 @@ training. You can only measure an accurate Pace in a regular pool.
 On the pool screen, open the menu (**≡**, top left) and choose
 **Calibrate pool...**. PoolWind winds the jet down and hands it to the
 calibration; when you close the calibration, PoolWind uses the new table
-at once. (On a first install, or if PoolWind won't start, the calibration
-also runs on its own: `python3 poolwind.py --calibrate` in a terminal, in
-the PoolWind folder. Close PoolWind first then: both use the same relays.)
+at once. If a swimmer's USB stick is in and the Pace table changed, their
+welcome screen then asks whether to use the new one. (On a first install,
+or if PoolWind won't start, the calibration also runs on its own:
+`python3 poolwind.py --calibrate` in a terminal, in the PoolWind folder.
+Close PoolWind first then: both use the same relays.)
 
 The first screen explains each choice. Only **Begin initial voltage scan**
 can be pressed until the scan is done.
@@ -232,7 +234,7 @@ can be pressed until the scan is done.
 
 Every pool sends different voltages. This scan runs the jet from its
 slowest to its fastest speed, finds your pool's voltage range, and fits
-PoolWind's safety limits to it. This procedure combined with **Swimmer limits** establish the "feel" of the pool, how fast the swimmer swims in the highest zone, how slow in the lowest zone, and how it "feels" to transition through the zones. It does set temporary Pace settings for each zone but those settings have nothing to do with the "feel".
+the Pace table to it: its first and last rows become the jet's limits (5.3). This procedure combined with **Swimmer limits** establish the "feel" of the pool, how fast the swimmer swims in the highest zone, how slow in the lowest zone, and how it "feels" to transition through the zones. It does set temporary Pace settings for each zone but those settings have nothing to do with the "feel".
 
 1. Press **Begin initial voltage scan**, then **Start**. The calibration
    reads the voltage for a few seconds, takes the jet down to its slowest
@@ -263,35 +265,79 @@ voltage scan** again. It says the scan has already been run and asks
 
 **Step 2: the paces. Choose one:**
 
-- **Pace Entry**, if your pool has a **Pace Display**. The calibration
-  steps the jet up one step at a time; at each step, wait until the
-  display is steady, type the pace it shows on the number pad (`2:15`, or
-  just `215`) and press **Record**. Check the **highest voltage** first:
-  it never steps above it. Press **Finish** when the jet is as fast as you
-  want to go, or when the display stops changing (it offers to finish when
-  the display shows the same pace twice). **Fix row** changes a row: tap
-  it, type the right pace, press Fix row. About 30 steps, 15-20 minutes.
-- **PingPong**, without a Pace Display. You need five **orange** ping-pong
-  balls (bright or fluorescent; white ones don't work). At every 3rd step
-  (you can choose every step), the calibration waits for the water to
-  catch up, then asks for balls: set one gently on the water right at the
-  jet, in the middle, and take your hand out of the picture; drop the next
-  when it reaches the back wall. When 3 drops agree, it steps on by itself.
-  The steps in between are filled in. Collecting the balls is the tedious
-  part. About 25-35 minutes. The ball floats on the fastest water, so its
-  pace is turned into a swimming pace with a factor measured on the
-  author's pool: the new table is only estimated, and you may want to
-  correct it afterwards.
+**Pace Entry**, if your pool has a **Pace Display**. It has three screens:
 
-Each ends with a results table, new against current. **Save table** writes
-it (with a backup); **Quit** without saving keeps the current table. Every
-reading is kept in `calibration_session_<date>.csv`. **Stop** lets go of
-the buttons at once, any time; **Finish** takes the jet down to its
-slowest speed and shows the results.
+- **Edit**, where it opens: the pool's Pace table, fastest step at the
+  top (Step, Volts, Pace), with a small number pad beside it.
+  - **Tap a step.** The jet goes there (its row is marked ▶ and grey) and
+    waits for the voltage to settle. When the Pace Display is steady, type
+    the pace it shows: `1 4 8` is 1:48, on the keyboard or the pad. The
+    third digit records it. **<** (Backspace) takes off a digit, **Clear**
+    (Esc) all of them.
+  - A Pace that can't be right (not faster than the step below) turns its
+    row **red**, and a red line "There are warnings in the table below"
+    shows. The jet goes to the red step next, the one above first. A Pace
+    typed again is taken as right, and the whole table is checked again
+    around it.
+  - **↺** beside a changed step puts it back as it was. With nothing typed
+    for a while, the jet goes down to its slowest speed by itself.
+- **Scan**: **Auto scan** clears the table's Paces, takes the jet down to
+  its slowest speed, then steps it up one step at a time to the top of the
+  table while you type the Pace at each. A Pace that can't be right only
+  turns red and the scan goes on: there's no time for corrections at high
+  speeds. At the top, the jet comes back down, stopping at each red step to
+  ask again. **Back** stops the scan: in its question, **Back** carries on
+  and **Continue** keeps what you typed, takes the jet down and goes to the
+  Edit screen, where **Continue Auto scan** carries on later from the last
+  step typed. About 30 steps, 15-20 minutes.
+- **Finish** (from the Edit screen): the new table beside the current one,
+  and how far apart they are in %. Steps without a Pace are filled in and
+  marked `~`: between the steps typed, and on to 1:00 at the fastest step
+  and 7:00 at the slowest. So you can stop typing at high speeds where the
+  pool is strained or the display stops changing. **Save Table** replaces
+  the Master table (it asks first, and warns if a step is still red) and
+  goes back to PoolWind. **Edit table** goes back to the Edit screen.
+  **Quit** leaves without saving, after "Are you sure?".
+
+**PingPong**, without a Pace Display. You need five **orange** ping-pong
+balls (bright or fluorescent; white ones don't work). Check the **highest
+voltage** first: it never steps above it. The slowest step is taken as
+7:00. From step 4, at every 3rd step (you can choose every step), the
+calibration waits for the water to catch up, then asks for balls: set one
+gently on the water right at the jet, in the middle, and take your hand out
+of the picture; drop the next when it reaches the back wall. When 3 drops
+agree, it steps on by itself. The steps in between are filled in.
+Collecting the balls is the tedious part. About 25-35 minutes.
+
+The ball rides on the surface, in the fastest water; a swimmer is lower,
+in slower water, and drags against it. So the ball's pace is turned into a
+swimming Pace with two numbers: **bodyDrag**, the factor at the jet's
+fastest speed (1.50), and **deltaBodyDrag**, how much more it is at the
+slowest (0.18): swimming slowly the legs sink, and at the back of the pool
+the flow has spread out. Between the two it changes evenly, step by step.
+These are defaults that work in the author's pool, an educated guess for
+yours. The results screen shows both: change them and the table follows.
+They're kept in the calibration file with the ball measurements, so they
+can be changed again later in Pace correction.
+
+PingPong ends with a results table, new against current. **Save table**
+writes it (with a backup); **Quit** without saving keeps the current table.
+**Stop** lets go of the buttons at once, any time; **Finish** takes the jet
+down to its slowest speed and shows the results.
+
+**The Master table and the swimmers' tables.** Pace Entry and PingPong
+make the pool's basic calibration: saving replaces the **Master** Pace
+table in `poolwind_calibration.txt`, and with it any Pace corrections made
+to it before. Each swimmer with a USB stick swims with their own table on
+the stick; it isn't changed. Their welcome screen asks whether to keep
+their own (**Old**) or use the new calibration (**New**). Every reading is
+kept in `calibration_session_<date>.csv`.
 
 **The Paces don't feel right?** Use **Pace correction...** in PoolWind's
 menu: you swim at a Pace you know and type what it should be (see the
 [user manual](USER_MANUAL.md#pace-correction-when-the-paces-dont-feel-right)).
+With a swimmer's stick in, it corrects that swimmer's own table; without
+one, the Master table.
 
 **The table in the file** looks like this:
 
@@ -307,26 +353,27 @@ menu: you swim at a Pace you know and type what it should be (see the
 
 Each pair is (pace in minutes per 100 yards as a decimal, volts). For example
 `2.25` means 2:15. After a scan there is one pair per jet step, slowest
-first. The table that comes with PoolWind was measured on the author's
+first. A swimmer's table on their stick (`poolwind_ind_calibration.txt`)
+has the same voltages, with their own Paces. The table that comes with PoolWind was measured on the author's
 pool, a Standard Endless Pool, with PingPong.
 
-### 5.3 Safety voltage limits
+### 5.3 The jet's limits
 
-```
-'SafetyVoltageLimits': (1.46, 2.15)
-```
+There is no separate limits setting: the **Pace table's first and last
+rows** are the jet's limits.
 
-- The **first** number is the jet's lowest voltage. PoolWind winds the jet
-  down to this when **OnOff** is pressed, before it switches the pump.
-- The **second** number is the highest voltage PoolWind may ever drive the
-  jet to, whatever any swimmer's setting says. Set it at the fastest speed
-  you're willing to let PoolWind reach in your pool.
+- The **first** row's voltage is the jet's lowest. PoolWind winds the jet
+  down to it when **OnOff** is pressed, before it switches the pump.
+- The **last** row's voltage is the highest PoolWind ever drives the jet
+  to, whatever any swimmer's setting says.
 
-The calibration's scan fits both to your pool's voltages, and where you
-stopped the scan (**Use as top**) is a ceiling: the second number is never
-above it. Zones outside these limits are never used. With the author's
-pace table, `(1.46, 2.15)` keeps the jet between about 4:17 and 1:46 per
-100 yards.
+The scan ends the table where you stopped it (**Use as top**), or at the
+jet's top speed. Pace Entry and PingPong never step the jet above it. The
+limits always come from the pool's table, never from a swimmer's.
+
+Before PoolWind v15.6 the limits were a `'SafetyVoltageLimits'` line in the
+calibration file. An old line is ignored now, and the next scan takes it
+out.
 
 Changes to the calibration file take effect at the next start.
 
@@ -380,9 +427,10 @@ starting with the program's name:
 | File | Holds | Who changes it |
 |---|---|---|
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick | The owner |
-| `poolwind_calibration.txt` | Pace table (the zones), safety limits, swim area, swim length, center lane, number of zones, raw video, and the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetSteps`) | The calibration and the technician |
+| `poolwind_calibration.txt` | The Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, number of zones, raw video, the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetSteps`, `PacesFromFormula`: the Paces are still the scan's estimate), PingPong's numbers (`bodyDrag`, `deltaBodyDrag`, `PingPongBalls`), and Pace correction's pending changes for swimmers without a stick (`PacesPending`) | The calibration, Pace correction and the technician |
 | `poolwind_calibration_camera.png` | The camera picture the swim area was set on (the camera check, 5.1) | PoolWind, when the swim area is saved |
 | `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | That swimmer |
+| `poolwind_ind_calibration.txt` (on each USB stick) | One swimmer's own Pace table, their Pace correction's pending changes and drag numbers, their welcome screen choice (`choice`: Old or New), and the pool's table they chose against (`poolTable`), with their own kept aside while they use the pool's (`oldTable`, `oldDrag`). Made from the pool's table the first time the stick is used | Pace correction and the welcome screen |
 
 The swimmer settings use **the same names** in the defaults file and on
 the USB sticks. A stick's value wins while it's inserted. See the
@@ -481,14 +529,17 @@ PoolWind to be closed and started again.
 | `'Runtime: hotReloadParameters'` | `True` | Picks up settings changes while running |
 
 The swimmer settings also have built-in fallbacks, used only if the
-defaults file leaves them out: every zone inside the safety limits
+defaults file leaves them out: every zone of the Pace table
 (`'zoneMin, Max': None`) and `'logRate': 5`.
 
 **The swim log** (`CSV Vault/<date>.csv`, one line per record, no header):
 time, pace, distance, video segment, frame, position (`CoM_h`), swimmer
 tick (`CoM_w`, `-1` = none), and since the zone highlight, the jet's zone
-(`-1` = none) and the number of zones. Older files without the last two
-columns replay without the highlight.
+(`-1` = none) and the number of zones. Older files without those columns
+replay without the highlight. Since v15.7 two more: the jet's voltage and
+the Pace the table in use gave there, so Swim Plot can show any swim in
+today's table (user manual, Swim Plot). Logs from before
+v15.7 show as they were swum.
 
 ## 8. Testing at a desk
 
