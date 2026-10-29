@@ -427,7 +427,7 @@ starting with the program's name:
 | File | Holds | Who changes it |
 |---|---|---|
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick | The owner |
-| `poolwind_calibration.txt` | The Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, number of zones, raw video, the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetSteps`, `PacesFromFormula`: the Paces are still the scan's estimate), PingPong's numbers (`bodyDrag`, `deltaBodyDrag`, `PingPongBalls`), and Pace correction's pending changes for swimmers without a stick (`PacesPending`) | The calibration, Pace correction and the technician |
+| `poolwind_calibration.txt` | The Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, number of zones, raw video, the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetSteps`, `PacesFromFormula`: the Paces are still the scan's estimate), PingPong's numbers (`bodyDrag`, `deltaBodyDrag`, `PingPongBalls`), Pace correction's pending changes for swimmers without a stick (`PacesPending`), and the update's `logsTable` / `rulerAdded` (section 10) | The calibration, Pace correction and the technician |
 | `poolwind_calibration_camera.png` | The camera picture the swim area was set on (the camera check, 5.1) | PoolWind, when the swim area is saved |
 | `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | That swimmer |
 | `poolwind_ind_calibration.txt` (on each USB stick) | One swimmer's own Pace table, their Pace correction's pending changes and drag numbers, their welcome screen choice (`choice`: Old or New), and the pool's table they chose against (`poolTable`), with their own kept aside while they use the pool's (`oldTable`, `oldDrag`). Made from the pool's table the first time the stick is used | Pace correction and the welcome screen |
@@ -642,9 +642,29 @@ git pull
 bash install.sh
 ```
 
-(In a new terminal, which starts in your home folder.)
+(In a new terminal, which starts in your home folder.) If you no longer
+have the `PoolWind-download` folder, follow section 3 again: it's the same
+script.
 
-Your settings, calibration, swim logs and videos are kept.
+The same script installs and updates. On an update it replaces the program
+(keeping the old one as `poolwind.py.previous`) and leaves everything else
+as it is: your settings, your pool's calibration, swim logs, videos and USB
+sticks. When it finishes it says which version it updated from and to, and
+what's new.
+
+The new version reads the older files as they are. Updating from v15.5 to
+v15.7, for example:
+
+- the calibration's old `'SafetyVoltageLimits'` line is ignored (the jet's
+  limits are the Pace table's ends, 5.3);
+- the first start keeps the pool's Pace table as `'logsTable'` in the
+  calibration file: the table the old swims were swum with;
+- each swim log folder (`CSV Vault`, the Pi's and each USB stick's, when
+  the stick is first used) has its old logs given the jet's voltage and
+  Pace once, so Swim Plot can show them in today's Paces; it's marked
+  `'rulerAdded'`, and takes a few seconds;
+- each swimmer's own Pace table is made on their stick the first time it's
+  used.
 
 ## 11. Backups
 

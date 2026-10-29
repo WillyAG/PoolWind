@@ -461,8 +461,10 @@ table you swim with **now**. Correct your Paces today, and your old swims
 read in the corrected table too, so they can be compared with today's.
 (Each line of your swim log keeps the jet's voltage and the Pace your table
 gave it then; PoolWind works the Pace and the distance out again from
-those.) Days logged before PoolWind v15.7 don't have them: their average
-Paces on the calendar are **grey**, and they show as they were swum.
+those.) Swims logged before PoolWind v15.7 are given them once, the first
+time your stick is used after the update (a few seconds). A day that
+couldn't be converted shows its average Pace in **grey** on the calendar,
+and its swims as they were swum.
 
 ### Choosing the days
 

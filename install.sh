@@ -149,7 +149,12 @@ rm -f "$tmp"
 say "   allowed setting up USB sticks without a password"
 
 step "7/8  Copying PoolWind to $PW_DIR"
+# An update: which version it was (the program's first line names it)
+OLD_VER=""
+NEW_VER="$(grep -m1 -o 'poolwindAI_v[0-9.]*[0-9]' "$SOFTWARE/poolwind.py" | sed 's/poolwindAI_//')"
 if [ -f "$PW_DIR/poolwind.py" ]; then
+    OLD_VER="$(grep -m1 -o 'poolwindAI_v[0-9.]*[0-9]' "$PW_DIR/poolwind.py" | sed 's/poolwindAI_//')"
+    OLD_VER="${OLD_VER:-an earlier version}"
     run cp "$PW_DIR/poolwind.py" "$PW_DIR/poolwind.py.previous"
     say "   the previous program is kept as poolwind.py.previous"
 fi
@@ -287,6 +292,24 @@ say "   the monitor turns to portrait each time the Pi starts"
 
 # --------------------------------------------------------------------------
 step "Done"
+if [ -n "$OLD_VER" ]; then
+    # An update: what was kept, and what's new (software/WHATS_NEW.txt)
+    if [ "$OLD_VER" = "$NEW_VER" ]; then
+        say "PoolWind $NEW_VER was already installed: the program was copied again."
+    else
+        say "PoolWind is updated from $OLD_VER to $NEW_VER."
+    fi
+    say "Kept as they were: your settings (poolwind_defaults.txt), your pool's"
+    say "calibration (poolwind_calibration.txt), swim logs, videos and USB sticks."
+    say "The previous program is kept as poolwind.py.previous."
+    if [ "$OLD_VER" != "$NEW_VER" ] && [ -f "$SOFTWARE/WHATS_NEW.txt" ]; then
+        say ""
+        while IFS= read -r line; do say "$line"; done < "$SOFTWARE/WHATS_NEW.txt"
+    fi
+    say ""
+    say "Next: restart the Pi, then start PoolWind as usual."
+    exit 0
+fi
 say "PoolWind is installed in $PW_DIR."
 say ""
 say "Next:"

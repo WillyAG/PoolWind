@@ -1,0 +1,21 @@
+What's new in PoolWind v15.7 (since v15.5)
+
+For swimmers (user manual):
+- Your own Pace table on your USB stick. A welcome screen greets you
+  and says which table you swim with; when the pool is calibrated
+  again, it asks Old (yours) or New (the pool's).
+- A USB stick plugged in or pulled out while PoolWind runs is picked up.
+- Pace correction redone: correct your Paces while you swim. Changes
+  stay pending until you make them permanent.
+- Swim Plot and the calendar show old swims in today's Paces. The
+  first start after this update adds the jet's voltage to your old swim
+  logs, once for each USB stick (a few seconds). Days that can't be
+  converted show grey.
+
+For the builder (setup guide, section 5):
+- The voltage scan can be run again any time; its Paces are a first
+  estimate (7:00 at the slowest speed, 1:00 at the top).
+- Pace Entry has Edit, Scan and Finish screens; PingPong has bodyDrag
+  and deltaBodyDrag.
+- The jet's limits are now the Pace table's first and last rows. An old
+  'SafetyVoltageLimits' line in the calibration file is ignored.
