@@ -47,8 +47,9 @@ pool are covered in the build guide and the setup and calibration guide.
 4. Press **Begin** (or **Resume**, see below) when you're ready to swim.
    Until then, the jet stays at its lowest setting.
 
-**The welcome screen** says **"Welcome to PoolWind, <your stick's name>."**,
-or **"Swimming with default (Master) data"** when no swimmer's stick is in,
+**The welcome screen** says **"Welcome to PoolWind v15.7, <your stick's
+name>."** (with the version you have), or **"PoolWind v15.7: Swimming with
+default (Master) data"** when no swimmer's stick is in,
 and which Pace table you swim with: your own (**Old**) or the pool's
 calibration (**New**). It closes by itself after 10 seconds; **OK** or
 **Esc** closes it at once. **Change** lets you choose the other table:
