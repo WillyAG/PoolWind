@@ -272,10 +272,13 @@ Tap a box, or a zone on the graph, to choose it; drag the graph to scroll.
 **Esc**, or **↺** beside a box, puts it back. **▲** in the top corner hides
 the instructions to give the table more room; **▼** brings them back.
 
-**How New is worked out.** The Paces you type, and the slowest zone
-(always 7:00), stay exactly as typed. Every other zone keeps the shape of
-Now, stretched to pass through them, so one Pace changes almost every zone
-a little. To hold part of the table where it is, type a Pace there too.
+**How New is worked out.** The Paces you type stay exactly as typed, and
+so do the two ends, set when the pool was calibrated: the slowest zone
+(always 7:00) and the fastest zone (the Pace at the jet's top speed). Every
+other zone keeps the shape of Now, stretched to pass through them, so one
+Pace changes the zones on both sides of it, most near your Pace and less
+toward the ends. To hold part of the table where it is, type a Pace there
+too.
 
 **Red** in New is a zone that isn't faster than the one below it; the box
 that causes it is red too. Change the red box. While anything is red,
