@@ -518,6 +518,32 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
   right way. However it is mounted, the camera must see the whole swim area, between the benches, from the back to the front of the pool. Make plans so the camera will be about 5 to 6 feet above the pool but be flexible, the distance may have to be adjusted. See the setup guide, [section 5.1 (The swim area)](SETUP_GUIDE.md#51-the-swim-area), to help you place the camera correctly.
   Placement isn't critical, any image outside this area is trimmed out.
   Also it is not essential that the camera is mounted exactly in the center point of the pool, still the closer the better. PoolWind has perspective correction which visually moves the camera to the center but distorts the objects it sees. The camera could hang off the ceiling or be mounted on poles from the side and brought in toward the center. The mount should be sturdy though because you don't want the camera to shake. 
+- **Not enough height?** For the author's 13.5 ft swim area, a camera
+  centered over the pool needs to see about 100° along the pool at
+  5½ ft above the water, about 120° at 4 ft, and about 130° at 3 ft.
+  (A camera's advertised angle is usually measured corner to corner, so
+  it sees less than that along the picture; check the model's details,
+  or hold it at the planned height and look.) Two ways to manage with
+  less height:
+  - **Mount the 120° camera at one end of the pool**, high up, looking
+    down along it at a slant instead of straight down. PoolWind's
+    perspective correction handles this; the far end is seen at a slant,
+    so its detail is coarser. Try this first: it needs no other camera.
+  - **A wider USB camera**, 140° up to 180° ("fisheye"), for example the
+    ELP USB cameras with 160-180° lenses. Choose one that offers MJPG
+    1280×720 at 30 fps, like the parts list's camera. Up to about 140°
+    it's an ordinary wide lens. Wider lenses bend straight lines: the
+    pool's edges bow outward. PoolWind straightens the swim area from its
+    four corners, which assumes straight edges, so with a fisheye the
+    swimmer's position, and with it the jet speed, is a little off,
+    mostly near the front and back. PoolWind doesn't yet correct for
+    this. If you build with one, ask in Discussions: the fix (a one-time
+    lens calibration with a printed checkerboard) is known, but not
+    built.
+
+  A low camera also sees the swimmer's head and hands larger and further
+  from the center of the picture, and splashes and condensation reach it
+  more easily.
   
   
 - **Cable:** a 10 ft USB extension reaches the Raspberry Pi. A longer run
