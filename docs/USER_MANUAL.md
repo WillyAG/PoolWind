@@ -274,11 +274,12 @@ the instructions to give the table more room; **▼** brings them back.
 
 **How New is worked out.** The Paces you type stay exactly as typed, and
 so do the two ends, the slowest and fastest zones' Paces, set when the
-pool was calibrated. Every
-other zone keeps the shape of Now, stretched to pass through them, so one
-Pace changes the zones on both sides of it, most near your Pace and less
-toward the ends. To hold part of the table where it is, type a Pace there
-too.
+pool was calibrated. Every other zone keeps its place on the Now curve:
+between two fixed Paces it sits the same part of the way from one to the
+other as it does in Now. So New keeps Now's shape and stays in order, as
+long as each Pace you type is faster than the one below it. One Pace
+changes the zones on both sides of it, most near your Pace and less toward
+the ends. To hold part of the table where it is, type a Pace there too.
 
 **Red** in New is a zone that isn't faster than the one below it; the box
 that causes it is red too. Change the red box. While anything is red,
