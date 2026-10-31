@@ -42,24 +42,11 @@ pool are covered in the build guide and the setup and calibration guide.
 
 1. Insert your USB stick.
 2. Start PoolWind with its **desktop icon**. 
-3. The pool screen appears, with the **welcome screen** over it (see
-   below).
+3. The pool screen appears, with the PoolWind version at the very top.
+   With your stick in, PoolWind uses your settings and your own Pace
+   table from the stick.
 4. Press **Begin** (or **Resume**, see below) when you're ready to swim.
    Until then, the jet stays at its lowest setting.
-
-**The welcome screen** says **"Welcome to PoolWind v15.7, <your stick's
-name>."** (with the version you have), or **"PoolWind v15.7: Swimming with
-default (Master) data"** when no swimmer's stick is in,
-and which Pace table you swim with: your own (**Old**) or the pool's
-calibration (**New**). It closes by itself after 10 seconds; **OK** or
-**Esc** closes it at once. **Change** lets you choose the other table:
-choosing New keeps your own table aside, and Change brings it back later.
-
-If the pool has been calibrated again since you last swam, the welcome
-screen asks instead: **"The pool calibration has changed since you last
-swam here. Do you want to use your old settings or change to the new
-calibration?"** and waits for **Old** or **New**. The pool runs on
-underneath meanwhile.
 
 **Begin or Resume?** If you've already swum today, the big button says
 **Resume** (in red) instead of Begin. Your swim continues where it left off:
@@ -257,14 +244,15 @@ the jet speeds or anyone's zones.
 
 1. Open the menu (**≡**) and choose **Pace correction...**. A box opens
    over the pool screen. It lists every zone, fastest at the top: **Zone**,
-   **Now** (the Pace your table gives), **New** (with your corrections) and
-   an empty box to type in, with a graph of the same beside them (Now grey,
-   New blue). Your own zones are bold.
+   **Your stored Pace** (the Pace your table gives), **Your pending Pace**
+   (with your corrections) and **Your new Pace**, an empty box to type in,
+   with a graph of the same beside them (stored grey, pending blue). Your
+   own zones are bold.
 2. Swim until the current feels like a Pace you know, then move aside. The
    zone you were in turns yellow and its box is ready.
 3. Type the Pace it should be: `1 4 8` is 1:48, on the keyboard or the
-   box's number pad; the third digit enters it. New and the graph change
-   as you type, and the pool uses New at once.
+   box's number pad; the third digit enters it. Your pending Pace and the
+   graph change as you type, and the pool uses them at once.
 4. Swim again, and do it again at other speeds (slow, medium, fast) as
    often as you like.
 
@@ -272,12 +260,13 @@ Tap a box, or a zone on the graph, to choose it; drag the graph to scroll.
 **Esc**, or **↺** beside a box, puts it back. **▲** in the top corner hides
 the instructions to give the table more room; **▼** brings them back.
 
-**How New is worked out.** The Paces you type stay exactly as typed, and
+**How your pending Paces are worked out.** The Paces you type stay exactly as typed, and
 so do the two ends, the slowest and fastest zones' Paces, set when the
 pool was calibrated (shown in their boxes, grey; they can't be changed).
-Every other zone keeps its place on the Now curve:
+Every other zone keeps its place on the stored curve:
 between two fixed Paces it sits the same part of the way from one to the
-other as it does in Now. So New keeps Now's shape and stays in order, as
+other as it does there. So the pending curve keeps the stored one's shape
+and stays in order, as
 long as each Pace you type is faster than the one below it. One Pace
 changes the zones on both sides of it, most near your Pace and less toward
 the ends. To hold part of the table where it is, type a Pace there too.
@@ -296,13 +285,14 @@ it. While the box is open PoolWind doesn't suspend the swim by itself.
 | Button | What it does |
 |---|---|
 | **Back** | Back to the pool screen. Your changes stay in use, **pending** |
-| **Make permanent** | Writes New into your table (Now). It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept |
-| **Switch to 'Now' values** / **'New' values** | Swims the table as it was, to compare. PoolWind starts with New every time |
-| **Clear** | Drops the pending changes, after "Are you sure?": New is Now again |
+| **Make permanent** | Writes your pending Paces into your stored ones. It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept |
+| **Swim with 'stored' values** / **'pending' values** | Swims your stored Paces, to compare. PoolWind starts with pending every time |
+| **Copy Pool values to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
+| **Clear** | Drops the pending changes, after "Are you sure?": your pending Paces are your stored ones again |
 | **Details…** | A typical session, and how it all works |
 
 **Pending changes** are kept on your stick (or with the Master table) even
-if PoolWind is closed or the power goes off; **"New Paces"** shows on the
+if PoolWind is closed or the power goes off; **"Pending Paces"** shows on the
 pool screen while they're in use. Closing PoolWind with changes pending
 asks **Keep pending** or **Make permanent**.
 
@@ -380,8 +370,7 @@ on the Pi, so their swims can't be told apart.
 a few seconds. A swim in progress is suspended (the button turns red),
 Pace correction and Swimmer limits close, and PoolWind starts again with
 that swimmer's settings, swims, today's totals and Pace table, or with
-the Master data when the stick was pulled. The welcome screen shows who is
-swimming now.
+the Master data when the stick was pulled.
 
 ### How much it holds depends on **logRate**
 
@@ -530,7 +519,7 @@ The same user settings live in two places:
   your personal settings. They replace the main settings file's while the
   stick is in. A setting missing from the stick comes from the main
   settings file. Next to it, `poolwind_ind_calibration.txt` is your Pace
-  table: leave that file to Pace correction and the welcome screen.
+  table: leave that file to Pace correction.
 - To edit either file, find it with the File Manager and double-click it.
   After PoolWind has closed, your stick is ejected and doesn't show in the
   File Manager: pull it out and plug it back in first. Keep the quote marks, commas and brackets exactly as they

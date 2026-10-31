@@ -87,7 +87,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Automatic detection if swimmer leaves the center swim zone, pausing data collection and lowering the jet flow to its lowest setting
 
-- Per-swimmer USB sticks: personal settings (height, zone limits, video recording switch), the swimmer's own Pace table, and swim data. A welcome screen greets each swimmer, and a stick can be swapped while PoolWind runs. Months of data can be collected depending on the size of the USB stick
+- Per-swimmer USB sticks: personal settings (height, zone limits, video recording switch), the swimmer's own Pace table, and swim data. A stick can be swapped while PoolWind runs. Months of data can be collected depending on the size of the USB stick
 (Approx 70 hours on a 32 GB stick) 
 
 - Safety voltage limits
