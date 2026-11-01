@@ -280,9 +280,9 @@ faster than they can handle.
      or the voltage stops rising (`NO_STEP_S`); build the table from the
      bottom and top voltages in equal steps (`jetStepVolts` and
      `pace_voltage`, Paces from `pace_curve` as now). Make the number of
-     steps a calibration setting: the author suggested 40, but 40 zones are
-     about 4 inches each in the pool; the author's 26 steps give about 6,
-     so start near 26 and try more.
+     steps a calibration setting, 30 to start (the author's suggestion):
+     40 zones would be about 4 inches each in the pool, the author's 26
+     steps give about 6.
   2. **Pace Entry's Auto scan and PingPong** (`_step_up`, state `up`) hold
      UP until they see a voltage jump, which never comes on a ramp: drive
      to the next row's voltage instead, as `_drive_to` / `_drive_tick`
