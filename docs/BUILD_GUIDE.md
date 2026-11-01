@@ -33,7 +33,7 @@ these fails, the rest of this guide won't help, so check all three first.
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. Another range works too, as long
    as the INA260 sensor can read it (0 to 36 V): after installing, the
-   calibration's voltage scan fits PoolWind to your pool's range. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified. On the author's pool the voltage is there whether the pump is running or not; if yours drops to zero while the pump is off, PoolWind may need changes too. An AI assistant such as Claude Code can help with them (setup guide, [section 12](SETUP_GUIDE.md#12-getting-help)).
+   calibration's voltage scan fits PoolWind to your pool's range. On the author's pool the voltage changes in steps, one for each press of Up or Down. If yours rises continuously instead, PoolWind will have to be modified by the builder (with Claude's help), but it is very likely to work. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified. On the author's pool the voltage is there whether the pump is running or not; if yours drops to zero while the pump is off, PoolWind may need changes too. An AI assistant such as Claude Code can help with them (setup guide, [section 12](SETUP_GUIDE.md#12-getting-help)).
 3. **Your skills.** PoolWind is a do-it-yourself project, not a product: it
    isn't for sale, and there's no kit. You buy the parts from various
    suppliers, then build, install and set it up yourself, at your own risk
@@ -515,35 +515,23 @@ corrosion from the moist, chlorinated air.
 The camera selected for this is wide angle with a 120 degree view, chosen so it can see the entire swim area of the pool without being mounted too high.
 
 - **Mounting position:** this depends on your pool, so there's no single
-  right way. However it is mounted, the camera must see the whole swim area, between the benches, from the back to the front of the pool. Make plans so the camera will be about 5 to 6 feet above the pool but be flexible, the distance may have to be adjusted. See the setup guide, [section 5.1 (The swim area)](SETUP_GUIDE.md#51-the-swim-area), to help you place the camera correctly.
-  Placement isn't critical, any image outside this area is trimmed out.
-  Also it is not essential that the camera is mounted exactly in the center point of the pool, still the closer the better. PoolWind has perspective correction which visually moves the camera to the center but distorts the objects it sees. The camera could hang off the ceiling or be mounted on poles from the side and brought in toward the center. The mount should be sturdy though because you don't want the camera to shake. 
-- **Not enough height?** For the author's 13.5 ft swim area, a camera
-  centered over the pool needs to see about 100° along the pool at
-  5½ ft above the water, about 120° at 4 ft, and about 130° at 3 ft.
-  (A camera's advertised angle is usually measured corner to corner, so
-  it sees less than that along the picture; check the model's details,
-  or hold it at the planned height and look.) Two ways to manage with
-  less height:
-  - **Mount the 120° camera at one end of the pool**, high up, looking
-    down along it at a slant instead of straight down. PoolWind's
-    perspective correction handles this; the far end is seen at a slant,
-    so its detail is coarser. Try this first: it needs no other camera.
-  - **A wider USB camera**, 140° up to 180° ("fisheye"), for example the
-    ELP USB cameras with 160-180° lenses. Choose one that offers MJPG
-    1280×720 at 30 fps, like the parts list's camera. Up to about 140°
-    it's an ordinary wide lens. Wider lenses bend straight lines: the
-    pool's edges bow outward. PoolWind straightens the swim area from its
-    four corners, which assumes straight edges, so with a fisheye the
-    swimmer's position, and with it the jet speed, is a little off,
-    mostly near the front and back. PoolWind doesn't yet correct for
-    this. If you build with one, ask in Discussions: the fix (a one-time
-    lens calibration with a printed checkerboard) is known, but not
-    built.
+  right way. However it is mounted, the camera must at least see the whole water area. Make plans so the camera will be about 5 to 6 feet above the pool.
+  Also it is not essential that the camera is mounted exactly in the center point of the pool, still the closer the better. PoolWind has perspective correction which visually moves the camera to the center but distorts the objects it sees.
 
+- **Not enough height?** For the author's 8 x 15 ft pool, the 120 degree camera
+  centered over the pool needs to be 5½ to 6ft away from the surface of the water. That distance may not be available. The author placed the camera about 3 ft from the center point along the lengthwise axis toward the front of the pool. The swimmer does not appear distorted when corrected.
+   
+  You could bring the camera to the side, still centered on the length (15ft). For four feet of available space, the camera would need to be brought out from the side by about 3ft. Although the program will run fine, the side image of the swimmer may hide some movements when reviewing the video. See [user manual, section 7: The plot and video](USER_MANUAL.md#the-plot-and-video).
+  
+  **Mounting on a post to the side?** Same reasoning as above, you can go off to the pool side by 3 ft and get the 8 x 15 ft from a height of 4 ft from the surface of the water. Closer to the center of the pool is always better.
+
+  The mount should be sturdy though because you don't want the camera to shake.
+  
   A low camera also sees the swimmer's head and hands larger and further
   from the center of the picture, and splashes and condensation reach it
-  more easily.
+  more easily. 
+
+  Be flexible on your mounting plan. You will actually view what the camera sees later when the software is installed: see [section 9, step 3](#set-up-the-camera).
   
   
 - **Cable:** a 10 ft USB extension reaches the Raspberry Pi. A longer run
@@ -599,8 +587,8 @@ Before connecting anything to the pool:
 2. **Power up the Raspberry Pi** and install the software (setup guide,
    section 3). PoolWind starts as a demo. Before steps 5 and 6, turn the
    demo off ([setup guide, section 4](SETUP_GUIDE.md#4-first-start)).
-3. **Set up the camera** 
-   To see what the camera sees, use the Raspberry Pi VLC Media Player and select 'Open Capture Device' -> 'Video Device Name' -> '/dev/video0' -> 'Play'. You should orient the camera so that it displays the pool with the **pool front to the left**. Don't try to correct the orientation with the program. Once you see the entire swim area in view you're done.
+3. <a id="set-up-the-camera"></a>**Set up the camera**   
+   To see what the camera sees, use the Raspberry Pi VLC Media Player and select 'Open Capture Device' -> 'Video Device Name' -> '/dev/video0' -> 'Play'. The camera must display the pool with the **pool front to the left**. Physically move the camera to the correct orientation and adjust so that at a minimum all of the water area is showing but, if possible, some of the decking as well.
 4. **Check that the INA260 is found:** in a terminal, `i2cdetect -y 1`
    should show `40` in its table.
 5. **Check the On/Off relay clicks**, with the remote not yet connected:

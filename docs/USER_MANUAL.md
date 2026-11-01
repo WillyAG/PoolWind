@@ -41,6 +41,8 @@ pool are covered in the build guide and the setup and calibration guide.
 ## 2. Starting PoolWind
 
 1. Insert your USB stick.
+   - If no USB stick is found, all data will be recorded on the SD card as the 'master' swimmer. Pool calibrations are defined by the 'master' data.
+   - A USB stick may be left connected between sessions.
 2. Start PoolWind with its **desktop icon**. 
 3. The pool screen appears, with the PoolWind version at the very top.
    With your stick in, PoolWind uses your settings and your own Pace
@@ -151,12 +153,12 @@ are turned off when PoolWind starts.
 - It moves as soon as the jet changes speed, a moment after you move. The
   water then takes a few more seconds to catch up. Those delays are why a
   sprint can run you into the wall: you can watch it happen.
-- Don't blame the program for the slow movement of the band: it only reflects built in pool delays of setting the jet speed (moving the valve). Moving the mass of the water takes a few seconds more. Nothing can speed that up.
+- Don't blame the program for the slow movement of the band: it only reflects built-in pool delays of setting the jet speed (moving the valve). Moving the mass of the water takes a few seconds more. Nothing can speed that up.
 
 The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
 
 ### swimArea definition
-**swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left)  **Set Swim Area...** (see [The swim area](SETUP_GUIDE.md#51-the-swim-area) in the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
+**swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left)  **Set Swim Area...** (see [The swim area](SETUP_GUIDE.md#52-set-swim-area) in the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
 
 ### swimZone definition
 **swimZone** is a subset of the swimArea and is a lateral zone down the middle of the pool that has a width of 35% (as shipped) of the swimArea. It's a "zone" because PoolWind only responds to swims occurring in the swimZone.
@@ -167,6 +169,7 @@ The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot
 - compute and display average Pace
 - record video taken of the swimArea including the swimmer
 - record swim data synchronized with the video including Pace, averagePace, and distance
+
 This set can be turned on or off as a whole. When "on", the latest data is displayed and sent to the USB stick (or on the SD if there is no stick). When "off", computation and recording stop, leaving latest values frozen on the monitor (Pace, however, still updates). When "on" again, data is appended, not destroyed.
 
 ### Swim down the middle in the swimZone
@@ -232,7 +235,7 @@ correct them while you swim:
 
 > On a newly calibrated pool, the Paces start as a rough estimate from the
 > calibration's voltage scan: 7:00 at the slowest jet speed to 1:00 at the
-> fastest (see [The calibration program](SETUP_GUIDE.md#52-the-calibration-program)
+> fastest (see [Begin initial voltage scan](SETUP_GUIDE.md#53-calibrate-pool---begin-initial-voltage-scan)
 > in the setup guide). Pace correction brings them closer to your own.
 
 **Whose Paces.** With your USB stick in, you correct **your own Pace
@@ -241,6 +244,16 @@ you correct the pool's **Master** table, which everyone without a stick
 swims with. The box's title says whose, for example **Pace correction:
 Bill_G** or **Pace correction: Master**. Only the Paces shown change, never
 the jet speeds or anyone's zones.
+
+<a id="pace-changes-and-earlier-swims"></a>**Your earlier swims change too.**
+Swim Plot and the calendar show every swim in the Paces **in use now** (see
+[Master vs Swimmer datasets](#master-vs-swimmer-datasets)). So as soon as you type a
+Pace, move a drag number or press **Copy Master values**, your earlier swims
+are shown in the new Paces as well. With your stick in, that's all your
+swims; with no stick, all swims made without a stick. Your swim logs
+themselves never change: **↺**, or putting the Paces back, shows them as
+before. PoolWind warns you in the Pace correction box and when you press
+**Make permanent**.
 
 1. Open the menu (**≡**) and choose **Pace correction...**. A box opens
    over the pool screen. It lists every zone, fastest at the top: **Zone**,
@@ -272,10 +285,9 @@ changes the zones on both sides of it, most near your Pace and less toward
 the ends. To hold part of the table where it is, type a Pace there too.
 
 **Red**: two of your Paces are out of sequence (a faster zone with a
-slower Pace); both boxes turn red. Change one of them. While anything is red,
-**Back** and **Make permanent** wait.
+slower Pace); both boxes turn red. Change one of them. 
 
-**Swimming with the box open.** PoolWind runs as usual underneath. With
+**Swimming with the Pace correction screen open.** PoolWind runs as usual underneath. With
 **Suspend** showing (a copy of the button is at the top of the box) the
 swim counts toward distance and the log as usual, and while you swim a big
 blue Pace display covers the instructions so you can read your Pace. With
@@ -285,9 +297,9 @@ it. While the box is open PoolWind doesn't suspend the swim by itself.
 | Button | What it does |
 |---|---|
 | **Back** | Back to the pool screen. Your changes stay in use, **pending** |
-| **Make permanent** | Writes your pending Paces into your stored ones. It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept |
+| **Make permanent** | Writes your pending Paces into your stored ones. It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept. Greyed out until there's something pending, so after a save until you make another change |
 | **Swim with 'stored' values** / **'pending' values** | Swims your stored Paces, to compare. PoolWind starts with pending every time |
-| **Copy Pool values to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
+| **Copy Master values to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
 | **Clear** | Drops the pending changes, after "Are you sure?": your pending Paces are your stored ones again |
 | **Details…** | A typical session, and how it all works |
 
@@ -298,8 +310,58 @@ asks **Keep pending** or **Make permanent**.
 
 After a **PingPong** calibration, two more numbers are at the top of the
 box, **bodyDrag** and **deltaBodyDrag**: they change the whole table (see
-the [setup guide](SETUP_GUIDE.md#52-the-calibration-program)).
+the [setup guide](SETUP_GUIDE.md#55-calibrate-pool---pingpong)).
 **Defaults** puts them back to the author's pool's.
+
+### What happens to your old swim data if the pool is re-calibrated
+
+Nothing is lost: your swim logs aren't changed. Each line keeps the jet's
+voltage and the Pace it was swum at, so Swim Plot and the calendar show
+old swims in the new table (see
+[Master vs Swimmer datasets](#master-vs-swimmer-datasets)). If the pool's
+controller or Pace cable was replaced, old swims may read a little off.
+
+A swimmer's own table on their USB stick isn't changed by re-calibrating
+the pool: with your stick in, your swims look the same. Changing your own
+Paces in Pace correction does change them: see
+[Your earlier swims change too](#pace-changes-and-earlier-swims).
+
+**Doesn't re-calibrating make old swims wrong?** No, it corrects them.
+
+- **What doesn't change: the jet.** At 1.90 V it pushes the same water at
+  the same speed today as last month. That's what you swam against.
+- **What changes: the table.** It only translates voltage into Pace.
+  Re-calibrating says "1.90 V is really 2:10, not 2:00."
+- **If old swims kept their old Paces**, they'd show 2:00 and today's
+  swims at the same voltage 2:10: you'd look 8% slower, though nothing
+  about you or the water changed.
+- **So PoolWind re-reads old swims in the new table.** Both show 2:10:
+  old and new are measured with the same ruler.
+
+**The arithmetic.** Each line of a swim log keeps three numbers: the Pace
+you were shown (**P**), the jet's voltage (**V**) and the table's Pace at
+that voltage at the time (**T**). P can differ a little from T, because it
+also follows where you are in the pool. Shown today:
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Pace today = P × (new table's Pace at V) / T**
+
+Example: logged at 1.90 V, the old table gave 2:00 (T), you were shown
+2:02 (P). The new table says 2:10 at 1.90 V, so that line now shows
+2:02 × 2:10 / 2:00 = 2:12. Distances are worked out again from the new
+speeds (speed = 1 / Pace): a swim that was 1000 yd at the old Paces shows
+about 923 yd at Paces 8% slower. The log file itself never changes.
+
+**Where it can still be off:**
+
+1. **New hardware.** With a new controller or Pace cable, 1.90 V may be a
+   different jet speed, so old voltages no longer line up.
+2. **A fresh scan, no measured Paces yet.** The table is only the scan's
+   7:00-to-1:00 estimate until Pace Entry or PingPong is run: old and new
+   swims still compare fairly, but the Paces are only as good as that
+   estimate.
+3. **Swims from before PoolWind v15.7.** They were given their numbers
+   once, from the table at the update. A day that couldn't be converted
+   shows grey on the calendar and keeps its Paces as swum.
 
 ## 5. Finishing a swim
 
@@ -313,8 +375,7 @@ Press **OnOff** to turn the pump off: the jet winds down first. Then press
 1. releases its control of the pool's remote (closing doesn't slow the
    jet: if the pump is still running, the jet stays at its speed),
 2. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
-3. **ejects your USB stick**, so it's safe to remove (unless your stick's
-   `'ejectStickOnClose'` setting is `False`: see below).
+3. **ejects your USB stick**, so it's safe to remove.
 
 There's no message: once PoolWind has closed, you can remove your stick,
 and the next swimmer can insert theirs before starting PoolWind. Or leave
@@ -332,15 +393,9 @@ can hold the last part of your swim in memory for up to half a minute.
 Pulling a stick that hasn't been ejected can lose the end of your swim,
 or leave the stick needing repair.
 
-**Which setting suits you?**
-
-- **A single swimmer who leaves the stick in the Pi:** set
-  `'ejectStickOnClose'` to `False`. The stick stays open, and you can look
-  at its files after PoolWind closes.
-- **A coach, or several swimmers sharing the pool:** keep it `True`, so each
-  swimmer can take their stick away.
-- **A coach who needs to edit a stick:** plug it in (or unplug it and plug it
-  back in) while PoolWind is closed. It then shows in the File Manager.
+**To look at your stick's files** (or for a coach to edit a stick): unplug
+it and plug it back in while PoolWind is closed. It then shows in the File
+Manager.
 
 Once PoolWind is closed, the pool works normally with its own remote.
 
@@ -358,6 +413,10 @@ Each swimmer has their own USB stick. It holds:
 
 Swimmers without a stick all share one log and the pool's Master Pace table
 on the Pi, so their swims can't be told apart.
+
+For how the pool's Master data, your own data and the USB stick fit
+together, see [Pool, Master, and Swimmer datasets and the USB stick](SETUP_GUIDE.md#51-pool-master-and-swimmer-datasets-and-the-usb-stick)
+in the setup guide.
 
 ### Insert USB stick before, remove after
 
@@ -438,53 +497,33 @@ closes the box without changing anything.
 
 Open the menu (**≡**, top left) and choose **Swim Plot...**.
 
-- **"Navigating away from the main pool screen"**: the jet first winds down to its lowest
-  setting, and PoolWind lets go of the pool's UP and DN controls.
-- **OnOff** still works: the calendar and the plot screen each have a
-  light red button for the pump. To prevent an accidental press, it asks
-  "Are you sure?" first: press **OK** to turn the pump on or off, or
-  **Cancel**.
-- **"Back to the pool screen"**: when you return, the jet winds down
-  again and starts from its lowest setting.
+**Selecting dates to review:**\
+The "Select Swim Date(s)" screen shows up with "Use .. dataset" selector (see **Master vs Swimmer datasets** below) and a "From" calendar and a "To" calendar. After a short "Please wait" popup, the current month shows in both calendars and each day having a swimming session shows up in green font with the daily average Pace underneath. 
 
-The same happens with **Set Swim Area...**.
+Today's date in both is selected and is generally the most picked date range, so you can go directly to **OK** to bring up the plot and video.
 
-### Paces in today's table
+But you can pick a range of dates. Going to an earlier month, PoolWind reads that month's swims the first time, popping up "Please wait", and then shows each day's average Pace. Pick a range of dates, then press **OK**. Another "Please wait" shows while the plot is prepared.
 
-Swim Plot and the calendar's average Paces show every swim in the Pace
-table you swim with **now**. Correct your Paces today, and your old swims
-read in the corrected table too, so they can be compared with today's.
-(Each line of your swim log keeps the jet's voltage and the Pace your table
-gave it then; PoolWind works the Pace and the distance out again from
-those.) Swims logged before PoolWind v15.7 are given them once, the first
-time your stick is used after the update (a few seconds). A day that
-couldn't be converted shows its average Pace in **grey** on the calendar,
-and its swims as they were swum.
+Pulling your USB stick while Swim Plot is open closes it. You can plug it (or another swimmer's stick) back in and select **Swim Plot...** again.
 
-### Choosing the days
-
-A window with two calendars appears: **From** and **To**. Both start on
-today. Days with swims are marked in green, and each shows that day's
-average Pace. Pick a single day or a range, then press **OK**. If none of the
-chosen days has a swim, PoolWind says so and stays on the calendars: pick a
-green date (a grey average: see [Paces in today's table](#paces-in-todays-table)). **Close** returns to the pool screen. **Pump On/Off** turns the
-pool's pump on or off and is there for emergency purposes.
-
-### The plot and video
-
+**The plot and video**:\
 The swim's training video plays together with a plot of your swim:
 
 <img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the zone highlight as a light band across the shoulders, and the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
 
 - **Pace** over time (shown first), or **MPH** over distance: switch with
-  the **MPH** button. 
-- Faster swimming means a lower Pace but the Pace plot is inverted to avoid confusion. Up means faster swimming in both plots.
+  the **goto MPH** / **goto Pace** button (it names the other plot). 
+- Faster swimming means a lower Pace so the Pace plot is inverted to avoid confusion. Up means faster swimming in both plots.
 - A **cursor** on the plot follows the video, frame by frame. Move the
   cursor and the video jumps to that moment.
 - A **swim date** is shown centered and under the top header that represents the date of the plot where the cursor is positioned. If multiple days were selected, that date will change as the cursor moves through the plot.
-- The **zone highlight** shows as a lighter band when it's on: click the video to turn it on or off
+- **PACE** or **MPH**, at the left of the date's line, names the plot shown.
+- The small box at the lower right shows the cursor's **Time** and **Pace** (or **Miles** and **MPH**).
+- **Avg Pace overall** is the whole range's average.
+- **Distance (miles) overall** is the whole range's distance.
+- The **zone highlight** shows the zones and the moving current zone band when it's on: click the video to turn it on or off
 - The **plot window** can be moved out of the way by click and drag on the top header.
-- Note the **Avg** (average Pace of swim to the moment), **Pace** (the current pace at the moment) and **Dist** (total distance to the moment) are part of the video, which also shows them when played on a separate video player.
+- Note the **Avg** (average Pace of swim to the moment), **Pace** (the current pace at the moment) and **Dist** (total distance to the moment) are part of the video written at the moment. If pool calibration had changed (or **Master vs Swimmer datasets** had switched, see below) since then, their values may be different than their corresponding values in the plot box. 
 
 **Controls:**
 
@@ -493,12 +532,18 @@ The swim's training video plays together with a plot of your swim:
 | **▶ Play / Pause** | Plays or pauses. The video starts playing by itself and stops at the end |
 | Mouse wheel over the plot | Zooms time or distance in and out |
 | Mouse wheel over **Play** or the speed label | Plays faster or slower |
-| **Compress Gaps** | Shortens the breaks between swims to a few seconds, so the plot shows mostly swimming. The gaps are quite large between days (if multiple days were selected) and those are compressed as well. |
+| **Compress Gaps** | Shortens the breaks between swims to a few seconds, so the plot shows mostly swimming. The gaps are quite large between days (if multiple days were selected) and those are compressed as well. The cursor stays where it was, and the Time, Pace and distance shown don't change. |
 | Left click on the plot and drag | Moves the cursor and swim video through time or distance |
 | Right click on the plot and drag | Moves the entire plot and cursor left or right |
 | Click on the video | Turns the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) on or off (swims recorded since it was added) |
 | **On/Off** (light red) | Turns the pool's pump on or off, after "Are you sure?" (**OK** / **Cancel**) |
 | **Close** | Back to the calendars, to pick another day |
+
+<a id="master-vs-swimmer-datasets"></a>**Master vs Swimmer datasets:**
+Any swimmer can change the Pace values in the Pace-volt table with the **Pace correction...** menu selection. The new values go into the Swimmer dataset on their own USB stick and will apply to their entire Swimmer dataset, even prior swims. That makes their Pace-volt table different from the Master dataset. The swimmer would usually select **Swimmer dataset** in the calendar screen.
+
+A coach who wants to compare swims from different swimmers can select **Master dataset** in the calendar screen to even the playing field. The pool had been calibrated by the builder and all swimmers would be evaluated against it.
+
 
 ### What to look for
 
@@ -535,7 +580,6 @@ The same user settings live in two places:
 | `'zoneMin, Max'` | `(8, 22)` | Your slowest and fastest zone (zone 1 is the jet's slowest speed). Set them with [Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone) |
 | `'paceMin, Max'` | `('5:00', '3:00')` | Instead of zones (the main settings file, as shipped): the slowest and fastest Pace, in minutes per 100 yards, turned into zones by PoolWind. `'zoneMin, Max'` wins if both are there |
 | `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
-| `'ejectStickOnClose'` | `True` | Eject your stick when PoolWind closes, so it's safe to remove (it can also stay in for the next start). `False` leaves it open, so its files still show in the File Manager after PoolWind closes. Eject it with the eject icon (⏏) before removing it. See [Which setting suits you?](#5-finishing-a-swim) |
 | `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
 
 ### logRate: how often PoolWind records

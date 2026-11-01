@@ -171,9 +171,9 @@ faster than they can handle.
   calibration file. With a swimmer's stick in, the Paces come from their
   own `poolwind_ind_calibration.txt` on the stick (`App._load_swimmer`,
   made from the pool's the first time; read onto the pool's jet steps if a
-  scan moved them), only the Paces, never the voltages. The welcome screen
-  (`WelcomeBox`, `App.choose_table`) offers Old (own) or New (the pool's)
-  when the pool's table changed. `App.watch_stick` switches swimmer when a
+  scan moved them), only the Paces, never the voltages. No welcome screen
+  (dropped 2026-10-30): Pace correction's Copy Pool values puts the pool's
+  table into the swimmer's pending one. `App.watch_stick` switches swimmer when a
   stick is plugged in or pulled while running (`switch_swimmer`).
   Pace correction's pending changes (`PacesPending`) live in whichever file
   is in use; Make permanent writes it. Log rows carry the jet's voltage and
@@ -187,9 +187,11 @@ faster than they can handle.
   `poolwind_calibration_camera.png`.
 - The calibration (`CalibrateWindow`, the voltage scan, Pace Entry with its
   Edit / Scan / Finish screens, PingPong) is a section of the same file: menu **Calibrate pool...**
-  (real valve only), or `python3 poolwind.py --calibrate`
-  (`calibration_main`; `--simulate --window` at a desk, and always
-  simulated while Demo is on).
+  (real valve only; greyed with a stick in and the builder's password
+  first, both skipped with developerMode), or `python3 poolwind.py
+  --calibrate` (`calibration_main`; refuses in a Demo). No calibration
+  simulation since 2026-10-31: always the real jet (Bill: the valve moves
+  with the pump off).
 
 ## Finding out what's wrong
 
@@ -201,8 +203,8 @@ faster than they can handle.
 - **Desk testing** (setup guide, section 8): `'developerMode': True` plus a
   simulated valve and/or a recorded video, so nothing at the pool moves.
 - **Developer traces:**
-  - `'paceTrace': True` in the defaults file writes `pace_trace_*.csv` next to
-    the program, one row per loop: voltage, paces, position, swimmer found,
+  - `'paceTrace': True` in the defaults file writes `pace_trace_*.csv` in the
+    `temp` folder next to the program, one row per loop: voltage, paces, position, swimmer found,
     target step, relay. It's switched live and grows about 15 MB an hour.
   - `recordRawVideo` (calibration file, works only with `'developerMode':
     True`) records the camera's uncorrected video for replaying a problem.
@@ -226,7 +228,7 @@ faster than they can handle.
   fresh anyway. The extra cost is about 6% of one core. Check with a
   short timing loop around `vidSrc.read()`.
 - **Swimmer not found / jet not following.** Usually the swim area (setup
-  guide 5.1: corners on the water surface, redo it if the camera moved),
+  guide 5.2: corners on the water surface, redo it if the camera moved),
   lighting (outdoor sun, glare and sharp shadows are untested), or the
   center lane (`middleSwimZone %`). The zone highlight and the
   developer readouts show what PoolWind sees.
@@ -253,7 +255,7 @@ faster than they can handle.
 - **The pace table doesn't fit the user's pool.** The shipped table is
   the author's pool. The calibration built into PoolWind (menu
   **Calibrate pool...**, or `python3 poolwind.py --calibrate`; setup guide
-  5.2) scans the user's jet steps and rewrites the table.
+  5.3) scans the user's jet steps and rewrites the table.
 - **A pool whose speed voltage drops to zero while its pump is off.** On the
   author's pool the voltage is always there, and PoolWind assumes so. On
   such a pool, with the pump off and a swimmer in the swim area, PoolWind
@@ -262,3 +264,39 @@ faster than they can handle.
   A fix: treat a reading far below the table's first row as "no feedback" and
   press neither UP nor DN until a good reading returns, then wind down
   once.
+- **A pool whose speed voltage rises continuously, not in steps.** The
+  author's pool (and the program) has discrete jet steps: each press or
+  repeat of the remote's UP or DN moves the voltage one step and it stays
+  flat in between. A pool whose voltage ramps smoothly while UP is held is
+  not supported: the voltage scan (Calibrate pool, setup guide 5.3) checks
+  its first 8 steps up and, if most rose smoothly, stops, takes the jet
+  down, saves nothing and tells the builder to come here. Confirm it first
+  (with nobody in the pool, hold the pool's own UP for a second and watch
+  the Pace Display voltage, `V` with developerMode on: a ramp, not a jump
+  about once a second). The plan, worked out with the author (a day or two
+  of work; test it in simulation first, then at the pool with nobody in it):
+  1. **The scan** (`CalibrateWindow._scan_tick`, state `scan_up`): on a
+     ramp, keep UP held until the builder presses Stop, then Use as top,
+     or the voltage stops rising (`NO_STEP_S`); build the table from the
+     bottom and top voltages in equal steps (`jetStepVolts` and
+     `pace_voltage`, Paces from `pace_curve` as now). Make the number of
+     steps a calibration setting: the author suggested 40, but 40 zones are
+     about 4 inches each in the pool; the author's 26 steps give about 6,
+     so start near 26 and try more.
+  2. **Pace Entry's Auto scan and PingPong** (`_step_up`, state `up`) hold
+     UP until they see a voltage jump, which never comes on a ramp: drive
+     to the next row's voltage instead, as `_drive_to` / `_drive_tick`
+     already do (they let go within half a step of the target).
+  3. **The swim control** (`App._hold_drive`) holds UP or DN until
+     `findClosestPlateauIndex` reaches the desired step. On a ramp the jet
+     keeps moving after the relay lets go (the radio remote's delay), so it
+     can overshoot narrow steps and hunt up and down. Add a deadband: let go
+     a little before the target (learn the overshoot from the ramp rate),
+     and don't start a correction for less than about one step.
+  4. **The calibration's checks**: `_apply_pool_scale` (`step_v`,
+     `jump_v`) and the scan's `CONT_*` check (turn it off for this pool).
+  5. **A simulated continuous valve** for desk tests: the main program's
+     simulated valve (`sim_update`) moves whole steps; add a ramp mode.
+  Everything else uses only the table's voltages and should work as it is:
+  zones, Swimmer limits, Pace correction, the zone highlight, OnOff's
+  wind-down and Swim Plot.
