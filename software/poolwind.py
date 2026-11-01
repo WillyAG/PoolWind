@@ -1,5 +1,294 @@
 
 if True:  # keep this here as an  easy way to skip over all this
+    # poolwindAI_v15.7   -- A PACE TABLE PER SWIMMER (planned). Bill,
+    #                       2026-10-29: "Such a major change, let's archive
+    #                       v15.6 and go on to v15.7." The swimmer's own Pace
+    #                       table on their USB stick (no stick: the Master
+    #                       data), the pool's jet steps and limits always the
+    #                       pool's, log rows carrying the jet step's volts and
+    #                       the table's Pace (so any swim can be shown in
+    #                       today's calibration), a welcome screen (since
+    #                       dropped), and a
+    #                       stick plugged in or pulled while PoolWind runs.
+    #                       Starts as a copy of v15.6.
+    #                       - STAGE 1, THE LOG'S RULER: each log row also
+    #                         holds the jet's voltage and the Pace the table
+    #                         in use gave there (columns 10-11), so the swim
+    #                         can be shown in any later table. Older logs
+    #                         (9 columns) read as before.
+    #                       - STAGE 2, THE SWIMMER'S TABLE: with a swimmer's
+    #                         stick in, the Paces come from their own table
+    #                         (poolwind_ind_calibration.txt on the stick,
+    #                         made from the pool's the first time; their own
+    #                         drag numbers and pending changes in it); with
+    #                         no stick from the Master data (the pool's
+    #                         table). The jet's steps and limits always the
+    #                         pool's. Pace correction changes the swimmer's
+    #                         (its title shows whose).
+    #                       - STAGE 3, TODAY'S CALIBRATION: Swim Plot and the
+    #                         calendar's average Paces show every swim in the
+    #                         table in use now (redo_in_today: each row's
+    #                         Pace x today's table / its ruler, the distance
+    #                         from the same speeds); days logged before v15.7
+    #                         are as swum, their averages grey. No "As swum"
+    #                         choice (Bill, 2026-10-29: "drop the calendar
+    #                         choice").
+    #                       - STAGE 4, THE WELCOME SCREEN (dropped
+    #                         2026-10-30, see below; WelcomeBox): at
+    #                         start "Welcome to PoolWind, <stick name>." (no
+    #                         stick: "Swimming with default (Master) data")
+    #                         and which table (Old: their own; New: the
+    #                         pool's calibration), Change, closing after 10 s
+    #                         or at Esc; when the pool's calibration changed
+    #                         since the swimmer chose, it asks Old or New and
+    #                         waits (App.choose_table; their own table kept
+    #                         aside so Change can bring it back).
+    #                       - STAGE 5, A STICK PLUGGED IN OR PULLED WHILE
+    #                         POOLWIND RUNS (App.watch_stick, every 2 s):
+    #                         a swim running is suspended first, Pace
+    #                         correction and Swimmer limits close, then
+    #                         PoolWind starts fresh with that swimmer's (or
+    #                         the Master) settings, CSV Vault, today's
+    #                         totals and Pace table, the jet wound down until
+    #                         Begin / Resume (and the welcome screen, gone).
+    #                       - PACE ENTRY REDONE (Bill's list, 2026-10-29):
+    #                         the keyboard types too; the third digit
+    #                         records; a Pace that can't be right only turns
+    #                         red and the jet steps on; at the top the red
+    #                         rows are worked out again (the fewest that put
+    #                         the column in order) and the jet comes down
+    #                         stopping at each to ask again (an error message
+    #                         if still wrong); at the bottom a row tapped
+    #                         drives the jet there to type it again (5 s
+    #                         idle: down again); Finish shows the summary,
+    #                         where Save table saves (a warning first if a
+    #                         row is still red: Go on anyway / Go back).
+    #                         A Pace typed again is taken as right and the
+    #                         table checked again around it (no error
+    #                         message); it opens on the Master table, a row
+    #                         tapped without Start; the jet's row grey.
+    #                         Three screens (Bill: "There should be three
+    #                         screens"): Edit (the table, a row tapped,
+    #                         Auto scan / Continue Auto scan, Finish), Scan
+    #                         (no Stop; Back asks Back / Continue while it
+    #                         runs, what was typed kept), Finish (the % table
+    #                         only; Save Table goes back to PoolWind, Edit
+    #                         table, Quit asks). No voltage on the first
+    #                         calibration screen. The Edit screen (Bill,
+    #                         2026-10-30): no Highest voltage (the scan
+    #                         goes to the table's top; a new scan clears
+    #                         the Paces, steps not typed filled in at Save,
+    #                         on to 1:00 / 7:00 at the ends), the entry box
+    #                         and pad half size beside the table, 7 8 9 on
+    #                         top, no Record, ↺ per changed step, the
+    #                         fastest step on top (the Finish table too).
+    #                       - THE UPDATE FROM v15.5 (Bill, 2026-10-30: "What
+    #                         about the user swim files that had two new
+    #                         columns added?"): the first v15.7 start keeps
+    #                         the pool's table as 'logsTable' (the one the
+    #                         old swims were swum with), and each CSV Vault,
+    #                         the Master's and each stick's when it's first
+    #                         used, gets the ruler once (add_ruler,
+    #                         'rulerAdded'). DecimalToTime: 4.9999 is 5:00,
+    #                         not 4:60.
+    #                       - NO WELCOME SCREEN (Bill, 2026-10-30: "It
+    #                         would confuse a swimmer who knows nothing
+    #                         about master data and USB data. By plugging in
+    #                         the USB drive, the swimmer accepts that the
+    #                         Pace-volt table comes from their drive" ... "It
+    #                         was a pain in the butt opening up the program
+    #                         with it."): WelcomeBox, the Old / New choice
+    #                         and their keys in the stick's file gone. The
+    #                         version on the pool screen instead, small,
+    #                         centered above the Pace, the readouts' color.
+    #                       - PACE CORRECTION, STORED AND PENDING: the
+    #                         columns Your stored Pace / Your pending Pace /
+    #                         Your new Pace, "Swim with 'stored' / 'pending'
+    #                         values"; with a stick in, Copy Pool values to
+    #                         "Your pending" (stays down; ↺ beside it brings
+    #                         the swimmer's own pending changes back, kept
+    #                         in 'PacesPending' under 'copied' so a restart
+    #                         keeps them; the drag numbers greyed while
+    #                         down). The ends: the pool's, in grey boxes;
+    #                         New kept in Now's shape (fix_table); "x is out
+    #                         of sequence with y".
+    #                       - '# zones or auto' GONE (Bill, 2026-10-31: "I
+    #                         think that was only used in development and
+    #                         'auto' seems to work fine all the time"): one
+    #                         zone per jet step between the swimmer's limits,
+    #                         always; an old file's line is dropped when read.
+    #                       - The calibration file in groups: the builder's
+    #                         lines, '# --- Program Derived, do not touch ---',
+    #                         '# --- Developer defaults ---'; four lines of
+    #                         comments at the top instead of thirty.
+    #                       - Calibrate pool greyed with a stick in; the
+    #                         builder's password (the Pi's login) before it,
+    #                         and before Pace correction with no stick, once a
+    #                         run. Pool screens marked full screen (the Pi's
+    #                         header stays under them).
+    #                       - DRIFT_SCALE built in 1.67 (was 1.5): what Bill
+    #                         swims with and likes.
+    #                       - 'ejectStickOnClose' GONE: the stick is always
+    #                         written and ejected at close.
+    #                       - Pace Entry's Auto scan: Entry complete, the
+    #                         last step typed the table's top.
+    #                       - 'jetStepVolts' (back, in a new role): the
+    #                         scan's step volts, for Pace Entry only; the
+    #                         steps above the table's top show "-----" and
+    #                         can be typed again. Replaces 'jetSteps'.
+    #                       - developerMode: Calibrate pool with a stick in
+    #                         too, and no builder's password.
+    #                       - The calibration's simulation GONE (simulated
+    #                         jet, Pace Display, balls; --simulate,
+    #                         --write-cal): always the real jet. PoolWind's
+    #                         own (Valve 'simulate', video, Demo) stays.
+    #                       - recordRawVideo moved from the calibration file
+    #                         to the defaults file's developer tools (built
+    #                         in False); the calibration file drops it.
+    #
+    # poolwindAI_v15.6   -- CALIBRATION CHANGES. Bill, 2026-10-25:
+    #                       "I've been swimming and testing. I'd like to
+    #                       make changes to the calibration section and make
+    #                       a semi-important to PoolWInd."
+    #                       Starts as a copy of v15.5.
+    #                       - THE VOLTAGE SCAN CAN BE RUN AGAIN: Calibrate
+    #                         pool always shows "Begin initial voltage
+    #                         scan" (bold only until it has been done); once
+    #                         it has been done, it first says so
+    #                         (the range and steps it found) and asks Replace
+    #                         or Cancel. Bill: "we shouldn't make it a one
+    #                         time initial calibration. It should be able to
+    #                         run anytime the builder thinks it's necessary."
+    #                       - THE SCAN'S PACES FOLLOW THE PACE CURVE: 7:00
+    #                         at the slowest step, 1:00 at the top (where
+    #                         the builder stops the scan), the original Pace
+    #                         Display table's shape in between (fitted
+    #                         between 1.229 and 2.515 V; pace_curve,
+    #                         PACE_CURVE). Bill, 2026-10-26: "It's very
+    #                         important that the builder stops the
+    #                         initialization when the pool seems too fast
+    #                         ... I'd like that point to be Pace = 1.0. At
+    #                         the lowest setting, Pace = 7.0." No more flat
+    #                         top where the Pace Display stops at 1:26. On
+    #                         the first scan, and on later ones while the
+    #                         paces are still the curve's ('PacesFromFormula'
+    #                         in the calibration file); once corrected (Pace
+    #                         Entry, PingPong, Pace correction) a scan keeps
+    #                         them: "If the builder had made corrections to
+    #                         the table, keep those changes they had made for
+    #                         any subsequent initialization scans."
+    #                       - PACE CORRECTION REDONE (PaceCorrectionPanel):
+    #                         a still picture of the swim area (the camera
+    #                         check's reference picture, straightened) with
+    #                         the swimmer's zones and the zone they were
+    #                         last seen in lit; beside each zone its Pace and
+    #                         an empty m:ss box; View results works out the
+    #                         whole table from the typed and fixed Paces
+    #                         (fix_table), checked to be in order, then Save.
+    #                         Fixed Paces are kept in the calibration file
+    #                         ('PacesFixed') so a later correction can't move
+    #                         them. Bill, 2026-10-26: "when one Pace was
+    #                         entered, the Pace I had earlier set changed in
+    #                         the interpolation."
+    #                       - PINGPONG'S BALL FACTOR FROM PHYSICS: Pace =
+    #                         ball pace x (bodyDrag + deltaBodyDrag x
+    #                         (steps - step) / (steps - 1)): bodyDrag 1.50 at
+    #                         the fastest step, 0.18 more at the slowest (was
+    #                         1.50 to 1.68 by ball speed, matched to the Pace
+    #                         Display). Changed on PingPong's results screen,
+    #                         or later in Pace correction from
+    #                         the ball steps kept in the calibration file
+    #                         ('PingPongBalls'). Timing starts 10% from the
+    #                         jet (was 16%). Bill, 2026-10-27: "I would
+    #                         rather work from physics rather than from old
+    #                         Pace tables."
+    #                       - BALL FACTOR JOINED PACE CORRECTION: after a
+    #                         PingPong, bodyDrag / deltaBodyDrag at the top
+    #                         of Pace correction, the Paces following at
+    #                         once, the fixed Paces laid on top and not moved
+    #                         by them; Table / Picture: every zone, fastest
+    #                         at the top (Zone, Now, New, a box); PingPong
+    #                         keeps the fixed Paces as 'PacesFixedEarlier',
+    #                         shown in purple to put back. fix_table refuses
+    #                         only the order problems a correction makes.
+    #                         Bill, 2026-10-27: "We could just add the new
+    #                         features to 'Pace correction' and drop 'Ball
+    #                         factor'."
+    #                       - PINGPONG'S BOTTOM: step 1 is 7:00 (the scan's
+    #                         assumption), the first balls go in at step 4
+    #                         (FIRST_BALL_STEP), the steps between filled in;
+    #                         the results show the steps not faster than the
+    #                         one below. Bill, 2026-10-27: "at the very
+    #                         lowest voltage from the initialization scan,
+    #                         the Pace is 7:00 ... So maybe we can just
+    #                         interpolate using that and the step 1 and step
+    #                         4 measurements."
+    #                       - PACE CORRECTION KEPT SIMPLE: one table, the
+    #                         picture beside the swimmer's zones; New starts
+    #                         as Now and follows every change (no View
+    #                         results button); the Paces typed and the
+    #                         bottom zone's 7:00 are the only fixed points;
+    #                         red in New: not faster than the zone below,
+    #                         and the box whose Pace is the trouble; Clear:
+    #                         New is Now again. No more fixed Paces kept in
+    #                         the calibration file (PacesFixed,
+    #                         PacesFixedEarlier). Bill, 2026-10-28: "There is
+    #                         too much going on with what is displayed" ...
+    #                         "Let's throw out the history of changes."
+    #                       - PACE CORRECTION'S GRAPH (PaceGraph) under the
+    #                         table: Pace (7:00 to 1:00) against zone, Now
+    #                         grey, New blue. Bill, 2026-10-28: "Could we put
+    #                         a graph of Pace vs Zone there?"
+    #                       - PACE CORRECTION'S GRAPH IN THE PICTURE'S PLACE:
+    #                         turned to run down beside the table, a row per
+    #                         zone, scrolling with it; Escape puts back the
+    #                         chosen box's Pace (Cancel closes). Bill,
+    #                         2026-10-28: "I'm thinking of replacing the
+    #                         picture with it."
+    #                       - WHILE PACE CORRECTION IS OPEN the jet follows
+    #                         the swimmer whatever Begin / Suspend / Resume
+    #                         shows (normal wind-down when they leave), no
+    #                         distance or log rows, no auto-suspend
+    #                         (App.pace_correcting). Bill, 2026-10-28: "when
+    #                         the 'Pace correction' menu is selected, we
+    #                         should not be accumulating distance or writing
+    #                         to log files but the pool should follow the
+    #                         swimmer until he gets out of the swimZone, then
+    #                         normal windDown happens."
+    #                       - PACE CORRECTION'S CHANGES KEPT PENDING: kept in
+    #                         the calibration file ('PacesPending') and used
+    #                         by the pool while 'New' is chosen (default at
+    #                         every start; Switch to 'Now' values); Make
+    #                         permanent writes them into the table; asked on
+    #                         closing PoolWind (Keep pending / Make
+    #                         permanent); "New Paces" on the pool screen. In
+    #                         Pace correction: Back / Make permanent (greyed
+    #                         while a value is red), ↺ per changed box, a
+    #                         copy of the Suspend button, and while swimming
+    #                         with Suspend showing the big Pace display over
+    #                         the instructions. Swims count as usual with
+    #                         Pace correction open (Suspend showing). Bill,
+    #                         2026-10-29: "The new values need to be kept so
+    #                         that adjustments can be made throughout the
+    #                         swim while looking at the previous adjustments."
+    #                       - SAFETY LIMITS FROM THE TABLE: no more
+    #                         'SafetyVoltageLimits' in the calibration file;
+    #                         the jet's limits are the Pace table's first and
+    #                         last rows (_safety_limits). The scan's table
+    #                         ends where it stopped (Use as top) or at the
+    #                         jet's top; Pace Entry and PingPong never go
+    #                         above the table's top. Bill, 2026-10-27: "have a
+    #                         global variable that looks at the highest
+    #                         voltage in the calibration default file and
+    #                         sets the high safety limit from there" ... "The
+    #                         safety lower limit is the first line in the
+    #                         calibration default table".
+    #                       - The semi-important change (turning off
+    #                         BodyCoMCorrection for fixed zones) dropped:
+    #                         "we did this already and lost the 'feel'".
+    #                       Archived 2026-10-29; v15.7 for a Pace table per
+    #                       swimmer (on the USB stick).
+    #
     # poolwindAI_v15.5   -- MAJOR: THE POOL IS CONTROLLED BY JET STEPS (ZONES),
     #                       PACE IS ONLY DISPLAYED (avg Pace, distance, the
     #                       readout). Bill, 2026-10-21: "We have decided that
@@ -21,7 +310,8 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       - '# zones or auto' (calibration file): 'auto' =
     #                         every step between the limits; a number = that
     #                         many zones spread over them, each on the nearest
-    #                         step (out of range: 'auto').
+    #                         step (out of range: 'auto'). Gone in v15.7:
+    #                         always every step.
     #                       - SWIMMER LIMITS (menu): a small panel over the pool
     #                         screen: zones with the pace beside them, + / -
     #                         (screen or keyboard), Start -> Low limit reached
@@ -72,6 +362,10 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         files are still read. 162 on the author's pool
     #                         (15 ft inside, the jet unit 18" into it), with
     #                         DRIFT_SCALE 1.67.
+    #                       Published 2026-10-23 (GitHub WillyAG/PoolWind,
+    #                       Release v15.5), with the demo for Windows.
+    #                       Archived 2026-10-25; v15.6 for calibration
+    #                       changes.
     #
     # poolwindAI_v15.4   -- COPIED FROM v15.2 (not v15.3) TO KEEP "THE FEEL".
     #                       Bill, 2026-10-19: "Swimming under V15.3 felt awful.
@@ -123,7 +417,8 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         again at the next start (no replug). Message
     #                         only if something is using it.
     #                         'ejectStickOnClose' is a user setting (also on a
-    #                         stick). Eject & Replace ejects it too.
+    #                         stick; gone in v15.7: always ejected). Eject &
+    #                         Replace ejects it too.
     #                       - The algorithm is a developer choice in the main
     #                         defaults file only (users get swimmerPace).
     #                       - PUMP buttons light red; On/Off off the main
@@ -283,6 +578,11 @@ BUILT_IN_DEFAULTS = {
     # the developer's defaults file) enables all of those, and the four
     # lines below. (Readouts are live; the rest need a restart.)
     'developerMode': False,
+    # The camera's full, uncorrected video (large files), developerMode
+    # only; in the calibration file until v15.7 (Bill, 2026-10-31: "Can we
+    # move the one Developer default in the cal file to the defaults file
+    # with the rest of them?")
+    'recordRawVideo': False,
 
     # --- where the program runs (only used when developerMode is True) ---
     # A workplace line in the defaults file switches all three at once:
@@ -327,7 +627,10 @@ BUILT_IN_DEFAULTS = {
     'autoSuspendMinutes': 3,             # developer: minutes with no swimmer before PoolWind suspends (live)
 
     # --- Swimmer Pace estimator (Algorithm 'swimmerPace') ---
-    'DRIFT_SCALE': 1.5,                  # weight of the swimmer's forward/back drift
+    'DRIFT_SCALE': 1.67,                 # weight of the swimmer's forward/back drift (1.5 until
+                                         # v15.7; Bill, 2026-10-31: "whatever DRIFT_SCALE I swim
+                                         # with now (stick plugged in) works good so make that the
+                                         # default")
     'WATER_TAU': 5.0,                    # seconds the water speed lags the jet setting
     'DRIFT_TAU': 5.0,                    # seconds of smoothing on the drift speed
     'DRIFT_MAX': 25.0,                   # cap on the drift speed (yards/min)
@@ -339,9 +642,6 @@ BUILT_IN_DEFAULTS = {
     # 5 is smooth enough for pace; 15 gives smooth stroke video at three
     # times the storage. Limited to LOG_RATE_RANGE.
     'logRate': 5,
-    # Eject the USB stick when PoolWind closes (a user setting, also on a
-    # stick: a swimmer who keeps their stick in all the time sets False).
-    'ejectStickOnClose': True,
     'paceTrace': False,                  # developer: pace_trace_*.csv debug file, ~15 MB/hour (live)
     'comBar': True,                      # developer: the CoM bar, pool screen and replay (live)
     'readouts': True,                    # developer: the dIdx / V / CoM numbers on the pool screen (live)
@@ -568,59 +868,12 @@ class App:
             # the demo tour's (Bill, 2026-10-24)
             self.Suspend_btn_press()
 
-        # Load today's CSV
-        time_raw, pace_raw, dist_raw, segment_raw, frame_raw = self.load_today_csv()
-
-        # Default if no CSV yet
-        self.last_segment_id = 0
-
-        # Recover last segment ID from CSV
-        if len(segment_raw) > 0:
-            self.last_segment_id = segment_raw[-1]
-
-        # Recover last distance
-        self.total_distance = dist_raw[-1] if len(dist_raw) > 0 else 0.0
-
-        # Rebuild pacePoints and swimtime
-        self.pacePoints = []
-        self.total_swimtime = 0.0
-        prev_t = None
-
-        for t, p, d in zip(time_raw, pace_raw, dist_raw):
-            self.pacePoints.append((t, p))
-
-            if prev_t is not None:
-                dt_sec = t - prev_t
-                if dt_sec <= self.GAP_SEC:
-                    self.total_swimtime += dt_sec / 60.0
-
-            prev_t = t
-
-        # UI fields
-        self.PaceDisplay = "0:00"
-        self.distanceSwam = f"{self.total_distance:.3f} mi"
-
-        if self.total_swimtime > 0 and self.total_distance > 0:
-            avgSwimRate = self.total_distance / self.total_swimtime  # miles/min
-            avgPace = (100.0 / self.YARDS_PER_MILE) / avgSwimRate    # min per 100y
-            self.avgPaceDisplay = Utils.DecimalToTime(avgPace)
-        else:
-            self.avgPaceDisplay = "0:00"
+        self._load_today_totals()
 
         # ---------------------------------------------------------
         # Extract Non Hot changeable parameters from self.REPdefaults
         # ---------------------------------------------------------
-        lo, hi = self.LOG_RATE_RANGE
-        rate = self.REPdefaults[self.KEY_LOGRATE]
-        try:
-            rate = int(round(float(rate)))
-        except (TypeError, ValueError):
-            rate = BUILT_IN_DEFAULTS[self.KEY_LOGRATE]
-        if not lo <= rate <= hi:
-            print(f"logRate {rate} is outside {lo}-{hi}; using {min(hi, max(lo, rate))}")
-            rate = min(hi, max(lo, rate))
-        self.data_recs_per_sec  = rate
-        self.data_interval_sec  = 1.0 / self.data_recs_per_sec
+        self._apply_log_rate()
 
         self.capture_device = self.REPdefaults["capture_device (camera or video)"]
         self.valveOption = self.REPdefaults["Valve (real or simulate)"]
@@ -686,14 +939,16 @@ class App:
         # Pace / plateau configuration
         # ---------------------------------------------------------
         self.speedArray = self.REPdefaults["pace_voltage"]
-        self.SafetyVoltageLimits = self.REPdefaults["SafetyVoltageLimits"]
+        self.SafetyVoltageLimits = self._safety_limits()
         # The jet's steps (v15.5: the pool is controlled by these, Pace is
         # only displayed): the pace table's voltages, the one source (the
         # calibration tool's voltage scan writes one row per jet step; two
         # rows within 0.01 V are one step, e.g. 1.185 / 1.186).
         self.plateau_voltages = self._jet_steps()
         self.limits_procedure = False      # Swimmer limits: zones open to the whole safety range
+        self.pace_correcting = False       # Pace correction open: no auto-suspend
         self._seen_voltage = None          # the jet's voltage when the swimmer was last seen
+        self._seen_zone = None             # ...and the zone lit then (Pace correction)
         self.noiseAllowedPercent_valve = 0.15
         self.noiseAllowedPercent_desired = 0.40
         self.overLap = 0.75
@@ -774,6 +1029,14 @@ class App:
         # Create controller
         # ---------------------------------------------------------
         self.controller = SwimController(self)
+        # Pace correction's changes not yet made permanent, and whether the
+        # pool uses them: 'New' at every start (Bill, 2026-10-29: "'New'
+        # will be selected and bold as default unless changed")
+        self.use_new = True
+        self._load_swimmer()
+        self._ruler_old_logs()
+        self.pending = self._load_pending()
+        self.apply_pace_table()
 
         # ---------------------------------------------------------
         # Now create the REAL video capture object with correct filter
@@ -781,9 +1044,9 @@ class App:
         self.myVideoCapture = MyVideoCapture(self)
 
         # Raw/Training video recording is config-driven, not manually
-        # selected -- recordRawVideo is a technician setting (calibration
-        # file), recordTrainingVideo can be overridden per-swimmer via
-        # the USB stick overlay above.
+        # selected -- recordRawVideo is a developer setting (defaults file,
+        # developerMode only), recordTrainingVideo can be overridden
+        # per-swimmer via the USB stick overlay above.
         self.myVideoCapture.makeRawVideo = ("Start" if self.REPdefaults["developerMode"]
                                             and self.REPdefaults["recordRawVideo"] else "Close")
         self.myVideoCapture.makePerspectVideo = "Start" if self.REPdefaults["recordTrainingVideo"] else "Close"
@@ -827,6 +1090,8 @@ class App:
 
         # The jet's zone, for the swim zone highlight (display and log only)
         self.jetZone, self.jetZones = self.controller.jet_zone(valveVoltage)
+        if self.window.swimmerFound:
+            self._seen_zone = self.jetZone
 
         # ------------------------------------------------------------
         # Selected algorithm (defaults file) -> desired index + swim_pace
@@ -869,9 +1134,14 @@ class App:
         # --------------------------------------------------------
         # Safety gating based on absolute voltage limits
         # --------------------------------------------------------
+        # (the limits are the table's end rows: UP stops a third of a step
+        # below the top row, so the top step's own noise never lets it
+        # through to the next one)
         minV, maxV = self.SafetyVoltageLimits
-        self.allow_DN = valveVoltage > minV   # allow DN if above min
-        self.allow_UP = valveVoltage < maxV   # allow UP if below max
+        V = self.plateau_voltages
+        margin = (V[-1] - V[-2]) / 3 if len(V) > 1 else 0.0
+        self.allow_DN = valveVoltage > minV + margin   # allow DN if above min
+        self.allow_UP = valveVoltage < maxV - margin   # allow UP if below max
 
         # --------------------------------------------------------
         # Act on decision
@@ -999,8 +1269,17 @@ class App:
                 zone = getattr(self, "jetZone", None)
                 zone = -1 if zone is None else int(zone)
                 zones = int(getattr(self, "jetZones", 0) or 0)
+                # columns 10-11 (since v15.7): the jet's voltage and the Pace
+                # the table in use gave there -- the row's own ruler, so the
+                # swim can be shown in any later table: Pace x (that table
+                # there / this Pace) (Bill, 2026-10-29: a Pace table per
+                # swimmer; "what they will be shown will deoend on the choice")
+                volts, table_pace = getattr(self, "_ruler", (0.0, 0.0))
+                if volts > 0:                  # the table's Pace at the volts as written (3 decimals)
+                    volts = round(volts, 3)
+                    table_pace = self.controller._get_pace_from_voltage(volts)
                 f.write(f"{timestamp:.2f},{pace:.2f},{self.total_distance:.3f},{segment_id},{frameNum},"
-                        f"{com_h},{com_w},{zone},{zones}\n")
+                        f"{com_h},{com_w},{zone},{zones},{volts:.3f},{table_pace:.4f}\n")
         except OSError as e:
             # Last-resort net: the mid-session free-space reserve in
             # _perspect_video_writer should make this unreachable, but
@@ -1360,7 +1639,6 @@ class App:
                 self.KEY_RECORD: self.REPdefaults[self.KEY_RECORD],
                 # (no algorithm line: a developer choice since 2026-10-17)
                 self.KEY_LOGRATE: self.REPdefaults[self.KEY_LOGRATE],
-                self.KEY_EJECT: bool(self.REPdefaults.get(self.KEY_EJECT, True)),
             }
             ind_path = os.path.join(new_mount_path, "poolwind_ind_defaults.txt")
             self._write_stick_file(ind_path, ind_defaults)
@@ -1490,17 +1768,15 @@ class App:
     # writes the main defaults file, so comments in it are kept.
     # ---------------------------------------------------------------
     KEY_ZONES       = "zoneMin, Max"
-    KEY_NZONES      = "# zones or auto"     # calibration file
     KEY_PACE        = "paceMin, Max"        # before v15.5 (still read)
     KEY_HEIGHT      = "swimmersHeight"
     KEY_POOL_LENGTH = "usableSwimLength"
     KEY_RECORD      = "recordTrainingVideo"
     KEY_ALGO        = "algorithm (basic or swimmerPace)"
     KEY_LOGRATE     = "logRate"         # built in: 5
-    KEY_EJECT       = "ejectStickOnClose"   # built in: True
     LOG_RATE_RANGE  = (1, 15)           # rows (and video frames) per second
-    STICK_KEYS      = (KEY_HEIGHT, KEY_ZONES, KEY_PACE, KEY_RECORD, KEY_LOGRATE,
-                       KEY_EJECT)       # (algorithm: main file only, 2026-10-17)
+    STICK_KEYS      = (KEY_HEIGHT, KEY_ZONES, KEY_PACE, KEY_RECORD,
+                       KEY_LOGRATE)     # (algorithm: main file only, 2026-10-17)
     OLD_SETTING_NAMES = {
         "defaultPaceMin, Max":              KEY_PACE,
         "PaceLimitsDec":                    KEY_PACE,      # decimal minutes, e.g. (5, 1.5)
@@ -1582,23 +1858,6 @@ class App:
                 return inside[0], inside[-1]
         return 0, last
 
-    def zones_wanted(self, available):
-        """'# zones or auto': how many zones to use when `available` steps
-        lie between the limits ('auto', or out of range: all of them)."""
-        value = self.REPdefaults.get(self.KEY_NZONES, "auto")
-        if isinstance(value, str) and value.strip().lower() == "auto":
-            return available
-        try:
-            n = int(value)
-        except (TypeError, ValueError):
-            n = 0
-        if 2 <= n <= available:
-            return n
-        if getattr(self, "_bad_nzones", None) != (value, available):
-            print(f"'{self.KEY_NZONES}': {value!r} is out of range (2-{available}) -- using 'auto'")
-            self._bad_nzones = (value, available)
-        return available
-
     def _derive_internal_defaults(self, defaults):
         """Returns REPdefaults: the settings plus the derived internal keys."""
         rep = dict(defaults)
@@ -1627,28 +1886,34 @@ class App:
             print("algorithm on the USB stick is ignored (a developer setting: main defaults file only)")
         if self.KEY_LOGRATE in ind:              # used at program start
             self.REPdefaults[self.KEY_LOGRATE] = ind[self.KEY_LOGRATE]
-        if self.KEY_EJECT in ind:                # used at close
-            self.REPdefaults[self.KEY_EJECT] = bool(ind[self.KEY_EJECT])
         self._ind_defaults = dict(ind_defaults)
 
     # ---------------------------------------------------------------
     # Calibration file (since v7.44): <program name>_calibration.txt
     # Pool/installation data that the program and the calibration tool
-    # write -- not the user. SAFETY-CRITICAL: pace_voltage and
-    # SafetyVoltageLimits decide which voltages the jet is driven to.
+    # write -- not the user. SAFETY-CRITICAL: pace_voltage decides which
+    # voltages the jet is driven to (never outside its first and last rows).
     # Read at startup only. Set Swim Area writes swimAreaPoints right away
     # when Save is pressed -- in camera mode only; in video mode the test
     # video's points live in the code. Same Python-dictionary format as
     # the defaults file.
     # ---------------------------------------------------------------
-    CAL_KEYS = ("pace_voltage", "SafetyVoltageLimits", "swimAreaPoints",
-                "usableSwimLength", "middleSwimZone %", "recordRawVideo",
-                "InitialCalFinished", "jetVoltageRange", "jetSteps", "# zones or auto")
+    # The builder's lines first, then what PoolWind and its calibration
+    # work out, then the developer's (Bill, 2026-10-31: "The lines above it
+    # should be all the lines that the builder would receive on download."
+    # "make a line '# --- Program Derived, do not touch ---' and put the
+    # related defaults uner that but before ' --- Developer defaults ---'")
+    CAL_BUILDER_KEYS = ("usableSwimLength", "middleSwimZone %")
+    CAL_DERIVED_KEYS = ("pace_voltage", "swimAreaPoints", "InitialCalFinished", "PacesFromFormula", "jetVoltageRange", "jetStepVolts", "jetSteps",
+                        "bodyDrag", "deltaBodyDrag", "PingPongBalls", "PacesPending",
+                        "logsTable", "rulerAdded")
+    CAL_KEYS = CAL_BUILDER_KEYS + CAL_DERIVED_KEYS
     # Entries added after the file format first appeared: taken over from
     # the defaults file (where they lived before) or these values.
-    CAL_FALLBACKS = {"usableSwimLength": 180, "middleSwimZone %": 35, "recordRawVideo": False,
-                     "# zones or auto": "auto"}
-    CAL_REQUIRED = ("pace_voltage", "SafetyVoltageLimits", "swimAreaPoints")
+    CAL_FALLBACKS = {"usableSwimLength": 180, "middleSwimZone %": 35}
+    # v15.7: always one zone per step; recordRawVideo in the defaults file
+    DROPPED_CAL_KEYS = ("# zones or auto", "recordRawVideo")
+    CAL_REQUIRED = ("pace_voltage", "swimAreaPoints")
     OLD_CAL_KEYS = ("cameraSwimAreaPoints", "videoSwimAreaPoints")   # before v7.44: one per source
     OLD_CAL_NAMES = {"poolLength": "usableSwimLength",              # renamed in v15.3...
                      "usablePoolLength": "usableSwimLength"}        # ...and in v15.5
@@ -1657,7 +1922,7 @@ class App:
         """
         Returns the calibration dict. If the file doesn't exist yet, it is
         created from the same entries in the defaults file (how they were
-        stored before v7.44). Exits if the pace table or safety limits
+        stored before v7.44). Exits if the pace table (the jet's limits)
         can't be found -- the jet must never run without them.
         """
         if os.path.isfile(self.calibration_path):
@@ -1669,6 +1934,9 @@ class App:
                 sys.exit()
             changed = self._convert_old_swim_area(cal)
             changed = self._rename_old_cal_keys(cal) or changed
+            for key in self.DROPPED_CAL_KEYS:
+                if cal.pop(key, None) is not None:
+                    changed = True
             for key, fallback in self.CAL_FALLBACKS.items():
                 if key not in cal:           # was in the defaults file (or built in) before
                     cal[key] = self._defaults_file_value(key, fallback)
@@ -1752,28 +2020,19 @@ class App:
         """Writes self.calibration (written to a temporary file first, so a
         power cut can't leave a half-written file)."""
         lines = [
-            "# PoolWind calibration -- SAFETY-CRITICAL, technician changes only.",
-            "# Written by the program (Set Swim Area) and the calibration tool.",
-            "# pace_voltage: (pace min/100 yd, Pace Display volts) measured on this",
-            "# pool. SafetyVoltageLimits: the jet is never driven outside these volts.",
-            "# swimAreaPoints: the swim area's corners in the camera picture (Set",
-            "# Swim Area). usableSwimLength: the swim area's length in inches, from the back",
-            "# wall to the jet unit's edge (not the whole pool). middleSwimZone %: the",
-            "# center lane's width, side to side, as a percent of the swim area.",
-            "# recordRawVideo: record the camera's full, uncorrected video (large",
-            "# files) -- developer tool, used only when developerMode is on.",
-            "# InitialCalFinished: the calibration tool's initial voltage scan is done.",
-            "# jetVoltageRange: the slowest and fastest step's volts it measured;",
-            "# jetSteps: the number of steps between them (the scan writes one",
-            "# pace_voltage row per step: PoolWind's zones are the rows). # zones or",
-            "# auto: 'auto' = one zone per step between the swimmer's limits, or a",
-            "# number of zones spread over them (out of range: 'auto').",
-            "# Read at program start.",
+            "# PoolWind calibration: the pool's Master data -- SAFETY-CRITICAL.",
+            "# Close PoolWind before changing it: it's read when PoolWind starts.",
+            "# What the lines mean: the setup guide, section 5.",
             "{",
         ]
         items = [(k, self.calibration[k]) for k in self.CAL_KEYS if k in self.calibration]
         items += [(k, v) for k, v in self.calibration.items() if k not in self.CAL_KEYS]
+        group = ""
         for n, (key, value) in enumerate(items):
+            g = cal_group(key, self.CAL_BUILDER_KEYS, self.CAL_DERIVED_KEYS)
+            if g != group:
+                group = g
+                lines += ["", g]
             lead = "" if n == 0 else ","
             if key == "pace_voltage":
                 rows = ",\n".join(f"    {tuple(r)!r}" for r in value)
@@ -1896,9 +2155,8 @@ class App:
             return
         try:
             if getattr(self, "_pace_trace_f", None) is None:
-                path = os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    "pace_trace_" + time.strftime("%Y-%m-%d_%H%M%S") + ".csv")
+                path = temp_path(os.path.dirname(os.path.abspath(__file__)),
+                                 "pace_trace_" + time.strftime("%Y-%m-%d_%H%M%S") + ".csv")
                 self._pace_trace_f = open(path, "w", buffering=1)
                 self._pace_trace_f.write(
                     "t,voltage,raw_pace,pool_pace,v_water_lag,blob_h,CoM_h_corr,"
@@ -1929,6 +2187,7 @@ class App:
         # 1. Convert valveVoltage → raw pace (controller interpolation)
         # ------------------------------------------------------------
         raw_pace = self.controller._get_pace_from_voltage(valveVoltage)
+        self._ruler = (valveVoltage, raw_pace)     # logged with each row (accrue_log_disp)
 
         # ------------------------------------------------------------
         # 2. Update pool_pace (EMA smoothing stays exactly as before)
@@ -1968,7 +2227,7 @@ class App:
 
     def reload_calibration(self):
         """After Calibrate pool: the calibration file again (pace table,
-        safety limits, the scan's results), the jet steps and the zones,
+        the jet's limits, the scan's results), the jet steps and the zones,
         without a restart."""
         self.calibration = self._load_calibration()
         for k, v in self.calibration.items():
@@ -1976,18 +2235,242 @@ class App:
             if hasattr(self, "original_defaults"):
                 self.original_defaults[k] = v
         self.speedArray = self.REPdefaults["pace_voltage"]
-        self.SafetyVoltageLimits = self.REPdefaults["SafetyVoltageLimits"]
+        # The swim length and the swim zone's width, changed in the
+        # calibration window (2026-10-31)
+        height, _ = self.REPdefaults["swimmersHeight,usableSwimLength"]
+        self.REPdefaults["swimmersHeight,usableSwimLength"] = (
+            height, self.calibration.get(self.KEY_POOL_LENGTH, 162))
+        self.zoneWidth = self.REPdefaults["middleSwimZone %"] / 100
+        self.SafetyVoltageLimits = self._safety_limits()
         self.plateau_voltages = self._jet_steps()
         self.controller = SwimController(self)
+        self._load_swimmer()
+        self.pending = self._load_pending()
+        self.apply_pace_table()
         self.valveIndex = self.findClosestPlateauIndex(
             self.currentVoltage, self.noiseAllowedPercent_valve, self.plateau_voltages)
         self.desiredIndex = self.valveIndex
         print("Calibration reloaded:", self.calibration_path)
 
+    # ------------------------------------------------------------------
+    # The swimmer's Pace table (v15.7, Bill, 2026-10-29: "Would it be a good
+    # idea to keep the pace-voltage table on the users stick (or default to
+    # the SD user if no stick)?"). With a swimmer's stick in, their own
+    # table in poolwind_ind_calibration.txt on it (made from the pool's the
+    # first time); with no stick the Master data, the pool's own table in
+    # the calibration file. The Paces come from it; the jet's steps and
+    # limits always from the pool's table. Pace correction changes it.
+    # ------------------------------------------------------------------
+    IND_CAL_NAME = "poolwind_ind_calibration.txt"
+
+    def _ruler_old_logs(self):
+        """Once for each CSV Vault (the Master's, each stick's): logs from
+        before v15.7 given the ruler (add_ruler), from the Pace table they
+        were swum with: the pool's table as the first v15.7 start found it
+        ('logsTable' in the calibration file; before v15.7 everyone swam
+        with it). Marked done ('rulerAdded') in the swimmer's table file."""
+        if "logsTable" not in self.calibration:
+            table = [(float(p), float(v)) for p, v in self.calibration["pace_voltage"]]
+            try:
+                d = load_calibration(self.calibration_path)
+                d["logsTable"] = table
+                save_calibration(self.calibration_path, d)
+                self.calibration["logsTable"] = table
+            except Exception as e:
+                print(f"Couldn't keep the logs' Pace table ({e})")
+                return
+        if self.REPdefaults.get("Demo") or self.swimmer_cal.get("rulerAdded"):
+            return
+        try:
+            t0 = time.time()
+            files, rows = add_ruler(self.data_dir, self.calibration["logsTable"])
+            self._write_swimmer({"rulerAdded": True})
+            if files:
+                print(f"Swim logs from before v15.7 in {self.data_dir}: {files} logs, {rows} rows given "
+                      f"the jet's voltage and Pace ({time.time() - t0:.1f} s)")
+        except Exception as e:
+            print(f"Couldn't update the swim logs in {self.data_dir} ({e}); they show as swum")
+
+    def avg_pace_store(self):
+        """The calendar's daily averages kept while PoolWind runs, for the
+        CSV Vault in use and the dataset chosen: ({day: average}, {day: the
+        log's time when read}). Gone with a new stick or another Pace table
+        (apply_pace_table); a day whose log changed since is read again
+        (Bill, 2026-11-01: "Only if a new stick had been entered or PoolWind
+        restarted should the data need to be re-read.")."""
+        store = self.__dict__.setdefault("_avg_store", {})
+        return store.setdefault((self.data_dir, bool(getattr(self, "plot_master", False))), ({}, {}))
+
+    def plot_pace_from_voltage(self):
+        """volts -> Pace for Swim Plot and the calendar's averages: the
+        table in use (the swimmer's, or the Master's with no stick), or with
+        "Master dataset (coach)" chosen on the date screen the pool's Master
+        table, so swimmers and calibrations compare on one scale (Bill,
+        2026-11-01: "There needs to be a comparison option that regardless
+        of what the swimmers set their own Paces at, in the comparison
+        view, the only calibration applied would be the Master dataset.")."""
+        if not getattr(self, "plot_master", False):
+            return self.controller._get_pace_from_voltage
+        rows = sorted((float(v), float(p)) for p, v in self.calibration["pace_voltage"])
+        vs, ps = [v for v, _ in rows], [p for _, p in rows]
+        return lambda v: float(np.interp(v, vs, ps))
+
+    def swimmer_name(self):
+        """The stick's name (its label), or None: Master data."""
+        root = getattr(self, "_stick_root", None)
+        return os.path.basename(os.path.normpath(root)) if root and os.path.isdir(root) else None
+
+    def _load_swimmer(self):
+        """self.swimmer_cal / swimmer_path: the stick's table file, or the
+        calibration file itself (Master). The swimmer's table always on the
+        pool's jet steps: a table from before a new scan is read along its
+        own volts onto the new ones."""
+        pool = sorted(((float(p), float(v)) for p, v in self.calibration["pace_voltage"]), key=lambda r: r[1])
+        if self.swimmer_name() is None:
+            self.swimmer_path, self.swimmer_cal = self.calibration_path, self.calibration
+            return
+        path = os.path.join(self._stick_root, self.IND_CAL_NAME)
+        d = None
+        if os.path.isfile(path):
+            try:
+                d = load_calibration(path)
+            except Exception as e:
+                print(f"Couldn't read {path} ({e}); the pool's table is used")
+        if not d or not d.get("pace_voltage"):
+            d = {"pace_voltage": pool,
+                 "bodyDrag": self.calibration.get("bodyDrag", BODY_DRAG),
+                 "deltaBodyDrag": self.calibration.get("deltaBodyDrag", DELTA_BODY_DRAG)}
+            try:
+                save_swimmer_file(path, d)
+                print(f"{self.swimmer_name()}: Pace table made from the pool's ({path})")
+            except Exception as e:
+                print(f"Couldn't write {path} ({e}); the pool's table is used for now")
+        table = sorted(((float(p), float(v)) for p, v in d["pace_voltage"]), key=lambda r: r[1])
+        if len(table) != len(pool) or any(abs(v - w) >= 0.006 for (_, v), (_, w) in zip(table, pool)):
+            tv, tp = [v for _, v in table], [p for p, _ in table]
+            table = [(round(interp(v, tv, tp), 4), v) for _, v in pool]
+            print(f"{self.swimmer_name()}: Pace table read onto the pool's jet steps")
+        d = dict(d, pace_voltage=table)
+        self.swimmer_path, self.swimmer_cal = path, d
+
+    def _write_swimmer(self, changes, drop=()):
+        """Changes into the swimmer's table file (the stick's, or the
+        calibration file for Master), and into memory."""
+        path = self.swimmer_path
+        d = load_calibration(path) if os.path.isfile(path) else dict(self.swimmer_cal)
+        d.update(changes)
+        for k in drop:
+            d.pop(k, None)
+        if path == self.calibration_path:
+            save_calibration(path, d)
+        else:
+            save_swimmer_file(path, d)
+        targets = [self.swimmer_cal] + ([self.REPdefaults] if self.swimmer_cal is self.calibration else [])
+        for t in targets:
+            t.update(changes)
+            for k in drop:
+                t.pop(k, None)
+
+    # ------------------------------------------------------------------
+    # Pace correction's pending changes (Bill, 2026-10-29: "The new values
+    # need to be kept so that adjustments can be made throughout the swim
+    # while looking at the previous adjustments." ... "The pool needs to be
+    # set to use either 'Now' values or 'New' values."). Kept with the
+    # swimmer's table ('PacesPending': the Paces typed, the drag numbers,
+    # the New table) on every good change, so a restart or power cut keeps
+    # them; Make permanent writes New into its 'pace_voltage' (Now).
+    # ------------------------------------------------------------------
+    def _load_pending(self):
+        """The swimmer's 'PacesPending', if its New table is on the pool's
+        jet steps (else dropped: a scan moved them)."""
+        pend = self.swimmer_cal.get("PacesPending")
+        if not pend:
+            return None
+        try:
+            table = sorted(((float(p), float(v)) for p, v in pend["table"]), key=lambda r: r[1])
+            now = sorted(float(v) for _, v in self.calibration["pace_voltage"])
+            if len(table) == len(now) and all(abs(v - w) < 0.006 for (_, v), w in zip(table, now)):
+                return dict(pend, table=table)
+        except (KeyError, TypeError, ValueError):
+            pass
+        print("Pace correction: the pending changes don't fit the Pace table any more; dropped")
+        return None
+
+    def apply_pace_table(self):
+        """The pool's Paces from New (the pending changes) or Now, the
+        swimmer's table."""
+        new = self.use_new and self.pending is not None
+        self.speedArray = self.pending["table"] if new else self.swimmer_cal["pace_voltage"]
+        self.controller.set_table(self.speedArray)
+        self._avg_store = {}                    # the calendar's averages: read again in the new table
+        self._plot_store = {}                   # ...and Swim Plot's days (load_csv_range)
+        self._built_store = {}                  # ...and its prepared plots (SwimPlotWindow.prepare)
+
+    def save_pending(self, pend):
+        """Pace correction's changes kept with the swimmer's table (None:
+        none pending), and the pool's Paces to match."""
+        if pend:
+            self._write_swimmer({"PacesPending": pend})
+        else:
+            self._write_swimmer({}, ("PacesPending",))
+        self.pending = pend
+        self.apply_pace_table()
+
+    def make_pace_permanent(self, pend=None):
+        """New (the pending changes, or pend: Pace correction's New column
+        as it is) into the swimmer's table (Now), the pending changes gone;
+        the file before kept as a backup, the change recorded beside it
+        (calibration_correction_<date>.csv)."""
+        pend = pend or self.pending
+        if not pend:
+            return
+        path = self.swimmer_path
+        stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        base, ext = os.path.splitext(path)
+        if os.path.isfile(path):
+            with open(path) as f:
+                text = f.read()
+            with open(temp_path(os.path.dirname(path), f"{os.path.basename(base)}_before_{stamp}{ext}"),
+                      "w") as f:
+                f.write(text)
+        before = sorted(((float(p), float(v)) for p, v in self.swimmer_cal["pace_voltage"]), key=lambda r: r[1])
+        changes = {"pace_voltage": [(float(p), float(v)) for p, v in pend["table"]]}
+        if "bodyDrag" in pend:
+            changes["bodyDrag"], changes["deltaBodyDrag"] = pend["bodyDrag"], pend["deltaBodyDrag"]
+        if path == self.calibration_path:
+            changes["PacesFromFormula"] = False     # corrected (a scan starts over from the curve)
+        self._write_swimmer(changes, ("PacesPending", "PacesFixed", "PacesFixedEarlier"))
+        with open(temp_path(os.path.dirname(path), f"calibration_correction_{stamp}.csv"), "w",
+                  newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["volts", "pace_typed"])
+            for p, v in pend.get("typed", []):
+                w.writerow([f"{float(v):.3f}", pace_text(float(p))])
+            if "bodyDrag" in pend:
+                w.writerow([])
+                w.writerow(["bodyDrag", pend["bodyDrag"], "deltaBodyDrag", pend["deltaBodyDrag"]])
+            w.writerow([])
+            w.writerow(["volts", "pace_before", "pace_after"])
+            for (p0, v), (p1, _) in zip(before, pend["table"]):
+                w.writerow([f"{v:.3f}", pace_text(p0), pace_text(float(p1))])
+        self.reload_calibration()
+        print(f"Pace correction made permanent ({self.swimmer_name() or 'Master'}), backup "
+              f"temp/{os.path.basename(base)}_before_{stamp}{ext}")
+
+    def _safety_limits(self):
+        """The jet is never driven outside the pace table: its first and
+        last rows' volts (v15.6; before, 'SafetyVoltageLimits' in the
+        calibration file). The scan's table ends at the jet's top, or where
+        the builder stopped it (Use as top). Always the pool's table, never
+        a swimmer's (v15.7)."""
+        volts = sorted(float(v) for _, v in self.REPdefaults["pace_voltage"])
+        return volts[0], volts[-1]
+
     def _jet_steps(self):
-        """The jet's steps in volts, slowest first (see __init__)."""
+        """The jet's steps in volts, slowest first (see __init__): the pool's
+        table, never a swimmer's (v15.7)."""
         volts = []
-        for v in sorted(float(v) for _, v in self.speedArray):
+        for v in sorted(float(v) for _, v in self.REPdefaults["pace_voltage"]):
             if not volts or v - volts[-1] >= 0.01:
                 volts.append(v)
         print(f"Jet steps (zones): {len(volts)}, from the pace table ({volts[0]:.3f}-{volts[-1]:.3f} V)")
@@ -2405,19 +2888,13 @@ class App:
         """At close: make the swimmer's stick safe to remove. A message only
         when it couldn't be (something else is using it). Bill, 2026-10-17:
         no other messages are needed now that a restart finds the stick
-        again. With 'ejectStickOnClose' False everything is just written to
-        the stick, and it stays mounted."""
+        again. Always ejected: 'ejectStickOnClose' is gone, and a line
+        left in a file is ignored (Bill, 2026-10-31: "always eject and
+        remove the default from the default file")."""
         root = getattr(self, "_stick_root", None)
         if not root or not os.path.isdir(root):
             return                     # no stick in: nothing to say
         name = os.path.basename(os.path.normpath(root))
-        if not self.REPdefaults.get(self.KEY_EJECT, True):
-            try:
-                os.sync()              # the swim is on the stick, not just in memory
-            except Exception:
-                pass
-            print(f"USB stick '{name}' left in ('ejectStickOnClose' is False); everything written")
-            return
         if self._eject_stick(root):
             return                     # safe to remove, or to leave in for the next start
         else:
@@ -2499,6 +2976,125 @@ class App:
 
         self._reload_individual_if_changed()
 
+    # ------------------------------------------------------------------
+    # A stick plugged in or pulled while PoolWind runs (v15.7, Bill,
+    # 2026-10-29: "Can it be changed so program continues, starting fresh
+    # with the welcome screen and using the swimmers data? When pulled, it
+    # should go back to default data with welcome screen."; the welcome
+    # screen dropped 2026-10-30). The desktop
+    # mounts a stick when it's plugged in; PoolWind looks every 2 s.
+    # ------------------------------------------------------------------
+    STICK_WATCH_S = 2.0
+
+    def watch_stick(self):
+        if self.REPdefaults.get("Demo"):
+            return
+        now = time.time()
+        if now - getattr(self, "_stick_watch_t", 0.0) < self.STICK_WATCH_S:
+            return
+        self._stick_watch_t = now
+        root = self._stick_root
+        if root:
+            if not os.path.isfile(os.path.join(root, "poolwind_ind_defaults.txt")):
+                print(f"USB stick '{os.path.basename(os.path.normpath(root))}' pulled: Master data")
+                self.switch_swimmer(None)
+            return
+        matches = sorted(glob.glob("/media/*/*/poolwind_ind_defaults.txt"))
+        if matches:
+            print(f"USB stick plugged in: {os.path.dirname(matches[0])}")
+            self.switch_swimmer(os.path.dirname(matches[0]))
+
+    def switch_swimmer(self, root):
+        """Start fresh with the swimmer's stick at root, or the Master data
+        (None): a swim running is suspended first (never switched in the
+        middle of a swim), Pace correction and Swimmer limits close, the
+        video segment closes; then the stick's settings, its CSV Vault and
+        today's totals there, its Pace table, and the start-up hold (the jet
+        wound down until Begin / Resume)."""
+        if self.suspendButtonText == "Suspend":
+            self.Suspend_btn_press()
+        w = getattr(self, "window", None)
+        for attr in ("pace_panel", "limits_panel"):
+            panel = getattr(w, attr, None) if w is not None else None
+            if panel is not None:
+                panel.close_panel()
+        cap = getattr(self, "myVideoCapture", None)
+        if cap is not None and getattr(cap, "persp_writer", None) is not None:
+            try:
+                cap.persp_writer.release()
+            except Exception:
+                pass
+            cap.persp_writer = None
+
+        # The swimmer's settings: the main file's, then the new stick's
+        base = self._derive_internal_defaults(self.original_defaults)
+        for key in ("swimmersHeight,usableSwimLength",) + self.STICK_KEYS:
+            if key in base:
+                self.REPdefaults[key] = base[key]
+        self._ind_defaults = self._ind_path = self._ind_mtime = None
+        self._stick_root = self.usb_data_dir = None
+        if root:
+            ind_path = os.path.join(root, "poolwind_ind_defaults.txt")
+            try:
+                with open(ind_path) as f:
+                    ind = ast.literal_eval(f.read())
+                self._apply_individual_defaults(ind)
+                self._ind_path, self._ind_mtime = ind_path, os.path.getmtime(ind_path)
+                self._stick_root = self.usb_data_dir = root
+            except Exception as e:
+                print(f"Couldn't read {ind_path} ({e}): Master data")
+
+        # Its logRate and training video, from its first swim (Bill,
+        # 2026-10-31: "yes, fix 1 and 2"; before, both waited for a
+        # restart). The video segment is closed above, so the next one
+        # opens at the new rate. A menu screen open (Swim Plot...): the
+        # recording it resumes on closing follows the new setting too.
+        self._apply_log_rate()
+        if cap is not None:
+            want = bool(self.REPdefaults.get(self.KEY_RECORD, False))
+            if self.pause_update_loop:
+                cap.makePerspectVideo = "Pause" if want else "Close"
+                if w is not None:
+                    w._auto_paused_persp = want
+                    w._was_recording_persp = want
+            else:
+                cap.makePerspectVideo = "Start" if want else "Close"
+
+        # Its CSV Vault and today's totals there
+        here = os.path.dirname(os.path.abspath(__file__))
+        self.data_dir = os.path.join(self._stick_root or here, "CSV Vault")
+        os.makedirs(self.data_dir, exist_ok=True)
+        self.todayCsvFile = os.path.join(self.data_dir, f"{date.today()}.csv")
+        self.suspendButtonText = "Resume" if os.path.isfile(self.todayCsvFile) else "Begin"
+        self.firstTime = True
+        self._load_today_totals()
+        if cap is not None:
+            cap.segment_id = self.last_segment_id
+
+        # Its Pace table, New in use
+        self.use_new = True
+        self._load_swimmer()
+        self._ruler_old_logs()
+        self.pending = self._load_pending()
+        self.apply_pace_table()
+        print(f"Swimming with {self.swimmer_name() or 'Master'} data ({self.data_dir})")
+
+    def _apply_log_rate(self):
+        """logRate -> the swim log's rows (and training video frames) per
+        second: at start, and again when a stick is plugged in or pulled
+        (switch_swimmer)."""
+        lo, hi = self.LOG_RATE_RANGE
+        rate = self.REPdefaults[self.KEY_LOGRATE]
+        try:
+            rate = int(round(float(rate)))
+        except (TypeError, ValueError):
+            rate = BUILT_IN_DEFAULTS[self.KEY_LOGRATE]
+        if not lo <= rate <= hi:
+            print(f"logRate {rate} is outside {lo}-{hi}; using {min(hi, max(lo, rate))}")
+            rate = min(hi, max(lo, rate))
+        self.data_recs_per_sec  = rate
+        self.data_interval_sec  = 1.0 / self.data_recs_per_sec
+
     def _reload_individual_if_changed(self):
         """
         Hot-reload the swimmer's USB-stick file (checked about once a second):
@@ -2575,7 +3171,11 @@ class App:
         msg.show()
 
         # --- Read limits ---
-        minV, maxV = self.SafetyVoltageLimits
+        # Down to the bottom two steps: the limit is now the table's bottom
+        # row itself, which with its noise may never read at or below its
+        # own volts (v15.6)
+        V = self.plateau_voltages
+        minV = (V[1] + V[2]) / 2 if len(V) > 2 else self.SafetyVoltageLimits[0] + 0.02
 
         # --- Read initial voltage ---
         volts = self.takeReading()
@@ -2730,7 +3330,7 @@ class App:
 
         return "work"
 
-    def _parse_csv_file(self, csv_path, with_com=False):
+    def _parse_csv_file(self, csv_path, with_com=False, redo=True):
         # with_com=True also returns CoM_h and the swimmer tick's CoM_w per
         # row (columns 6-7, logged since v7.43; NaN for older files).
         time_raw    = []
@@ -2742,6 +3342,8 @@ class App:
         comw_raw    = []
         zone_raw    = []    # columns 8-9 (since v15.2): jet zone, number of zones
         zones_raw   = []
+        volts_raw   = []    # columns 10-11 (since v15.7): the row's ruler (redo_in_today)
+        tpace_raw   = []
 
         if not os.path.isfile(csv_path):
             if with_com:
@@ -2778,6 +3380,11 @@ class App:
                     zs = float(parts[8]) if len(parts) >= 9 else float("nan")
                 except ValueError:
                     zn = zs = float("nan")
+                try:
+                    rv = float(parts[9]) if len(parts) >= 11 else float("nan")
+                    rp = float(parts[10]) if len(parts) >= 11 else float("nan")
+                except ValueError:
+                    rv = rp = float("nan")
 
                 time_raw.append(t)
                 pace_raw.append(p)
@@ -2788,14 +3395,64 @@ class App:
                 comw_raw.append(cw)
                 zone_raw.append(zn)
                 zones_raw.append(zs)
+                volts_raw.append(rv)
+                tpace_raw.append(rp)
+
+        # Shown in today's calibration (redo=False: as logged, e.g. today's
+        # totals carried on at a restart)
+        if redo and time_raw:
+            pace_raw, dist_raw, _ = redo_in_today(pace_raw, dist_raw, volts_raw, tpace_raw,
+                                                  self.plot_pace_from_voltage())
 
         if with_com:
             return (time_raw, pace_raw, dist_raw, segment_raw, frame_raw,
                     comh_raw, comw_raw, zone_raw, zones_raw)
         return time_raw, pace_raw, dist_raw, segment_raw, frame_raw
 
+    def _load_today_totals(self):
+        """Today's distance, swim time and average Pace so far, from today's
+        log in the data folder (at start, and when the swimmer changes)."""
+        # Load today's CSV
+        time_raw, pace_raw, dist_raw, segment_raw, frame_raw = self.load_today_csv()
+
+        # Default if no CSV yet
+        self.last_segment_id = 0
+
+        # Recover last segment ID from CSV
+        if len(segment_raw) > 0:
+            self.last_segment_id = segment_raw[-1]
+
+        # Recover last distance
+        self.total_distance = dist_raw[-1] if len(dist_raw) > 0 else 0.0
+
+        # Rebuild pacePoints and swimtime
+        self.pacePoints = []
+        self.total_swimtime = 0.0
+        prev_t = None
+
+        for t, p, d in zip(time_raw, pace_raw, dist_raw):
+            self.pacePoints.append((t, p))
+
+            if prev_t is not None:
+                dt_sec = t - prev_t
+                if dt_sec <= self.GAP_SEC:
+                    self.total_swimtime += dt_sec / 60.0
+
+            prev_t = t
+
+        # UI fields
+        self.PaceDisplay = "0:00"
+        self.distanceSwam = f"{self.total_distance:.3f} mi"
+
+        if self.total_swimtime > 0 and self.total_distance > 0:
+            avgSwimRate = self.total_distance / self.total_swimtime  # miles/min
+            avgPace = (100.0 / self.YARDS_PER_MILE) / avgSwimRate    # min per 100y
+            self.avgPaceDisplay = Utils.DecimalToTime(avgPace)
+        else:
+            self.avgPaceDisplay = "0:00"
+
     def load_today_csv(self):
-        time_raw, pace_raw, dist_raw, segment_raw, frame_raw = self._parse_csv_file(self.todayCsvFile)
+        time_raw, pace_raw, dist_raw, segment_raw, frame_raw = self._parse_csv_file(self.todayCsvFile, redo=False)
 
         # Ensure sorted by timestamp (important for multi‑day merges)
         zipped = sorted(zip(time_raw, pace_raw, dist_raw, segment_raw, frame_raw),
@@ -2835,7 +3492,25 @@ class App:
         while d <= to_date:
             day_num += 1
             csv_path = os.path.join(self.data_dir, f"{d.isoformat()}.csv")
-            t, p, dist, seg, frm, ch, cw, zn, zs = self._parse_csv_file(csv_path, with_com=True)
+            # Each day kept once read, while PoolWind runs, as the
+            # calendar's averages (avg_pace_store): read again after a new
+            # stick or another Pace table (apply_pace_table), or if its log
+            # changed (Bill, 2026-11-01: "Yes, keep the plot data too. But
+            # if the day selection changes, wouldn't the plot data change as
+            # well?": a new range reads only the days not read yet)
+            try:
+                log_time = os.path.getmtime(csv_path)
+            except OSError:
+                log_time = None
+            store = self.__dict__.setdefault("_plot_store", {})
+            key = (self.data_dir, bool(getattr(self, "plot_master", False)), d)
+            kept = store.get(key)
+            if kept is not None and kept[0] == log_time:
+                parsed = kept[1]
+            else:
+                parsed = self._parse_csv_file(csv_path, with_com=True)
+                store[key] = (log_time, parsed)
+            t, p, dist, seg, frm, ch, cw, zn, zs = parsed
             if dist:
                 days_own_total = dist[-1]   # this day's final distance, before offsetting
                 dist = [x + dist_offset for x in dist]
@@ -2923,6 +3598,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
         # Position window at top-left
         self.move(0, 0)
+        pool_fullscreen(self, self.app)
 
         # ---------------------------------------------------------
         # Full-window video display (QWidget-based, no QLabel pixmap)
@@ -2946,7 +3622,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         self.menu_button = QPushButton("≡", self)
         self.menu_button.setFixedSize(36, 36)
 
-        self.menu_button.move(5, 5)
+        self.menu_button.move(*self.MENU_POS)
         self.menu_button.setStyleSheet("""
             QPushButton {
                 background-color: rgba(0, 0, 0, 120);
@@ -2988,6 +3664,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         corridor_mask = None
         if self.app.REPdefaults["Runtime: hotReloadParameters"]:
             self.app.reload_defaults_if_changed()
+        self.app.watch_stick()
 
         # Auto-pause recording when the program is paused. Remember that
         # it was this auto-pause, not the user: a menu item winds the jet
@@ -3119,7 +3796,8 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
         self.swimmerFound = w_ok and h_ok and (self.blob_CoM_w is not None)
 
-        # Suspend button forces "not found"
+        # Suspend button forces "not found" (with Pace correction open too:
+        # Bill, 2026-10-29: "'Tracking on' = normal swim")
         if self.app.suspendButtonText == "Resume":
             self.swimmerFound = False
 
@@ -3145,8 +3823,9 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         while len(grays) > 2 and now - grays[1][0] >= STILL_LAG_S:
             grays.popleft()            # keep the newest frame at least 0.5 s old
         defaults = self.app.REPdefaults
-        if self.app.suspendButtonText != "Suspend" or not hasattr(self, "_last_motion_t"):
-            self._last_motion_t = now
+        if (self.app.suspendButtonText != "Suspend" or self.app.pace_correcting
+                or not hasattr(self, "_last_motion_t")):
+            self._last_motion_t = now          # (no auto-suspend while Pace correction is open)
         elif (self.blob_CoM_w is not None and full_corridor_mask is not None
               and now - grays[0][0] >= 0.8 * STILL_LAG_S):
             blob = cv2.dilate((full_corridor_mask > 0).astype(np.uint8),
@@ -3838,6 +4517,21 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
                     (0, 255, 204),
                     9) 
 
+        # The version, small, centered above the Pace, the readouts' color
+        # (Bill, 2026-10-30: "writing a line right on the main screen at
+        # the top and centered that says 'PoolWind v1.23'. Don't let it
+        # touch the Pace display")
+        if not hasattr(self, "_version_text"):
+            self._version_text = " ".join(x for x in ("PoolWind", poolwind_version()) if x)
+        (tw, _), _ = cv2.getTextSize(self._version_text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        cv2.putText(frame, self._version_text, ((frame.shape[1] - tw) // 2, 15),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1, cv2.LINE_AA)
+
+        # Pace correction's New in use (Bill, 2026-10-29: "good")
+        if self.app.use_new and self.app.pending is not None:
+            cv2.putText(frame, "Pending Paces", (12, 212), cv2.FONT_HERSHEY_COMPLEX,
+                        0.9, (0, 255, 204), 2, cv2.LINE_AA)
+
         cv2.putText(frame,
                     self.app.avgPaceDisplay + avgLabel,
                     (10, 300),
@@ -4002,16 +4696,41 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             self.app.DN_btn_press()
 
     def closeEvent(self, event):
+        if getattr(self, "_swim_plot_close", None) is not None:
+            event.ignore()                      # × during Swim Plot: Swim Plot closes (openSwimPlot)
+            self._swim_plot_close()
+            return
         print("QtMainWindow closeEvent triggered")
+        # Pace correction's changes still pending (Bill, 2026-10-29: "Before
+        # program closes, if there are still changes pending, pop up message
+        # saying so and offer choices: 'Keep pending' , 'Make permanent'.")
+        if getattr(self.app, "pending", None) is not None and not getattr(self.app, "_already_shutdown", False):
+            box = QMessageBox(self)
+            box.setWindowTitle("Pace correction")
+            box.setText("Pace correction has changes that aren't permanent yet.")
+            box.addButton("Keep pending", QMessageBox.AcceptRole)
+            perm = box.addButton("Make permanent", QMessageBox.AcceptRole)
+            box.exec()
+            if box.clickedButton() is perm:
+                try:
+                    self.app.make_pace_permanent()
+                except Exception as e:
+                    QMessageBox.warning(self, "Pace correction", f"Couldn't save the calibration file:\n{e}")
         try:
             self.app.shutdown()
         except Exception as e:
             print("Error during shutdown:", e)
         event.accept()
 
+    # The menu button (≡): back near the top left corner, a little in from
+    # the edges (Bill, 2026-11-01: "Put the mani menu icon back near the top
+    # left corner, allow a little distance from the borders."; it was half
+    # an inch down, 0, 44, for a remote viewer, 2026-10-30)
+    MENU_POS = (8, 8)
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.menu_button.move(0, 0)
+        self.menu_button.move(*self.MENU_POS)
 
     def showMenu(self):
         menu = QMenu(self)
@@ -4023,16 +4742,24 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         item1.triggered.connect(self.openPlacePoints)
         menu.addAction(item1)
 
-        # The real pool only: greyed out with the simulated valve (home)
+        # The real pool only: greyed out with the simulated valve (home),
+        # and with a stick in: it writes the pool's (Master) table, never the
+        # swimmer's (Bill, 2026-10-31: "The swimmer shouldn't be able to
+        # calibrate the Master files."); developerMode: a stick in too
         item2 = QAction("Calibrate pool...", self)
         item2.triggered.connect(self.openCalibration)
-        item2.setEnabled(self.app.valveOption == "real")
+        # developerMode: always, whatever the workplace, valve, camera or
+        # stick (Bill, 2026-11-01: "The calibration routines are greyed out
+        # now. That feature should depend only on: (developerMode': True).")
+        # (never in the Demo: no real pool there)
+        dev = bool(self.app.REPdefaults["developerMode"]) and not self.app.REPdefaults.get("Demo")
+        item2.setEnabled(dev or (self.app.valveOption == "real" and self.app.swimmer_name() is None))
         menu.addAction(item2)
 
         # Like Calibrate pool, it changes the pool's calibration: the real pool only
         item2b = QAction("Pace correction...", self)
         item2b.triggered.connect(self.openPaceCorrection)
-        item2b.setEnabled(self.app.valveOption == "real")
+        item2b.setEnabled(dev or self.app.valveOption == "real")
         menu.addAction(item2b)
 
         item3 = QAction("Swimmer limits...", self)
@@ -4185,15 +4912,45 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         if box.clickedButton() is redo:
             self.openPlacePoints()
 
+    def _builder_ok(self, title):
+        """The builder's password (the Pi's login password) before the
+        pool's calibration can be changed, asked once in a PoolWind run
+        (Bill, 2026-10-31: "Only when routine is enterd, ask for a password.
+        And that check should be good for the whole PoolWind run.")."""
+        if getattr(self.app, "builder_ok", False) or self.app.REPdefaults["developerMode"]:
+            return True                # (developerMode: the builder's own file; Bill, 2026-10-31)
+        password, ok = QtWidgets.QInputDialog.getText(
+            self, title, "This changes the pool's calibration.\n"
+            "Builder's password (the Pi's login password):",
+            QtWidgets.QLineEdit.Password)
+        if not ok:
+            return False
+        QApplication.setOverrideCursor(Qt.WaitCursor)     # a wrong one takes ~2 s
+        try:
+            good = login_password_ok(password)
+        except Exception as e:
+            print("Password check failed:", e)
+            good = False
+        finally:
+            QApplication.restoreOverrideCursor()
+        if good is False:
+            QMessageBox.warning(self, title, "Wrong password.")
+            return False
+        self.app.builder_ok = True
+        return True
+
     def openPaceCorrection(self):
         """Pace correction: a small box over the pool screen; the swimmer
-        swims under it (PaceCorrectionPanel)."""
+        swims under it (PaceCorrectionPanel). With no stick in it changes
+        the pool's (Master) table: the builder's password first."""
+        if self.app.swimmer_name() is None and not self._builder_ok("Pace correction"):
+            return
         panel = getattr(self, "pace_panel", None)
         if panel is None:
             panel = self.pace_panel = PaceCorrectionPanel(self.app, self)
         panel.show()
         panel.raise_()
-        panel.entry.setFocus()
+        QTimer.singleShot(100, panel.focus_lit)     # after the menu has closed
 
     def openSwimmerLimits(self):
         """A small panel over the pool screen; the pool keeps running
@@ -4214,8 +4971,23 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         calibration as soon as the calibration window closes.
         """
         app = self.app
-        if app.valveOption != "real":
+        dev = bool(app.REPdefaults["developerMode"]) and not app.REPdefaults.get("Demo")
+        if app.valveOption != "real" and not dev:
             return
+        if not self._builder_ok("Calibrate pool"):
+            return
+        # PoolWind on the simulated valve (developerMode, Bill 2026-11-01):
+        # it has no relays or voltage sensor of its own, so the calibration
+        # opens the pool's directly (RealJet, as --calibrate does); and the
+        # real camera when PoolWind plays a video
+        own_jet = None
+        if app.valveOption != "real":
+            try:
+                own_jet = RealJet()
+            except Exception as e:
+                QMessageBox.warning(self, "Calibrate pool", "Couldn't reach the pool's jet relays and "
+                                    f"voltage sensor:\n{e}")
+                return
         app.pause_update_loop = True
         app.hold_mode = False
         app.initial_voltage_winddown("Calibration")
@@ -4225,8 +4997,9 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         app._calibrating = True               # PoolWind's relay watchdog stands aside
         try:
             win = CalibrateWindow(
-                EmbeddedJet(app), app.calibration_path, False,
-                camera_factory=lambda pts: EmbeddedCamera(app, pts, WORK_W, WORK_H))
+                own_jet or EmbeddedJet(app), app.calibration_path, False,
+                camera_factory=(lambda pts: EmbeddedCamera(app, pts, WORK_W, WORK_H))
+                if app.capture_device == "camera" else None)
             loop = QtCore.QEventLoop()
             watch = QTimer()
             watch.timeout.connect(lambda: None if win.isVisible() else loop.quit())
@@ -4238,6 +5011,9 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             QMessageBox.warning(self, "Calibrate pool", f"The calibration stopped:\n{e}")
         finally:
             app.relay_off()
+            app.GPIO.output(app.PIN_PUMP, True)     # the pump button let go, whatever the calibration left
+            if own_jet is not None:
+                own_jet.close()                     # (its relays let go and freed; closing it twice is harmless)
             app._calibrating = False
         app.reload_calibration()
         self._exit_submenu()
@@ -4278,6 +5054,46 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # picked range so it reappears with the same dates highlighted
         # instead of resetting to today.
         from_date, to_date = None, None
+        # The dataset chosen on the date screen (Swimmer, or Master for a
+        # coach) is kept until PoolWind restarts, through stick swaps (Bill,
+        # 2026-11-01: "Yes, keep Master until PoolWind restarts")
+        if not hasattr(self.app, "plot_master"):
+            self.app.plot_master = False
+        # The stick pulled while Swim Plot is open: its swims and videos are
+        # gone, so the calendar or the plot closes, back to the pool screen,
+        # where the stick watcher goes on to the Master data (Bill,
+        # 2026-11-01: "As long as it doesn't crash the program. Maybe if the
+        # stick is pulled, PoolWind can close the plot window.")
+        showing, pulled = [None], [False]
+        root = self.app._stick_root
+
+        def look_for_stick():
+            if pulled[0] or not root or os.path.isfile(os.path.join(root, "poolwind_ind_defaults.txt")):
+                return
+            pulled[0] = True
+            print("USB stick pulled during Swim Plot: closed")
+            w = showing[0]
+            if w is not None and w.isVisible():
+                (w.on_close if hasattr(w, "on_close") else w.reject)()
+
+        stick_timer = QTimer(self)
+        stick_timer.timeout.connect(look_for_stick)
+        stick_timer.start(1000)
+
+        # The window's × (its title bar, at the desk: display 'work') closes
+        # Swim Plot, back to the pool screen, not PoolWind (Bill,
+        # 2026-11-01: "There is the standard window expand and exit buttons
+        # on the plot window that shouldn't be there. Using it to exit loads
+        # to a USB stick warning box and the wqhole program exits.")
+        leave = [False]
+
+        def close_swim_plot():
+            leave[0] = True
+            w = showing[0]
+            if w is not None and w.isVisible():
+                (w.on_close if hasattr(w, "on_close") else w.reject)()
+
+        self._swim_plot_close = close_swim_plot
         while True:
             # Even though the calendar is now a full-screen frameless
             # dialog covering the same geometry as this window, blank the
@@ -4293,12 +5109,33 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             self.display_canvas.clear()
             QApplication.processEvents()
             range_dlg = SwimDateRangeDialog(self.app, self, from_date, to_date)
-            if range_dlg.exec() != QDialog.Accepted:
+            showing[0] = range_dlg
+            if range_dlg.exec() != QDialog.Accepted or pulled[0] or leave[0]:
                 break
             from_date, to_date = range_dlg.get_range()
-            dlg = SwimPlotWindow(self.app, self, from_date, to_date)
-            dlg.exec()
+            # The header says which table the plot reads the swims in, in
+            # place of the program's name (Bill, 2026-11-01: "Can you place
+            # it in the header instead of the 'poolwindAI_v15.7.py' that
+            # shows now?")
+            title = self.windowTitle()
+            self.setWindowTitle("Using Master dataset" if self.app.plot_master else "Using Swimmer dataset")
+            try:
+                dlg = getattr(range_dlg, "plot", None) or SwimPlotWindow(self.app, self, from_date, to_date)
+                showing[0] = dlg
+                if not pulled[0] and not leave[0]:  # (pulled while the plot loaded)
+                    dlg.exec()
+            finally:
+                self.setWindowTitle(title)
+                showing[0] = None
+            if pulled[0] or leave[0]:
+                break
 
+        stick_timer.stop()
+        stick_timer.deleteLater()
+        self._swim_plot_close = None
+        if pulled[0]:
+            QMessageBox.information(self, "Swim Plot", "The USB stick was pulled, so Swim Plot was "
+                                    "closed. Plug it in again to see its swims.")
         self._exit_submenu()
         self.app.return_to_main_screen()
         self.app.pause_update_loop = False
@@ -4905,10 +5742,15 @@ class SwimController:
         self.lastLoopTime = None
         self.loop_dt = 0.02  # for now, should have a dynamic value
 
+        self.set_table(self.app.speedArray)
+
+    def set_table(self, table):
+        """The pace table the Paces come from (Pace correction's Now or New,
+        App.apply_pace_table)."""
         # ---------------------------------------------------------
         # Build sorted pace/voltage arrays
         # ---------------------------------------------------------
-        speed_np = np.array(self.app.speedArray)
+        speed_np = np.array(table)
         idx = np.argsort(speed_np[:, 0])
         self.pace_asc = speed_np[idx, 0]       # ascending pace
         self.voltage_desc = speed_np[idx, 1]   # descending voltage
@@ -4986,17 +5828,15 @@ class SwimController:
           - only steps inside the safety limits, so no part of the pool
             asks for a speed it can't get (zones below the safety min all
             ran at the min: a dead back, swim test 2026-10-20);
-          - '# zones or auto' (calibration file): 'auto' = every step
-            between the limits; a number = that many zones spread evenly
-            (by voltage) between them, each on the nearest step. Out of
-            range: 'auto'.
+          - one zone per step between the limits (the calibration file's
+            '# zones or auto', fewer zones spread over them, gone in v15.7).
         Cached; recomputed if any of these change (e.g. a swimmer's USB
         stick is set up mid-session).
         """
         app = self.app
         rep = app.REPdefaults
         key = (repr(rep.get(App.KEY_ZONES)), repr(rep.get(App.KEY_PACE)), tuple(app.SafetyVoltageLimits),
-               repr(rep.get(App.KEY_NZONES)), app.limits_procedure)
+               app.limits_procedure)
         if getattr(self, "_zone_steps_key", None) != key:
             V = app.plateau_voltages
             minV, maxV = app.SafetyVoltageLimits
@@ -5007,15 +5847,6 @@ class SwimController:
                 mid = (V[max(0, min(len(V) - 1, lo))] + V[max(0, min(len(V) - 1, hi))]) / 2
                 pool = allowed or range(len(V))
                 steps = [min(pool, key=lambda i: abs(V[i] - mid))]
-            n = app.zones_wanted(len(steps))
-            if n != len(steps):
-                picked = []
-                for j in range(n):
-                    target = V[steps[0]] + j * (V[steps[-1]] - V[steps[0]]) / (n - 1)
-                    i = min(steps, key=lambda i: abs(V[i] - target))
-                    if i not in picked:
-                        picked.append(i)
-                steps = picked
             self._zone_steps_cache = steps
             self._zone_steps_key = key
             print("Zones (jet steps): " + ", ".join(f"{i + 1} ({Utils.DecimalToTime(app.zone_pace(i))})" for i in steps)
@@ -5314,9 +6145,8 @@ class Utils:
 
     @staticmethod
     def DecimalToTime(decimalIn):
-        s_min = math.trunc(decimalIn)
-        s_dec = decimalIn - s_min
-        s_sec = math.trunc(round(s_dec * 60, 0))
+        # Seconds rounded first, so 4.9999 is 5:00, not 4:60
+        s_min, s_sec = divmod(int(round(decimalIn * 60)), 60)
 
         if s_sec > 9:
             return f"{s_min}:{s_sec}"
@@ -5690,6 +6520,7 @@ class PlacePointsWindow(QDialog):
 
         # Force window to top-left corner
         self.move(0, 0)
+        pool_fullscreen(self, app)
 
         # Canvas fills the window
         self.canvas = PlacePointsCanvas(app, self)
@@ -5795,32 +6626,66 @@ class _MonthOnlyCalendar(QCalendarWidget):
     def setDataDates(self, data_dates):
         self._data_dates = set(data_dates)
 
-    def setAvgPaceSource(self, data_dir, cache, months_loaded):
+    def setAvgPaceSource(self, data_dir, cache, months_loaded, today=None, read_times=None):
         # cache: date -> "M:SS" string (or None if that date's CSV had no
         # usable pace). months_loaded: set of (year, month) already
         # scanned. Both are shared (same dict/set object) with the other
         # calendar in the dialog, so pace computed while browsing one
         # calendar is instantly available in the other.
         self._pace_data_dir = data_dir
+        self._today = today                 # volts -> Pace, today's table (redo_in_today)
         self._avg_pace_cache = cache
         self._avg_pace_months_loaded = months_loaded
+        self._avg_read_times = read_times if read_times is not None else {}
         self.currentPageChanged.connect(self._on_page_changed)
         self._on_page_changed(self.yearShown(), self.monthShown())
 
     def _on_page_changed(self, year, month):
-        key = (year, month)
-        if key not in self._avg_pace_months_loaded:
-            self._avg_pace_months_loaded.add(key)
-            self._load_month_averages(year, month)
+        # (every time: a day already read and its log unchanged is skipped)
+        self._avg_pace_months_loaded.add((year, month))
+        self._load_month_averages(year, month)
         self.updateCells()
 
     def _load_month_averages(self, year, month):
         days_in_month = QDate(year, month, 1).daysInMonth()
-        for day in range(1, days_in_month + 1):
-            d = date(year, month, day)
-            if d not in getattr(self, "_data_dates", ()) or d in self._avg_pace_cache:
-                continue
-            self._avg_pace_cache[d] = self._compute_avg_pace_for_date(d)
+        todo = [date(year, month, day) for day in range(1, days_in_month + 1)]
+        def log_time(d):
+            try:
+                return os.path.getmtime(os.path.join(self._pace_data_dir, f"{d.isoformat()}.csv"))
+            except OSError:
+                return None
+        times = {d: log_time(d) for d in todo if d in getattr(self, "_data_dates", ())}
+        todo = [d for d, t in times.items()
+                if d not in self._avg_pace_cache or self._avg_read_times.get(d) != t]
+        if not todo:
+            return
+        # "Please wait" while the month's swims are read (Bill, 2026-11-01:
+        # "we should put a little "Please wait" popup while the swimmer data
+        # is being analyzed before writing the daily averages in the
+        # calendar screen."): a small box in the middle of the screen,
+        # drawn before each day is read
+        # Qt's standard progress dialog, in the desktop's own style (Bill,
+        # 2026-11-01: "The 'please wait' box is kind of stark and ugly ...
+        # Is there a standard form you could replace it with?")
+        box = QtWidgets.QProgressDialog("Please wait: reading your swims...", None, 0, len(todo),
+                                        self.window() if self.window().isVisible() else None)
+        box.setWindowTitle("Swim Plot")
+        box.setWindowModality(Qt.ApplicationModal)
+        box.setMinimumDuration(0)
+        box.setAutoClose(False)
+        box.setMinimumWidth(320)
+        try:
+            box.setValue(0)
+            box.show()
+            for k, d in enumerate(todo, 1):
+                box.setLabelText(f"Please wait: reading your swims...\n(day {k} of {len(todo)})")
+                QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                self._avg_pace_cache[d] = self._compute_avg_pace_for_date(d)
+                self._avg_read_times[d] = times[d]
+                box.setValue(k)
+        finally:
+            box.close()
+            box.deleteLater()
 
     def _compute_avg_pace_for_date(self, d):
         # Distance/time-weighted, gap-aware -- matches the live "Avg
@@ -5828,11 +6693,11 @@ class _MonthOnlyCalendar(QCalendarWidget):
         # not a flat mean of the CSV's raw per-row pace column.
         GAP_SEC = 3
         YARDS_PER_MILE = 1760.0
+        # In today's calibration (redo_in_today); a day logged before v15.7
+        # can't be redone: (text, False), drawn grey
         csv_path = os.path.join(self._pace_data_dir, f"{d.isoformat()}.csv")
+        ts, paces, dists, volts, tpaces = [], [], [], [], []
         try:
-            prev_t = None
-            total_swimtime_min = 0.0
-            final_distance = 0.0
             with open(csv_path, "r") as f:
                 for line in f:
                     parts = line.strip().split(",")
@@ -5840,23 +6705,35 @@ class _MonthOnlyCalendar(QCalendarWidget):
                         continue
                     try:
                         t = float(parts[0])
+                        p = float(parts[1])
                         dist = float(parts[2])
                     except ValueError:
                         continue
-                    if prev_t is not None:
-                        dt_sec = t - prev_t
-                        if dt_sec <= GAP_SEC:
-                            total_swimtime_min += dt_sec / 60.0
-                    prev_t = t
-                    final_distance = dist
+                    try:
+                        rv, rp = (float(parts[9]), float(parts[10])) if len(parts) >= 11 else (0.0, 0.0)
+                    except ValueError:
+                        rv = rp = 0.0
+                    ts.append(t)
+                    paces.append(p)
+                    dists.append(dist)
+                    volts.append(rv)
+                    tpaces.append(rp)
         except OSError:
             return None
+        redone = False
+        if ts and getattr(self, "_today", None) is not None:
+            paces, dists, redone = redo_in_today(paces, dists, volts, tpaces, self._today)
 
+        total_swimtime_min = 0.0
+        for t0, t1 in zip(ts, ts[1:]):
+            if t1 - t0 <= GAP_SEC:
+                total_swimtime_min += (t1 - t0) / 60.0
+        final_distance = dists[-1] if dists else 0.0
         if total_swimtime_min <= 0 or final_distance <= 0:
             return None
         avg_rate = final_distance / total_swimtime_min          # miles/min
         avg_pace = (100.0 / YARDS_PER_MILE) / avg_rate          # min per 100yd
-        return Utils.DecimalToTime(avg_pace)
+        return Utils.DecimalToTime(avg_pace), redone
 
     def paintCell(self, painter, rect, qdate):
         if qdate.month() == self.monthShown() and qdate.year() == self.yearShown():
@@ -5882,25 +6759,33 @@ class _MonthOnlyCalendar(QCalendarWidget):
         pace_txt = getattr(self, "_avg_pace_cache", {}).get(
             date(qdate.year(), qdate.month(), qdate.day())
         )
+        redone = True
+        if isinstance(pace_txt, tuple):     # (text, in today's calibration?)
+            pace_txt, redone = pace_txt
         if pace_txt:
             painter.save()
             font = painter.font()
             font.setBold(False)
             font.setPointSize(max(6, font.pointSize() - 3))
             painter.setFont(font)
-            painter.setPen(QColor("blue"))
+            # grey: a day logged before v15.7, shown as swum (can't be redone)
+            painter.setPen(QColor("blue") if redone else QColor(150, 150, 150))
             # Bottom-aligned, inside the cell: Qt 6 (PySide6) clips each
             # cell's painting to its rect, so the old nudge below the
             # bottom edge cut the numbers off. The cell is tall enough
             # for the day number above it.
-            pace_rect = rect.adjusted(0, 0, 0, -1)
+            # Lowered into the font's descent (digits and ':' have none,
+            # so nothing is cut), clear of the day number (Bill, 2026-11-01:
+            # "bring down the avgPace readouts ... they got a little higher
+            # and are bumping into the 'day' readout")
+            drop = max(0, painter.fontMetrics().descent() - 1)
+            pace_rect = rect.adjusted(0, 0, 0, drop)
             painter.drawText(pace_rect, Qt.AlignHCenter | Qt.AlignBottom, pace_txt)
             painter.restore()
 
 class EmbeddedJet:
     """The calibration program's jet (its RealJet's methods) on PoolWind's
     own relays and voltage sensor, for Calibrate pool."""
-    simulated = False
 
     def __init__(self, app):
         self.app = app
@@ -5974,10 +6859,11 @@ class OverlayPanel(QFrame):
     """
     DRAG_KEEP_PX = 60
     PANEL_ATTR = None                  # the QtMainWindow attribute holding it
+    BACKGROUND = "rgba(255, 255, 255, 235)"
 
     def _setup_frame(self, parent, title):
         self.setObjectName("overlayPanel")
-        self.setStyleSheet("#overlayPanel { background-color: rgba(255, 255, 255, 235);"
+        self.setStyleSheet(f"#overlayPanel {{ background-color: {self.BACKGROUND};"
                            " border: 2px solid #2060c0; border-radius: 6px; }"
                            " QLabel, QPushButton, QLineEdit { font-size: 15px; }")
         self.setFocusPolicy(Qt.StrongFocus)
@@ -6093,7 +6979,7 @@ class SwimmerLimitsPanel(OverlayPanel):
     PANEL_ATTR = "limits_panel"
 
     def _bounds(self):
-        """Zone numbers inside the safety limits."""
+        """Zone numbers inside the jet's limits (the whole table)."""
         minV, maxV = self.app.SafetyVoltageLimits
         inside = [i + 1 for i, v in enumerate(self.app.plateau_voltages) if minV - 1e-6 <= v <= maxV + 1e-6]
         return (inside[0], inside[-1]) if inside else (1, len(self.app.plateau_voltages))
@@ -6182,201 +7068,1354 @@ class SwimmerLimitsPanel(OverlayPanel):
         super().close_panel()
 
 
+class PaceEdit(QtWidgets.QLineEdit):
+    """
+    One Pace box of Pace correction: m:ss with the colon already there
+    (Bill, 2026-10-26: "Maybe just a two digit entry automatically moving
+    around the ':'"): 1 4 8 types 1:48. Empty = left to the interpolation.
+    Chosen (clicked, or the lit zone's): ready for new numbers, a Pace
+    already in it selected so the first digit replaces it (Bill,
+    2026-10-28: "Clicking a box should also select, highlight, make it
+    ready for number entry").
+    """
+    CURSOR = (0, 2, 3, 4)              # where the next digit goes, by digits typed
+
+    def __init__(self, font):
+        super().__init__()
+        self.setFont(font)
+        self.setInputMask("0:00;_")
+        self.setAlignment(Qt.AlignCenter)
+        self.setFixedSize(84, 30)
+        self.on_focus = None           # the panel's: called with (box, why it got the focus)
+        self.keep_cursor = False       # given the focus back while typing: leave the cursor
+        self.before = ""               # what it held when chosen: Escape puts it back
+
+    def digits(self):
+        return "".join(c for c in self.text() if c.isdigit())
+
+    def ready(self):
+        if self.digits():
+            self.selectAll()
+        else:
+            self.setCursorPosition(0)
+
+    def focusInEvent(self, event):
+        super().focusInEvent(event)
+        if self.on_focus:
+            self.on_focus(self, event.reason())
+        if not self.keep_cursor:
+            self.before = self.text()
+            QTimer.singleShot(0, self.ready)
+
+    def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+        QTimer.singleShot(0, self.ready)        # clicked again: ready again, not where the click fell
+
+
+class PaceGraph(QWidget):
+    """
+    Pace correction's graph of Pace against zone, beside the table, a row
+    per zone level with the table's and scrolling with it (Bill,
+    2026-10-28: "Could we put a graph of Pace vs Zone there? Units of Pace
+    woud be fixed 7 to 1." ... "I'm thinking of replacing the picture with
+    it. The graph would have the fast end at top so it would need rotating
+    90 degrees. It will be lined up with the entry boxes and scrolled with
+    them. It makes visualizing the upside down nature of Pace easier to
+    see."): the zones down the side, fastest at the top; Pace across, 1:00
+    at the left to 7:00 at the right (PaceScale labels it: Fast / Slow
+    above the table, the minutes under it); Now grey, New blue, the Paces typed as dots, New's zones not
+    faster than the one below red, the swimmer's zones shaded, the lit one
+    yellow, thin lines at the zone boundaries, the swimmer's fastest and
+    slowest zones labelled (Bill, 2026-10-28: "in the highest blue zone could
+    you put 'Your Fastest Swimmer Limit'? Like wise in the lowest blue zone,
+    put 'Your Slowest Swimmer Limit'"). Dragged up or down, it scrolls
+    with the table ("Can we have the whole graph and table drag up and down
+    by click - drag on the graph area?"); a click picks the zone under
+    it: its box, ready ("when the graph is clicked within a zone, the table
+    moves to the same zone for entry").
+    """
+    SLOW, FAST = 7.0, 1.0
+    PAD = 8                                # room for a dot at 1:00 or 7:00
+    NOW, NEW, RED = QColor(150, 150, 150), QColor(32, 96, 192), QColor(176, 0, 0)
+
+    def __init__(self, parent, mine, row_h):
+        super().__init__(parent)
+        self.mine = sorted(mine)           # the swimmer's zones' jet steps
+        self.row_h = row_h
+        self.now, self.new, self.typed, self.red, self.lit = [], [], {}, set(), None
+        self.on_pick = None                # the panel's: called with the jet step clicked
+        self.scroll_bar = None             # the table's: a drag moves it
+        self._press = None                 # (where pressed on the screen, scroll then, dragging?)
+        self.setCursor(Qt.PointingHandCursor)
+
+    @classmethod
+    def x(cls, pace, width):
+        """Where a Pace goes across a graph `width` wide (PaceScale too)."""
+        pace = min(cls.SLOW, max(cls.FAST, pace))
+        return cls.PAD + (pace - cls.FAST) / (cls.SLOW - cls.FAST) * (width - 2 * cls.PAD)
+
+    def show_paces(self, now, new, typed, red):
+        self.now, self.new, self.typed, self.red = now, new, typed, red
+        self.update()
+
+    def set_lit(self, i):
+        self.lit = i
+        self.update()
+
+    def paintEvent(self, event):
+        n = len(self.new)
+        if n < 2:
+            return
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing, True)
+        w, rh = self.width(), self.row_h
+        top = lambda i: (n - 1 - i) * rh                   # row i's top, fastest at the top
+        x = lambda pace: self.x(pace, w)
+        y = lambda i: top(i) + rh / 2
+        if self.mine:                                       # the swimmer's zones
+            p.fillRect(QtCore.QRectF(0, top(self.mine[-1]), w, top(self.mine[0]) + rh - top(self.mine[-1])),
+                       QColor(230, 238, 250))
+        if self.lit is not None:
+            p.fillRect(QtCore.QRectF(0, top(self.lit), w, rh), QColor(255, 242, 160))
+        p.setPen(QPen(QColor(215, 215, 215), 1))            # the zone boundaries
+        for k in range(1, n):
+            p.drawLine(QtCore.QPointF(0, k * rh), QtCore.QPointF(w, k * rh))
+        p.setPen(QPen(QColor(225, 225, 225), 1))            # a line each minute
+        for m in range(int(self.FAST), int(self.SLOW) + 1):
+            p.drawLine(QtCore.QPointF(x(m), 0), QtCore.QPointF(x(m), n * rh))
+        for paces, color in ((self.now, self.NOW), (self.new, self.NEW)):
+            if len(paces) == n:
+                p.setPen(QPen(color, 2))
+                p.drawPolyline(QtGui.QPolygonF([QtCore.QPointF(x(q), y(i)) for i, q in enumerate(paces)]))
+        p.setPen(Qt.NoPen)
+        for i in self.red:
+            p.setBrush(self.RED)
+            p.drawEllipse(QtCore.QPointF(x(self.new[i]), y(i)), 4, 4)
+        for i, q in self.typed.items():                    # the Paces typed, ringed in white
+            p.setPen(QPen(QColor(255, 255, 255), 2))
+            p.setBrush(self.NEW)
+            p.drawEllipse(QtCore.QPointF(x(q), y(i)), 5, 5)
+        if self.mine:                                       # the swimmer's limits, on the side away from the curve
+            f = QFont(self.font())
+            f.setPixelSize(11)
+            f.setBold(True)
+            p.setFont(f)
+            p.setPen(QColor(32, 64, 128))
+            for i, text in ((self.mine[-1], "Your Fastest\nSwimmer Limit"), (self.mine[0], "Your Slowest\nSwimmer Limit")):
+                at = x(self.new[i])
+                r = (QtCore.QRectF(at + 8, top(i), w - at - 12, rh) if at < w / 2
+                     else QtCore.QRectF(4, top(i), at - 12, rh))
+                p.drawText(r, (Qt.AlignLeft if at < w / 2 else Qt.AlignRight) | Qt.AlignVCenter, text)
+        # Which line is which, in the bottom zone, away from the curve (Bill,
+        # 2026-10-28: "we lost the small letters that tell which plot is
+        # which ... A good place would be the botton zone area of the graph")
+        f = QFont(self.font())
+        f.setPixelSize(12)
+        p.setFont(f)
+        fm = p.fontMetrics()
+        at = x(self.new[0])
+        lx = 8 if at > w / 2 else w - 140
+        ly = top(0) + rh / 2
+        for k, (name, color) in enumerate((("Stored", self.NOW), ("Pending", self.NEW))):
+            p.setPen(QPen(color, 2))
+            p.drawLine(QtCore.QPointF(lx + 65 * k, ly), QtCore.QPointF(lx + 65 * k + 16, ly))
+            p.setPen(QColor(40, 40, 40))
+            p.drawText(QtCore.QPointF(lx + 65 * k + 20, ly + fm.ascent() / 2 - 1), name)
+        p.end()
+
+    DRAG_PX = 6                            # moved more than this: a drag, not a click
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            bar = self.scroll_bar
+            self._press = (event.globalPosition().y(), bar.value() if bar else 0, False)
+        event.accept()                     # not a drag of the panel
+
+    def mouseMoveEvent(self, event):
+        if self._press is not None and event.buttons() & Qt.LeftButton:
+            y0, v0, dragging = self._press
+            dy = event.globalPosition().y() - y0
+            if dragging or abs(dy) > self.DRAG_PX:
+                self._press = (y0, v0, True)
+                self.setCursor(Qt.ClosedHandCursor)
+                if self.scroll_bar:
+                    self.scroll_bar.setValue(int(v0 - dy))
+        event.accept()
+
+    def mouseReleaseEvent(self, event):
+        press, self._press = self._press, None
+        self.setCursor(Qt.PointingHandCursor)
+        n = len(self.new)
+        if press is not None and not press[2] and n and self.on_pick:
+            i = n - 1 - int(event.position().y() // self.row_h)
+            self.on_pick(max(0, min(n - 1, i)))
+        event.accept()
+
+
+class PaceScale(QWidget):
+    """The Pace graph's minutes, under the table, or (ends) "Fast" and
+    "Slow" in bold at its ends, above it (Bill, 2026-10-28: "Put the Pace
+    axis numbers under the plot and replace that line with bold letters:
+    'Fast       Slow' at the end points."); they stay put while the table
+    scrolls."""
+
+    def __init__(self, ends=False):
+        super().__init__()
+        self.ends = ends
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        if self.ends:
+            f = QFont(self.font())
+            f.setBold(True)
+            f.setPixelSize(15)                  # as the column headers
+            p.setFont(f)
+            p.setPen(QColor(0, 0, 0))
+            r = QtCore.QRectF(PaceGraph.PAD - 4, 0, self.width() - 2 * PaceGraph.PAD + 8, self.height())
+            p.drawText(r, Qt.AlignLeft | Qt.AlignVCenter, "Fast")
+            p.drawText(r, Qt.AlignRight | Qt.AlignVCenter, "Slow")
+            p.end()
+            return
+        fm = p.fontMetrics()
+        p.setPen(QColor(90, 90, 90))
+        for m in range(int(PaceGraph.FAST), int(PaceGraph.SLOW) + 1):
+            text = f"{m}:00" if m in (PaceGraph.FAST, PaceGraph.SLOW) else str(m)
+            cx = PaceGraph.x(m, self.width())
+            tw = fm.horizontalAdvance(text)
+            left = min(max(0, cx - tw / 2), self.width() - tw)
+            p.drawText(QtCore.QPointF(left, self.height() - fm.descent() - 2), text)
+        p.end()
+
+
+def poolwind_version():
+    """'v15.7': read from the program's own first changelog line
+    ('# poolwindAI_v15.7 ...'), so it's right whatever the file is called
+    (poolwind.py once installed) and moves on with each new version by
+    itself; '' if it can't be read."""
+    try:
+        with open(os.path.abspath(__file__), encoding="utf-8") as f:
+            m = re.search(r"poolwindAI_(v\d+(?:\.\d+)+)", f.read(4000))
+        return m.group(1) if m else ""
+    except Exception:
+        return ""
+
+
+def pool_fullscreen(win, app):
+    """On the pool screen: the window marked full screen for the window
+    manager (openbox), so it stays over the Pi's header bar while it, or
+    one of its own boxes (a message, the password), has the focus; only
+    screen-sized it was over the header only while itself focused, and
+    the header covered its top whenever a box or sub screen took the focus
+    (Bill, 2026-10-31: "Often but not always, the Pi header menu opens up
+    in PoolWind and the sub screens"). Alt-Tab to another window still
+    brings the header back. Not with the monitor left in landscape: the
+    window is narrower than the screen there, kept clear of the taskbar."""
+    screen = QApplication.primaryScreen().geometry()
+    if app.display_device == "pool" and (app.window_w, app.window_h) == (screen.width(), screen.height()):
+        win.setWindowState(win.windowState() | Qt.WindowFullScreen)
+
+
+def cal_group(key, builder, derived):
+    """The calibration file's heading a line goes under: none for the
+    builder's, then the program's, then the developer's (and any other)."""
+    if key in builder:
+        return ""
+    return ("# --- Program Derived, do not touch ---" if key in derived
+            else "# --- Developer defaults ---")
+
+
+def login_password_ok(password):
+    """True if password is the Pi's login password for the user running
+    PoolWind (the builder's password: Calibrate pool, and Pace correction
+    on the Master table). Asked of the Pi's own login check (PAM, service
+    'poolwind', which falls back to the standard password check); the
+    password is never kept. sudo can't be used: it asks no password on the
+    Pi. None where there's no PAM (not a Pi: no login password to check).
+    Keeps a swimmer out, isn't real security (Bill, 2026-10-31: "Real
+    security isn't essential, just keeping a typical user out of pool
+    calibration is enough")."""
+    import ctypes, ctypes.util, pwd
+    lib = ctypes.util.find_library("pam")
+    if not lib:
+        return None
+    pam = ctypes.CDLL(lib)
+    libc = ctypes.CDLL(ctypes.util.find_library("c"))
+    libc.calloc.restype, libc.calloc.argtypes = ctypes.c_void_p, (ctypes.c_size_t, ctypes.c_size_t)
+    libc.strdup.restype, libc.strdup.argtypes = ctypes.c_void_p, (ctypes.c_char_p,)
+
+    class Message(ctypes.Structure):
+        _fields_ = [("msg_style", ctypes.c_int), ("msg", ctypes.c_char_p)]
+
+    class Response(ctypes.Structure):
+        _fields_ = [("resp", ctypes.c_void_p), ("resp_retcode", ctypes.c_int)]
+
+    CONV = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.POINTER(Message)),
+                            ctypes.POINTER(ctypes.POINTER(Response)), ctypes.c_void_p)
+
+    class Conv(ctypes.Structure):
+        _fields_ = [("conv", CONV), ("appdata_ptr", ctypes.c_void_p)]
+
+    secret = password.encode("utf-8")
+
+    def answer(n, messages, responses, _):
+        # PAM frees the answers itself: they must come from C's own memory
+        out = ctypes.cast(libc.calloc(n, ctypes.sizeof(Response)), ctypes.POINTER(Response))
+        for i in range(n):
+            if messages[i].contents.msg_style == 1:     # PAM_PROMPT_ECHO_OFF: the password
+                out[i].resp = libc.strdup(secret)
+        responses[0] = out
+        return 0
+
+    pam.pam_start.argtypes = (ctypes.c_char_p, ctypes.c_char_p,
+                              ctypes.POINTER(Conv), ctypes.POINTER(ctypes.c_void_p))
+    pam.pam_authenticate.argtypes = (ctypes.c_void_p, ctypes.c_int)
+    pam.pam_end.argtypes = (ctypes.c_void_p, ctypes.c_int)
+    conv = Conv(CONV(answer), None)
+    handle = ctypes.c_void_p()
+    user = pwd.getpwuid(os.getuid()).pw_name.encode()
+    if pam.pam_start(b"poolwind", user, ctypes.byref(conv), ctypes.byref(handle)) != 0:
+        return False
+    result = pam.pam_authenticate(handle, 0)
+    pam.pam_end(handle, result)
+    return result == 0
+
+
+def temp_path(folder, name):
+    """Where PoolWind puts a file it never needs to run -- a backup, a
+    calibration session's record, a trace: the 'temp' folder in `folder`
+    (made when first needed). The program's folder (and the stick) keep
+    only what PoolWind runs on, and 'temp' can be deleted any time (Bill,
+    2026-10-30: "I should be able to delete 'temp' and the program will
+    completely operate.")."""
+    d = os.path.join(folder, "temp")
+    os.makedirs(d, exist_ok=True)
+    return os.path.join(d, name)
+
+
+class PaceBigDisplay(QFrame):
+    """Pace correction's copy of the pool screen's big Pace, in its own blue
+    box over the panel's title and instructions while the swimmer swims with
+    Suspend showing (Bill, 2026-10-29: "The instructions need to be replaced
+    by a copy of the big Pace display from the main screen" ... "Make it as
+    large as possible, maybe a seperate but connected box covering the area
+    including 'Pace correction' header. Give the box background a blue color
+    like the original main screen."). ▼ shows the instructions instead."""
+
+    def __init__(self, parent, on_toggle):
+        super().__init__(parent)
+        self.setObjectName("paceBig")
+        self.setStyleSheet("#paceBig { background-color: rgb(30, 90, 170); border: 2px solid #2060c0;"
+                           " border-radius: 6px; }")
+        self.label = QLabel("0:00", self)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("color: rgb(204, 255, 0);")
+        self.btn = QPushButton("▼", self)
+        self.btn.setFixedSize(40, 30)
+        self.btn.setFocusPolicy(Qt.NoFocus)
+        self.btn.setToolTip("Show the instructions")
+        self.btn.clicked.connect(on_toggle)
+        self.hide()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.label.setGeometry(0, 0, self.width(), self.height())
+        f = QFont("DejaVu Serif")
+        f.setBold(True)
+        f.setPixelSize(max(20, int(self.height() * 0.8)))
+        self.label.setFont(f)
+        self.btn.move(self.width() - self.btn.width() - 10, 8)
+
+    def set_pace(self, text):
+        if self.label.text() != text:
+            self.label.setText(text)
+
+
 class PaceCorrectionPanel(OverlayPanel):
     """
-    Pace correction (Bill at the pool, 2026-10-21: "should work like
-    swimmer limits. Swimmer swims to where they feel their known pace and
-    moves aside. Current pace should be displayed and all they have to do
-    is type in what they feel it should be. Simpler, no writing down
-    numbers."). The box shows the pace the table gives for the jet's speed
-    -- live while the swimmer is in the swim area, held at the speed when
-    they were last seen once they leave it. The swimmer (or coach) types
-    the pace it should be and presses Add; any number of speeds. Save
-    corrects the table (correct_table: exact at each pair, blended between,
-    carried on past the ends), with a backup and a record, and PoolWind uses
-    it at once. The jet speeds (voltages) don't change, only the paces.
+    Pace correction, v15.6 (Bill, 2026-10-26: "Could there be a shrunk down
+    picture of the swim area with the zones marked and the exit zone
+    highlighted?" ... "next to the picture are entry boxes displaying the
+    Pace for each zone ... the user could enter and overwrite the values in
+    any of those zones. The value entered would have to change the entire
+    curve by interpolation but any box where an entry was made would be
+    fixed." ... "A checker could make sure Pace numbers are in order.")
+
+    Each jet step has a row, fastest at the top: its zone (the swimmer's
+    zones, _zone_steps, bold), its Pace now, the new one, and an empty box
+    for the Pace it should be ("write the previous value next to the box and
+    have the box empty. That way a user can see which have new values").
+    Beside them the graph (PaceGraph), a row per zone, scrolling with them;
+    the zone the swimmer is in or was last seen in (_seen_zone) lit, its box
+    ready. Escape puts back what the chosen box held when it was chosen
+    (Bill, 2026-10-28: "escape puts back the prior value into an entry box
+    if it was changed. Otherwise, do nothing."); Cancel closes. While it
+    is open the jet follows the swimmer whatever Begin / Suspend / Resume
+    shows, winding down as usual when they leave the swim area, and nothing
+    was logged (2026-10-28, App.pace_correcting; since 2026-10-29 the swim
+    runs as usual, only no auto-suspend). (Before
+    2026-10-28: the swim area's picture where the graph is.)
+
+    Kept simple (Bill, 2026-10-28: "There is too much going on with what is
+    displayed. There are bold numbers, red numbers, plain numbers, no
+    numbers." ... "Let's throw out the history of changes."): New starts as
+    Now; every change works the table out again at once (no View results
+    button: "The 'View Results' should be run with every change"). The
+    Paces typed here are the only fixed points, and the bottom zone, always
+    7:00 ("Your typed Paces are the only fixed points. Yes, except the bottom
+    zone Pace = 7.00"; since 2026-10-30 the bottom and top zones' Paces in
+    the pool's table instead, "that was the builders choice");
+    fix_table does the rest: exact at them, Now's shape in between,
+    always in order. Red in New: not faster
+    than the zone below; a box red when its Pace is the trouble ("even if
+    the cursor is still in the offending entry box"). Clear empties the
+    boxes and puts the drag numbers back: New is Now again. The jet speeds
+    (voltages) don't change, only the paces. (Before: Paces fixed in earlier
+    corrections kept in the file, 'PacesFixed' / 'PacesFixedEarlier'.)
+
+    The changes stay pending, in use by the pool, while the swim goes on
+    (Bill, 2026-10-29: "The new values need to be kept so that adjustments
+    can be made throughout the swim while looking at the previous
+    adjustments."): every good change is kept in the calibration file
+    (App.save_pending, 'PacesPending'); Back goes to the pool screen keeping
+    them, Make permanent writes New into Now (App.make_pace_permanent),
+    Clear drops them; Switch to 'Now' values / 'New' values picks the table
+    the pool uses (App.use_new; the one in use bold). A red value is a
+    warning: Back and Make permanent wait until it's fixed; ↺ beside a
+    changed box puts it back. Swims count as usual (Suspend showing; a copy
+    of the button is at the top); while swimming with Suspend showing the
+    big Pace display (PaceBigDisplay) covers the title and instructions.
+
+    After a PingPong (Bill, 2026-10-27: "'Pace correction' is very similar
+    to this and maybe we could combine them") the drag numbers are at the
+    top: the table is worked out from PingPong's ball steps ('PingPongBalls')
+    with bodyDrag / deltaBodyDrag (ball_table), the typed Paces laid on top.
+
+    Before v15.6: one Pace at a time against the pace when last seen
+    (correct_table), Bill, 2026-10-21: "should work like swimmer limits.
+    Swimmer swims to where they feel their known pace and moves aside."
     """
     PANEL_ATTR = "pace_panel"
-    TEXT = ("Swim until the current feels like a Pace you know (from a regular pool), then "
-            "move aside: the Pace PoolWind reads for that speed stays below. Type the Pace "
-            "it should be and press Add. Do it at as many speeds as you like, then Save. "
-            "Drag this box to move it.")
+    ROW_H = 34                         # a row's height (pixels)
+    BACKGROUND = "white"               # solid: "Main screen bleeds through" (Bill, 2026-10-28)
+    CHOSEN = "border: 2px solid #2060c0;"
+    CHOSEN_BG = "background-color: #fff2a0;"
+    BAD = "background-color: #ffc0c0;"
+    END_BG = "background-color: #e4e4e4;"   # the ends' boxes: the pool's, not to be changed
+    RED = "#b00000"
+    # The instructions: plain steps; the theory behind them in Details (Bill,
+    # 2026-10-28: "The main instructions should just be plain instructions.
+    # The 'details' will bring up more theoritical explanation.")
+    TEXT = ("Swim until the current feels like a Pace you know, then move aside: your zone turns "
+            "yellow and its box is ready. Type the Pace it should be (1 4 8 = 1:48); Your pending "
+            "Pace and the graph change as you type, and the pool uses them at once. Tap a box, or a zone on the "
+            "graph, to choose it; drag the graph to scroll; Esc or ↺ puts a box back. "
+            "<span style='color:#b00000'>Red</span>: out of sequence, change one of the red "
+            "boxes. <b>Back</b> keeps your changes in use; <b>Make permanent</b> stores your "
+            "pending Paces; <b>Clear</b> starts again.")
+    DRAG_TEXT = (" After a PingPong, <b>bodyDrag</b> and <b>deltaBodyDrag</b> change the whole table.")
+    DETAILS_LINK = " <a href='details'>Details…</a>"
+    # Earlier swims are read in the Paces in use (Swim Plot, the calendar):
+    # said first, every time (Bill, 2026-11-01: "The swimmer and builder (or
+    # coach) should be warned about this in the program if they change Pace
+    # settings in the 'Pace correction screen' regardless of working with
+    # Master or Swimmer datasets.")
+    EARLIER_MINE = ("<span style='color:#b00000'><b>Changing your Paces changes how all your swims show "
+                    "in Swim Plot and the calendar, earlier ones too: they're read in the Paces in use. "
+                    "Your swim logs aren't changed; ↺ brings back how they were.</b></span><br>")
+    EARLIER_MASTER = ("<span style='color:#b00000'><b>Changing the Master Paces changes how all swims made "
+                      "without a USB stick show in Swim Plot and the calendar, earlier ones too: they're "
+                      "read in the Paces in use. The swim logs aren't changed; ↺ brings back how they "
+                      "were.</b></span><br>")
+    DETAILS = (
+        # First, Bill's scenario (2026-10-28: "Put that scenario titled as
+        # 'Scenario' as the first paragraph of the details box.")
+        "<p><b>Scenario</b></p>"
+        "<p>You're swimming and the Pace shown feels too slow. Step out of the swim area: your "
+        "zone is remembered and the jet winds down. Open <b>Pace correction</b> from the menu and "
+        "type the Pace it should be: Your pending Pace and the graph change, and the pool uses "
+        "them at once. "
+        "Swim again: with <b>Suspend</b> showing (there's a copy of the button at the top) the "
+        "swim counts as usual, and while you swim the big Pace display covers the instructions so "
+        "you can see your Pace. Step out, adjust again, and so on, as often as you like. "
+        "<b>Back</b> returns to the pool screen with your changes still in use; <b>Make "
+        "permanent</b> stores them. If you close PoolWind with changes "
+        "pending, it asks whether to keep them pending or make them permanent.</p>"
+        "<p><b>How Your pending Paces are worked out</b></p>"
+        "<p>Your new Paces stay exactly as typed, and so do the two ends, the bottom and top "
+        "zones' Paces set when the pool was calibrated (grey; they can't be changed). Every other "
+        "zone keeps its place on the stored curve: between two fixed Paces it sits the same part "
+        "of the way from one to the other as it does there. So the pending curve keeps the "
+        "stored one's shape and always gets faster zone by zone, however far your Paces are from "
+        "it, as long as each is faster than the one below it. One Pace "
+        "changes the zones on both sides of it, most near your Pace, less toward the ends. To "
+        "keep part of the table where it is, type a Pace there too.</p>"
+        "<p><b>bodyDrag and deltaBodyDrag</b> (after a PingPong)</p>"
+        "<p>PingPong times ping-pong balls, which ride on the surface of the water. A swimmer is "
+        "lower in the water, in slower water, and drags against it, so a swimmer's Pace is the "
+        "ball's pace times a factor. <b>bodyDrag</b> is that factor at the jet's fastest speed; "
+        "<b>deltaBodyDrag</b> is how much more it is at the slowest speed, at the back of the "
+        "pool: swimming slowly the legs sink, and further from the jet the flow spreads out and "
+        "down toward the return ducts. Between the two it changes evenly, zone by zone.</p>"
+        "<p>The numbers to start with (1.50 and 0.18) are an educated guess that works well in the "
+        "author's pool. Change them and watch Your pending Pace and the graph; <b>Defaults</b> puts them back. "
+        "Your typed Paces stay as they are.</p>"
+        # Bill, 2026-10-29: "'Tracking on' = normal swim."
+        "<p><b>Swimming with Pace correction open</b></p>"
+        "<p>PoolWind runs as usual under this box. With <b>Suspend</b> showing the jet follows you "
+        "and the swim counts toward distance and the log; with <b>Begin</b> or <b>Resume</b> "
+        "showing the jet stays wound down and nothing counts until you press the button (here or "
+        "on the pool screen). While this box is open PoolWind doesn't suspend the swim by itself. "
+        "When you swim with Suspend showing, the big Pace display takes the place of the "
+        "instructions; ▼ on it brings the instructions back, ▲ the Pace display.</p>"
+        "<p><b>Stored or pending</b></p>"
+        "<p>Your changes stay pending until you make them permanent, kept even if PoolWind is "
+        "closed or the power goes off. The pool uses Your pending Paces (shown bold, and "
+        "\"Pending Paces\" on the pool screen); <b>Swim with 'stored' values</b> swims your "
+        "stored Paces, to compare. The choice holds until PoolWind closes; it starts with "
+        "pending. <b>Make permanent</b> writes your pending Paces into your stored ones and keeps "
+        "a copy of the file before; <b>Clear</b> drops the pending changes.</p>"
+        "<p><b>The pool's values</b> (with your USB stick in)</p>"
+        "<p><b>Copy Master values to \"Your pending\"</b> puts the pool's own Paces into Your "
+        "pending Pace and empties Your new Pace; the pool swims them at once. The button stays "
+        "down; <b>↺</b> beside it brings back your own pending Paces and the Paces you had "
+        "typed, as they were (Paces typed while it was down go). <b>Make permanent</b> while "
+        "it's down stores the pool's values as your own. You can also type Paces on the pool's "
+        "values to adjust them.</p>"
+        "<p><b>Whose table</b></p>"
+        "<p>With a swimmer's USB stick in, the table is that swimmer's own, kept on the stick (the "
+        "title shows the stick's name); with no stick, the Master data, the pool's own table. "
+        "<b>Make permanent</b> writes that table, and its question names it. The jet's steps and "
+        "limits are always the pool's.</p>")
+    text_hidden = False                # ▲ / ▼: the instructions hidden (kept while PoolWind runs)
 
     def __init__(self, app, parent):
         super().__init__(parent)
         self.app = app
-        self.pairs = []                    # (felt, shown) paces
-        lay = self._setup_frame(parent, "Pace correction")
-        self.info.setText(self.TEXT)
+        app.pace_correcting = True             # no auto-suspend while open (close_panel)
+        lay = self._setup_frame(parent, f"Pace correction: {app.swimmer_name() or 'Master'}")
+        self.setFixedWidth(parent.width() - 20)
+        # ▲ in the top right corner hides the instructions, the table taking
+        # their room; ▼ brings them back (Bill, 2026-10-28: "could there be a
+        # ^ and inverse ^ (toggles) in the upper right corner that would
+        # remove the instructions and expand the table as much as possible?
+        # A smaller font would be OK too.")
+        title = lay.itemAt(0).widget()
+        lay.removeWidget(title)
+        top = QHBoxLayout()
+        top.addWidget(title)
+        top.addStretch(1)
+        self.text_btn = QPushButton()
+        self.text_btn.setFixedSize(40, 30)
+        self.text_btn.setFocusPolicy(Qt.NoFocus)
+        self.text_btn.clicked.connect(self._toggle_text)
+        top.addWidget(self.text_btn)
+        lay.insertLayout(0, top)
+        self.info.setStyleSheet("font-size: 13px;")
         big = QtGui.QFont(self.font())
-        big.setPointSize(16)
+        big.setPointSize(14)
         big.setBold(True)
 
-        self.reading = QLabel()
-        self.reading.setFont(big)
-        lay.addWidget(self.reading)
+        cal = app.calibration                 # the pool's (PingPong's balls)
+        mine = app.swimmer_cal                # the swimmer's table, or Master's
+        self.table = sorted(((float(p), float(v)) for p, v in mine["pace_voltage"]), key=lambda r: r[1])
+        self.tv = [v for _, v in self.table]
+        self.V = app.plateau_voltages
+        self.steps = list(app.controller._zone_steps())      # the zones (jet steps), slowest first
+        self.n = len(self.steps)
+        self.names = self._zone_numbers()
+        self.balls = [tuple(b) for b in cal.get("PingPongBalls", [])]
+        self.drag = bool(self.balls) and all(1 <= s <= len(self.tv) and abs(self.tv[s - 1] - v) <= 0.006
+                                             for s, v, _, _ in self.balls)
+        if self.balls and not self.drag:
+            print("Pace correction: the Pace table's steps no longer match PingPong's ball steps; "
+                  "bodyDrag and deltaBodyDrag can be changed again after a PingPong")
+        self.new = list(self.table)                           # New: Now until something changes
+        self.entries = {}                                     # {jet step: Pace typed}, the good ones
+        self.bad = set()                                      # jet steps whose box is the trouble
+        self.lit = None
+        self.current = None                                   # the box the digits go to
+        self.picked = False                                   # clicked by the user: the lit zone doesn't take it
+        self.edits, self.trows = {}, {}                       # {jet step: its box / row}
+        self.reverts = {}                                     # {jet step: its ↺ button}
+        self.tracking = False                                 # swimming with Suspend showing
+        self._found_t = 0.0                                   # when the swimmer was last seen swimming
+        self._away = True                                     # out of the swim area 2 s (_tick)
+        self.coach_text = False                               # ▼ on the Pace display: instructions instead
+        pend = app.pending or {}
+        self.info.setText((self.EARLIER_MINE if app.swimmer_name() else self.EARLIER_MASTER)
+                          + self.TEXT + (self.DRAG_TEXT if self.drag else "") + self.DETAILS_LINK)
+        self.info.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
+        self.info.linkActivated.connect(self._details)
 
-        row = QHBoxLayout()
-        row.addWidget(QLabel("It should be:"))
-        self.entry = QtWidgets.QLineEdit()
-        self.entry.setFont(big)
-        self.entry.setMaxLength(5)
-        self.entry.setPlaceholderText("1:45")
-        self.entry.setMinimumHeight(44)
-        self.entry.returnPressed.connect(self._add)
-        row.addWidget(self.entry, 1)
-        self.add_btn = QPushButton("Add")
-        self.add_btn.setMinimumSize(80, 44)
-        self.add_btn.clicked.connect(self._add)
-        row.addWidget(self.add_btn)
+        self.spins = []
+        row = QHBoxLayout()                     # the drag numbers' own row (the Copy row is full at 600 px)
+        if self.drag:
+            for name, lo, hi, value in (("bodyDrag", 1.0, 3.0, pend.get("bodyDrag", mine.get("bodyDrag", BODY_DRAG))),
+                                        ("deltaBodyDrag", -1.0, 1.0,
+                                         pend.get("deltaBodyDrag", mine.get("deltaBodyDrag", DELTA_BODY_DRAG)))):
+                row.addWidget(QLabel(name))
+                spin = QtWidgets.QDoubleSpinBox()
+                spin.setRange(lo, hi)
+                spin.setDecimals(2)
+                spin.setSingleStep(0.01)
+                spin.setValue(float(value))
+                spin.setMinimumHeight(40)
+                spin.valueChanged.connect(self._work_out)
+                row.addWidget(spin)
+                self.spins.append(spin)
+            b = QPushButton("Defaults")
+            b.setMinimumHeight(40)
+            b.setFocusPolicy(Qt.NoFocus)
+            b.clicked.connect(self._drag_defaults)
+            row.addWidget(b)
+            self.drag_defaults_btn = b
+            row.addStretch(1)
+            lay.addLayout(row)
+            row = QHBoxLayout()
+        # The pool's values into Your pending, the swimmer's own kept to come
+        # back with ↺ (Bill, 2026-10-30: "one new button that says : 'Copy
+        # Pool values to "Your pending" and when pressed, it will overwrite
+        # the existing column column 2) and clear out all the entries in
+        # column 3) The button will stay down when pressed but will have the
+        # little revert button next to it release the button and restore
+        # columns 2) and 3). Some small text close to the button should say
+        # 'entered data will not be lost'."). Only with a swimmer's stick in:
+        # without one, Your stored Paces are the pool's.
+        self.copy_btn = QPushButton('Copy Master values\nto "Your pending"')
+        self.copy_btn.setCheckable(True)
+        self.copy_btn.setMinimumHeight(44)
+        self.copy_btn.setFocusPolicy(Qt.NoFocus)
+        self.copy_btn.setStyleSheet("QPushButton:checked { background-color: #9cc0f0; }")
+        self.copy_btn.clicked.connect(self._copy_pressed)
+        self.copy_back = QPushButton("↺")
+        self.copy_back.setFixedSize(32, 30)
+        self.copy_back.setFocusPolicy(Qt.NoFocus)
+        self.copy_back.setToolTip("Your own Paces back")
+        self.copy_back.clicked.connect(self._uncopy)
+        self.copy_note = QLabel("entered data\nwill not be lost")
+        self.copy_note.setStyleSheet("font-size: 11px; color: #606060;")
+        row.addSpacing(12)
+        for w in (self.copy_btn, self.copy_back, self.copy_note):
+            row.addWidget(w)
+            w.setVisible(app.swimmer_name() is not None)
+        row.addStretch(1)
+        # A copy of the pool screen's Suspend button (Bill, 2026-10-29: "an
+        # exact copy of the 'Suspend' button on the same level as the
+        # bodyDrag buttons")
+        self.susp_btn = QPushButton()
+        self.susp_btn.setFixedSize(110, 40)
+        self.susp_btn.setFocusPolicy(Qt.NoFocus)
+        self.susp_btn.clicked.connect(self._press_suspend)
+        row.addWidget(self.susp_btn)
         lay.addLayout(row)
+        self.saved_drag = [float(mine.get("bodyDrag", BODY_DRAG)),
+                           float(mine.get("deltaBodyDrag", DELTA_BODY_DRAG))][:len(self.spins)]
+        # Left copied (Back, or PoolWind closed): copied again, ↺ still
+        # bringing the swimmer's own back
+        self.copied = "copied" in pend
+        self.before = pend.get("copied")                    # the pending changes before the copy, or None
+        self._show_copied()
 
-        # A small number pad, for the mouse (the keyboard types straight in)
-        pad = QtWidgets.QGridLayout()
-        for i, k in enumerate(["1", "2", "3", "4", "5", "6", "7", "8", "9", ":", "0", "<"]):
+        self._make_table(lay, big)
+        # The two ends, the pool's (the builder's): in their boxes, bold,
+        # not to be changed, no ↺ (Bill, 2026-10-30: "the top and bottom
+        # values should be written in their entry box in bold and be unable
+        # to edit. Don't need the revert button next to them either.")
+        pool = sorted((float(v), float(p)) for p, v in cal["pace_voltage"])
+        self.ends = {0: pool[0][1], len(self.table) - 1: pool[-1][1]}
+        for i, p in self.ends.items():
+            e = self.edits[i]
+            e.blockSignals(True)
+            e.setText(pace_text(p))
+            e.blockSignals(False)
+            e.setReadOnly(True)
+            e.setFocusPolicy(Qt.NoFocus)
+            self.reverts.pop(i).hide()
+
+        self.note = QLabel()                    # the checker's lines, shown only when there are some
+        self.note.setWordWrap(True)
+        self.note.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.note.hide()
+        lay.addWidget(self.note)
+
+        # A number pad, for the mouse (the keyboard types straight in)
+        pad = QHBoxLayout()
+        for k in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "<"]:
             b = QPushButton(k)
-            b.setFixedHeight(36)
+            b.setFixedHeight(40)
+            b.setFocusPolicy(Qt.NoFocus)
             b.clicked.connect(lambda _=False, k=k: self._key(k))
-            pad.addWidget(b, i // 6, i % 6)
+            pad.addWidget(b)
         lay.addLayout(pad)
 
-        self.pairs_label = QLabel()
-        self.pairs_label.setWordWrap(True)
-        lay.addWidget(self.pairs_label)
-
         row = QHBoxLayout()
-        self.cancel_btn = QPushButton("Cancel")
-        self.cancel_btn.clicked.connect(self.close_panel)
-        self.remove_btn = QPushButton("Remove last")
-        self.remove_btn.clicked.connect(self._remove)
-        self.save_btn = QPushButton("Save")
-        self.save_btn.clicked.connect(self._save)
-        for b in (self.cancel_btn, self.remove_btn, self.save_btn):
+        self.clear_btn = QPushButton("Clear")
+        self.clear_btn.clicked.connect(self._clear)
+        self.back_btn = QPushButton("Back")
+        self.back_btn.clicked.connect(self.close_panel)
+        self.save_btn = QPushButton("Make permanent")
+        self.save_btn.clicked.connect(self._make_permanent)
+        for b in (self.clear_btn, self.back_btn, self.save_btn):
             b.setMinimumHeight(48)
+            b.setFocusPolicy(Qt.NoFocus)
             row.addWidget(b)
         lay.addLayout(row)
 
-        self._show_pairs()
+        # The pending changes as they were left: the Paces typed in their boxes
+        for pace, volts in pend.get("typed", []):
+            i = min(range(len(self.V)), key=lambda k: abs(self.V[k] - float(volts)))
+            if abs(self.V[i] - float(volts)) < 0.006 and i not in self.ends:
+                e = self.edits[i]
+                e.blockSignals(True)
+                e.setText(pace_text(float(pace)))
+                e.blockSignals(False)
+        self.pace_box = PaceBigDisplay(parent, self._toggle_text)
+
         self._tick()
+        self._work_out()
+        self._show_text()
         self._place()
-        self.entry.setFocus()
+        self.focus_lit()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
         self.timer.start(500)
 
-    def _now(self):
-        """(volts, zone, pace PoolWind reads, the swimmer is in the area):
-        the jet now while the swimmer is in the swim area, else when they
-        were last seen."""
-        app = self.app
-        inside = bool(app.window.swimmerFound)
-        v = getattr(app, "_jet_voltage", None)
-        if not inside and app._seen_voltage is not None:
-            v = app._seen_voltage
-        if v is None:
-            v = app.currentVoltage
-        zone = app.findClosestPlateauIndex(v, app.noiseAllowedPercent_valve, app.plateau_voltages) + 1
-        return v, zone, app.controller._get_pace_from_voltage(v), inside
+    def _edit(self, i, font):
+        """A Pace box for jet step i."""
+        edit = PaceEdit(font)
+        edit.step = i
+        edit.on_focus = self._focused
+        edit.textChanged.connect(self._changed)
+        self.edits[i] = edit
+        return edit
+
+    def _make_table(self, lay, font):
+        """Every jet step, fastest at the top: the graph, Zone, Now, New and
+        a box; it all scrolls together. Now's and New's headers carry the
+        graph's colors (the legend)."""
+        # (Bill, 2026-10-30: "rename the Now column as [Your, stored, Pace]
+        # stacked." ... "the New column as [Your, pending, Pace]" ... "the
+        # Your Pace colums as [Your new Pace]")
+        line = lambda c: f"<span style='color:{c.name()}'>━</span> "
+        cols = (("Zone", 50), ("Your<br>stored<br>" + line(PaceGraph.NOW) + "Pace", 72),
+                ("Your<br>pending<br>" + line(PaceGraph.NEW) + "Pace", 72), ("Your<br>new<br>Pace", 84))
+        row_w = sum(w for _, w in cols) + 32 + 5 * 6           # and the ↺
+        self.graph_w = max(120, self.width() - 20 - row_w - 30)
+        head = QHBoxLayout()
+        head.setSpacing(6)                      # as the rows': the headers over their columns
+        ends = PaceScale(ends=True)
+        ends.setFixedSize(self.graph_w, 22)
+        head.addWidget(ends, 0, Qt.AlignBottom)
+        self.heads = {}
+        for text, w in cols:
+            lab = QLabel(f"<b>{text}</b>")
+            lab.setFixedWidth(w)
+            lab.setAlignment(Qt.AlignCenter)
+            head.addWidget(lab, 0, Qt.AlignBottom)
+            self.heads["Now" if "stored" in text else "New" if "pending" in text else text] = (lab, text)
+        head.addStretch(1)
+        lay.addLayout(head)
+        self.scroll = QtWidgets.QScrollArea()
+        self.scroll.setFrameShape(QFrame.NoFrame)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        inner = QWidget()
+        inner.setObjectName("tableInner")
+        inner.setStyleSheet("#tableInner { background: transparent; }")
+        top = lambda i: (len(self.V) - 1 - i) * self.ROW_H     # row i's y, fastest at the top
+        for i in reversed(range(len(self.V))):
+            w = QWidget(inner)
+            w.setObjectName("trow")
+            w.setAttribute(Qt.WA_StyledBackground, True)
+            w.setGeometry(self.graph_w + 6, top(i), row_w, self.ROW_H)
+            row = QHBoxLayout(w)
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(6)
+            zone = QLabel(f"<b>{self.names[i]}</b>" if i in self.steps else self.names[i])
+            now, new = QLabel(), QLabel()
+            for lab, wd in ((zone, 50), (now, 72), (new, 72)):
+                lab.setFixedWidth(wd)
+                lab.setAlignment(Qt.AlignCenter)
+                row.addWidget(lab)
+            edit = self._edit(i, font)
+            row.addWidget(edit)
+            back = QPushButton("↺")         # this box back as it was (Bill, 2026-10-29: "Let's bring
+            back.setFixedSize(32, 30)        # back your little revert buttons for each box changed.")
+            back.setFocusPolicy(Qt.NoFocus)
+            back.setToolTip("Put this box back")
+            back.clicked.connect(lambda _=False, e=edit: e.setText(""))
+            back.hide()
+            row.addWidget(back)
+            self.reverts[i] = back
+            row.addStretch(1)
+            self.trows[i] = {"widget": w, "now": now, "new": new}
+        self.graph = PaceGraph(inner, self.steps, self.ROW_H)
+        self.graph.setGeometry(0, 0, self.graph_w, len(self.V) * self.ROW_H)
+        self.graph.on_pick = self._pick
+        self.graph.scroll_bar = self.scroll.verticalScrollBar()
+        inner.setFixedSize(self.graph_w + 6 + row_w, len(self.V) * self.ROW_H)
+        self.scroll.setWidget(inner)
+        self.scroll.setFixedHeight(len(self.V) * self.ROW_H)
+        lay.addWidget(self.scroll)
+        under = QHBoxLayout()
+        under.setSpacing(6)
+        scale = PaceScale()
+        scale.setFixedSize(self.graph_w, 20)
+        under.addWidget(scale, 0, Qt.AlignTop)
+        under.addSpacing(50)                    # under Zone
+        # Which table the pool uses (Bill, 2026-10-29: "A button directly
+        # under the 'Now' and 'New' columns will say "Switch to 'Now' values"
+        # or "Switch to 'New' values". Whichever column is used will be shown
+        # in bold.")
+        self.switch_btn = QPushButton()
+        self.switch_btn.setFixedSize(72 + 6 + 72, 40)
+        self.switch_btn.setFocusPolicy(Qt.NoFocus)
+        self.switch_btn.setStyleSheet("font-size: 12px;")
+        self.switch_btn.clicked.connect(self._switch)
+        under.addWidget(self.switch_btn)
+        under.addStretch(1)
+        lay.addLayout(under)
+
+    def _place(self):
+        self._fit()
+        self.move(10, 10)
+
+    def _fit(self):
+        """The table as tall as the screen leaves room for (it scrolls), the
+        chosen box kept in sight."""
+        full = len(self.V) * self.ROW_H
+        self.scroll.setFixedHeight(full)
+        self.layout().activate()
+        # (no word-wrapped text on show: no height-for-width, the size hint then)
+        height = lambda: self.heightForWidth(self.width()) if self.hasHeightForWidth() else self.sizeHint().height()
+        extra = height() - (self.parent().height() - 20)
+        if extra > 0:
+            self.scroll.setFixedHeight(max(4 * self.ROW_H, full - extra))
+            self.layout().activate()
+        self.resize(self.width(), height())
+        if self.current is not None:
+            self.scroll.ensureWidgetVisible(self.current.parentWidget(), 0, 2 * self.ROW_H)
+
+    def _details(self, *_):
+        """The Details box: as wide as the panel (Bill, 2026-10-28: "the
+        details box is too long and truncated. It could easily be
+        widened."), as tall as the screen; the rest scrolls, by click and
+        drag on the text, the wheel or the bar ("Let the user scroll down
+        with click and drag or scroll wheel (or side drag bar)")."""
+        box = QDialog(self)
+        box.setWindowTitle("Pace correction: details")
+        lay = QVBoxLayout(box)
+        text = QLabel(self.DETAILS)
+        text.setTextFormat(Qt.RichText)
+        text.setWordWrap(True)
+        text.setStyleSheet("font-size: 14px;")
+        text.setContentsMargins(4, 4, 12, 4)
+        area = QtWidgets.QScrollArea()
+        area.setWidgetResizable(True)
+        area.setFrameShape(QFrame.NoFrame)
+        area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        area.setWidget(text)
+        QtWidgets.QScroller.grabGesture(area.viewport(), QtWidgets.QScroller.LeftMouseButtonGesture)
+        lay.addWidget(area)
+        ok = QPushButton("OK")
+        ok.setMinimumHeight(44)
+        ok.clicked.connect(box.accept)
+        lay.addWidget(ok)
+        top = self.window()
+        width = min(560, top.width() - 20)
+        box.setFixedWidth(width)
+        text.setFixedWidth(width - 40)
+        need = text.heightForWidth(width - 40) + ok.minimumHeight() + 40
+        box.resize(width, min(need, top.height() - 120))    # a little short of the screen (Bill, 2026-10-29)
+        box.move(top.mapToGlobal(QtCore.QPoint((top.width() - width) // 2, 60)))
+        box.exec()
+        if self.current is not None:
+            self.current.keep_cursor = True
+            self.current.setFocus()
+            self.current.keep_cursor = False
+
+    def _show_text(self):
+        """The instructions, or while swimming (Suspend showing) the big Pace
+        display over them, the table keeping its size (Bill, 2026-10-29:
+        "WHen tracking on, the table does not expand, instead the space is
+        used by the Pace display"). True if the table's room changed."""
+        hidden = PaceCorrectionPanel.text_hidden
+        show_info = self.tracking or not hidden
+        changed = show_info == self.info.isHidden()
+        self.info.setVisible(show_info)
+        if self.tracking:
+            self.text_btn.setText("▲")
+            self.text_btn.setToolTip("Show the Pace display")
+        else:
+            self.text_btn.setText("▼" if hidden else "▲")
+            self.text_btn.setToolTip("Show the instructions" if hidden else "Hide the instructions")
+        big = self.tracking and not self.coach_text
+        if big:
+            self._place_pace_box()
+            self.pace_box.raise_()
+        self.pace_box.setVisible(big)
+        return changed
+
+    def _toggle_text(self):
+        if self.tracking:                       # the Pace display <-> the instructions
+            self.coach_text = not self.coach_text
+        else:
+            PaceCorrectionPanel.text_hidden = not PaceCorrectionPanel.text_hidden
+        if self._show_text():
+            self._fit()
+
+    def _place_pace_box(self):
+        """Over the panel's title and instructions."""
+        bottom = self.info.geometry().bottom() + 4
+        self.pace_box.setGeometry(self.x(), self.y(), self.width(), max(60, bottom))
+
+    def moveEvent(self, event):
+        super().moveEvent(event)
+        if getattr(self, "pace_box", None) is not None and self.pace_box.isVisible():
+            self._place_pace_box()
+
+    # -- what's on the screen -------------------------------------------
+
+    def _zone_numbers(self):
+        """Each jet step's name: the swimmer's slowest zone 1 and on up, the
+        steps below 0, -1, ... and above carrying on (the zones spread over
+        fewer steps ('# zones'): numbers on theirs only)."""
+        steps = self.steps
+        every = steps == list(range(steps[0], steps[-1] + 1)) if steps else False
+        return [str(steps.index(j) + 1) if j in steps else (str(j - steps[0] + 1) if every else "")
+                for j in range(len(self.V))]
+
+    def _name(self, i):
+        return f"zone {self.names[i]}" if self.names[i] else f"{self.V[i]:.3f} V"
+
+    def _paces(self, table):
+        """The table's Pace at each jet step."""
+        tv = [v for _, v in table]
+        tp = [p for p, _ in table]
+        return [interp(v, tv, tp) for v in self.V]
 
     def _tick(self):
-        v, zone, pace, inside = self._now()
-        self.reading.setText(f"PoolWind reads:  {Utils.DecimalToTime(pace)}   (zone {zone}, "
-                             + ("swimming)" if inside else "when last seen)"))
+        """The zone the swimmer is in (swimming) or was last seen in: lit.
+        (No more "Swimming in zone ..." / "Last seen in zone ..." line, Bill,
+        2026-10-28: "unnecessary and confusing".)"""
+        app = self.app
+        inside = bool(app.window.swimmerFound)
+        self._show_suspend()
+        # Swimming with Suspend showing: the big Pace display (out of the
+        # swim area for 2 s: the instructions again; a blink isn't leaving)
+        now = time.time()
+        if inside:
+            self._found_t = now
+        tracking = app.suspendButtonText == "Suspend" and now - self._found_t < 2.0
+        # Out of the swim area again (2 s, as above): a new Pace to type,
+        # the zone left in chosen and ready, even with a box already typed
+        # in (Bill, 2026-10-30: "Pace correction works when I exit the swim
+        # zone and enter my new Pace. But not if I try the second time
+        # because my first entry id still focused.")
+        away = now - self._found_t >= 2.0
+        left = away and not self._away
+        self._away = away
+        if tracking != self.tracking:
+            self.tracking = tracking
+            if not tracking:
+                self.coach_text = False
+            if self._show_text() and hasattr(self, "timer"):
+                self._fit()
+        if self.pace_box.isVisible():
+            self.pace_box.set_pace(app.PaceDisplay)
+            self._place_pace_box()
+        z = getattr(app, "jetZone", None) if inside else app._seen_zone
+        v = getattr(app, "_jet_voltage", None) if inside else app._seen_voltage
+        if v is None:
+            v = app.currentVoltage
+        if z is None or z >= self.n:
+            z = min(range(self.n), key=lambda b: abs(self.V[self.steps[b]] - v)) if self.n else None
+        if z is None:
+            return
+        if z != self.lit:
+            self.lit = z
+            self._mark_lit()
+            self.graph.set_lit(self.steps[z])
+            if not self.picked and (self.current is None or not self.current.digits()):
+                self.focus_lit()
+        if left:
+            self.picked = False
+            self.focus_lit()
+            self.current.before = self.current.text()       # Escape puts this back
+            self.current.ready()
+
+    def _press_suspend(self):
+        self.app.window.handle_button(self.app.suspendButtonText)     # as on the pool screen
+        self._show_suspend()
+
+    def _show_suspend(self):
+        """The copy of the Suspend button: its word, red for Resume as on
+        the pool screen."""
+        text = self.app.suspendButtonText
+        if self.susp_btn.text() != text:
+            self.susp_btn.setText(text)
+            self.susp_btn.setStyleSheet("font-size: 15px; color: black; background-color: "
+                                        + ("rgb(200, 0, 0);" if text == "Resume" else "rgb(200, 200, 200);"))
+
+    def _mark_lit(self):
+        """The table's row for the lit zone, yellow."""
+        lit = self.steps[self.lit] if self.lit is not None else None
+        for i, r in self.trows.items():
+            r["widget"].setStyleSheet("#trow { background-color: #fff2a0; }" if i == lit else "")
+
+    def focus_lit(self):
+        """The lit zone's box chosen (at the start, Bill, 2026-10-28: "The
+        nearest entry box for that zone should be selected, highlighted, and
+        ready for new numbers")."""
+        if self.lit is not None:
+            self._choose(self.edits[self.steps[self.lit]])
+
+    def _choose(self, edit):
+        if edit.step in self.ends:
+            return                              # the pool's: nothing to type
+        self.scroll.ensureWidgetVisible(edit.parentWidget(), 0, 2 * self.ROW_H)
+        edit.setFocus()
+        self._focused(edit, None)
+
+    def _pick(self, i):
+        """A zone clicked in the graph: its box, ready, the table scrolled to it."""
+        if i in self.ends:
+            return
+        self.picked = True
+        self._choose(self.edits[i])
+        self.edits[i].ready()
+
+    def _focused(self, edit, why):
+        """A box got the focus: the one the digits go to, highlighted."""
+        if why == Qt.MouseFocusReason:
+            self.picked = True
+        if edit is not self.current:
+            self.current = edit
+            self._paint()
+
+    def _paint(self):
+        """The boxes: the chosen one with a blue frame, yellow, or red when
+        its Pace is the trouble."""
+        for i, e in self.edits.items():
+            style = (self.BAD if i in self.bad else self.CHOSEN_BG if e is self.current
+                     else self.END_BG if i in self.ends else "") + (self.CHOSEN if e is self.current else "")
+            if e.styleSheet() != style:
+                e.setStyleSheet(style)
+
+    def mouseReleaseEvent(self, event):
+        """Dragged, or a tap on the box's background: the chosen box keeps
+        the digits."""
+        self._drag_from = None
+        if self.current is not None:
+            self.current.keep_cursor = True
+            self.current.setFocus()
+            self.current.keep_cursor = False
+
+    def _show_new(self, red):
+        """Now and New, the one the pool uses bold; red in New: not faster
+        than the zone below. The ↺ beside each box with something in it."""
+        use_new = self.app.use_new
+        now, new = self._paces(self.table), self._paces(self.new)
+        bold = lambda text, b: f"<b>{text}</b>" if b else text
+        for i, r in self.trows.items():
+            r["now"].setText(bold(pace_text(now[i]), not use_new))
+            text = bold(pace_text(new[i]), use_new)
+            r["new"].setText(f"<span style='color:{self.RED}'>{text}</span>" if i in red else text)
+        for key, used in (("Now", not use_new), ("New", use_new)):
+            lab, text = self.heads[key]
+            lab.setText(f"<b>{text}</b>" if used else text)
+        # (Bill, 2026-10-30: "The 'Switch to' in the button should be
+        # changed to 'Swim with' and toggle 'stored' and 'pending' values.")
+        self.switch_btn.setText("Swim with\n'stored' values" if use_new else "Swim with\n'pending' values")
+        for i, b in self.reverts.items():
+            b.setVisible(bool(self.edits[i].digits()))
+
+    def _switch(self):
+        """The pool's Paces from Now or New (App.use_new)."""
+        self.app.use_new = not self.app.use_new
+        self.app.apply_pace_table()
+        self._show_new(self._red)
+
+    # -- typing ------------------------------------------------------------
+
+    def _changed(self, *_):
+        """Anything typed: New again at once."""
+        self._work_out()
 
     def _key(self, k):
-        t = self.entry.text()
-        self.entry.setText(t[:-1] if k == "<" else (t + k)[:5])
-        self.entry.setFocus()
-
-    def _add(self):
-        felt = parse_pace(self.entry.text())
-        if felt is None:
-            QMessageBox.warning(self, "Pace correction", "Type the Pace as minutes and seconds, "
-                                "for example 1:45 or 145.")
+        """The number pad: into the chosen box, which keeps the focus (the
+        pad's buttons take none, so the focus could land on the panel; it
+        went to the lit zone's box then, Bill, 2026-10-28: "As soon as the
+        first digit is pressed, the cursor jumps to the 'last seen' box")."""
+        edit = self.current
+        if edit is None:
+            self.focus_lit()
+            edit = self.current
+        if edit is None:
             return
-        _, _, shown, _ = self._now()
-        r = felt / shown
-        if not RATIO_LIMITS[0] <= r <= RATIO_LIMITS[1]:
-            QMessageBox.warning(self, "Pace correction", f"{pace_text(felt)} and the {pace_text(shown)} "
-                                "PoolWind reads are more than twice apart. Check the Pace.")
+        if not edit.hasFocus():
+            edit.keep_cursor = True
+            edit.setFocus()
+            edit.keep_cursor = False
+        edit.backspace() if k == "<" else edit.insert(k)
+
+    def _clear(self):
+        """Empty boxes, the drag numbers as saved: New is Now again, nothing
+        pending."""
+        if QMessageBox.question(self, "Pace correction",
+                                "Are you sure? Every change that isn't permanent goes, and your "
+                                "pending Paces are your stored ones again.") != QMessageBox.Yes:
             return
-        self.pairs.append((felt, shown))
-        self.entry.clear()
-        self._show_pairs()
-        self.entry.setFocus()
+        for i, e in self.edits.items():
+            if i in self.ends:
+                continue
+            e.blockSignals(True)
+            e.clear()
+            e.blockSignals(False)
+        for s, v in zip(self.spins, self.saved_drag):
+            s.blockSignals(True)
+            s.setValue(v)
+            s.blockSignals(False)
+        self.copied, self.before = False, None
+        self._show_copied()
+        self._work_out()
+        if self.current is not None:
+            self.current.ready()
 
-    def _remove(self):
-        if self.pairs:
-            self.pairs.pop()
-        self._show_pairs()
+    # -- Copy Master values ----------------------------------------------------
 
-    def _show_pairs(self):
-        lines = [f"{i + 1}.  reads {pace_text(s)}  ->  should be {pace_text(f)}"
-                 for i, (f, s) in enumerate(self.pairs)]
-        self.pairs_label.setText("\n".join(lines) if lines else "No Paces yet.")
-        self.save_btn.setEnabled(bool(self.pairs))
-        self.remove_btn.setEnabled(bool(self.pairs))
-        self.adjustSize()
+    def _show_copied(self):
+        """The Copy button down while copied, ↺ beside it then; the drag
+        numbers greyed (the pool's table is already worked out)."""
+        self.copy_btn.setChecked(self.copied)
+        self.copy_back.setEnabled(self.copied)
+        for w in self.spins + ([self.drag_defaults_btn] if self.spins else []):
+            w.setEnabled(not self.copied)
+
+    def _copy_pressed(self):
+        """Copy: the pool's table into Your pending, the boxes emptied; the
+        pending changes before kept (with the pending ones, so a restart
+        keeps them) for ↺. Pressed again: stays down, only ↺ lets it up."""
+        if self.copied:
+            self.copy_btn.setChecked(True)
+            return
+        pend = self.app.pending
+        self.before = {k: v for k, v in pend.items() if k != "copied"} if pend else None
+        self.copied = True
+        self._set_boxes([])
+        if self.drag:
+            for spin, value in zip(self.spins, (self.app.calibration.get("bodyDrag", BODY_DRAG),
+                                                self.app.calibration.get("deltaBodyDrag", DELTA_BODY_DRAG))):
+                spin.blockSignals(True)
+                spin.setValue(float(value))
+                spin.blockSignals(False)
+        self._show_copied()
+        self._work_out()
+        self.focus_lit()
+
+    def _uncopy(self):
+        """↺: the swimmer's own pending changes back as they were before the
+        copy (Paces typed since dropped), the button up."""
+        if not self.copied:
+            return
+        before = self.before or {}
+        self.copied, self.before = False, None
+        self._set_boxes(before.get("typed", []))
+        for spin, value in zip(self.spins, (before.get("bodyDrag", self.saved_drag[0] if self.spins else 0),
+                                            before.get("deltaBodyDrag", self.saved_drag[-1] if self.spins else 0))):
+            spin.blockSignals(True)
+            spin.setValue(float(value))
+            spin.blockSignals(False)
+        self._show_copied()
+        self._work_out()
+        self.focus_lit()
+
+    def _set_boxes(self, typed):
+        """The boxes (not the ends) emptied, then the Paces `typed` [(pace,
+        volts), ...] in theirs."""
+        for i, e in self.edits.items():
+            if i not in self.ends:
+                e.blockSignals(True)
+                e.clear()
+                e.blockSignals(False)
+        for pace, volts in typed:
+            i = min(range(len(self.V)), key=lambda k: abs(self.V[k] - float(volts)))
+            if abs(self.V[i] - float(volts)) < 0.006 and i not in self.ends:
+                e = self.edits[i]
+                e.blockSignals(True)
+                e.setText(pace_text(float(pace)))
+                e.blockSignals(False)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.close_panel()
+            e = self.current                # the box as it was when chosen; else nothing
+            if e is not None and e.text() != e.before:
+                e.setText(e.before)
+                e.ready()
+        elif event.text().isdigit() or event.key() == Qt.Key_Backspace:
+            self._key("<" if event.key() == Qt.Key_Backspace else event.text())     # the focus on the panel
         else:
             super().keyPressEvent(event)
 
-    def _save(self):
-        app = self.app
-        old = [(float(p), float(v)) for p, v in app.calibration["pace_voltage"]]
-        new, why = correct_table(old, self.pairs)
+    # -- New ---------------------------------------------------------------
+
+    def _drag_moved(self):
+        return [s.value() for s in self.spins] != self.saved_drag
+
+    def _drag_table(self):
+        """The table the corrections start from: Now, or after a PingPong
+        with the drag numbers changed, PingPong's ball steps x the drag
+        numbers (the steps above the last ball step as they are)."""
+        if self.copied:
+            return sorted(((float(p), float(v)) for p, v in self.app.calibration["pace_voltage"]),
+                          key=lambda r: r[1])
+        if not self._drag_moved():
+            return list(self.table)
+        paces = ball_table(self.tv, self.balls, *(s.value() for s in self.spins))
+        return [(p0 if p is None else p, v) for (p0, v), p in zip(self.table, paces)]
+
+    def _work_out(self, *_):
+        """The checker, then New: the typed Paces and the two ends, the
+        bottom and top zones' Paces in the pool's table (the builder's),
+        exact, the rest by fix_table. Run on every change. (Bill,
+        2026-10-30: "it has been determined that Pace at top speed = 1:44.
+        That's not a user choice, that was the builders choice. The curve
+        between 7:00 and 1:44 can be the users choice when saved to their
+        own USB drive." and "Maybe we should drop the bottom = 7:00 rule. It
+        could be the starting point for the table creation for the master
+        files but Pace correction should respect the builders bottom number
+        of the table." Before: the bottom always 7:00, and past the fastest
+        typed Pace the change carried on.)"""
+        base = self._drag_table()
+        now = self._paces(self.table)
+        entries, bad = {}, {}
+        ends = self.ends                                    # the pool's: the builder's
+        for i, e in sorted(self.edits.items()):
+            d = e.digits()
+            if i in ends or len(d) < 3:
+                continue                                    # the pool's, or still typing
+            p = parse_pace(d)
+            if p is None:
+                bad[i] = f"{self._name(i)}: type minutes and seconds, like 1 4 8 for 1:48"
+            else:
+                entries[i] = p
+        if entries:
+            for i, p in ends.items():
+                base[i] = (p, base[i][1])
+            fixed = dict(ends)
+            fixed.update(entries)
+        else:
+            fixed = {}
+        # Out of order: both boxes red, the one being typed in named first
+        # (Bill, 2026-10-30: "Just say "(New entry) is out of sequence with
+        # (other entry) and mark both entry boxes red.")
+        ordered = sorted(fixed.items())                     # by jet step, slowest first
+        for (i0, p0), (i1, p1) in zip(ordered, ordered[1:]):
+            if p1 >= p0:
+                a, b = (p0, p1) if self.current is not None and self.current.step == i0 else (p1, p0)
+                why = f"{pace_text(a)} is out of sequence with {pace_text(b)}"
+                for i in (i0, i1):
+                    bad.setdefault(i, why)
+                    entries.pop(i, None)
+        fixed = {i: p for i, p in fixed.items() if i in ends or i in entries}
+        if len(fixed) < 2:
+            fixed = {}
+        new, why = fix_table(base, [(p, self.V[i]) for i, p in fixed.items()])
         if new is None:
-            new, why2 = correct_table(old, self.pairs, project=False)
-            if new is None:
-                QMessageBox.warning(self, "Pace correction", f"These Paces can't correct the table: {why2}. "
-                                    "Remove one and try again.")
-                return
-        vs = [v for _, v in sorted(old, key=lambda r: r[1])]
-        ps = [p for p, _ in sorted(old, key=lambda r: r[1])]
-        nv = [v for _, v in new]
-        npc = [p for p, _ in new]
-        lo, hi = app.SafetyVoltageLimits
-        example = "\n".join(f"  {v:.3f} V:  {pace_text(interp(v, vs, ps))}  ->  {pace_text(interp(v, nv, npc))}"
-                            for v in (lo, (lo + hi) / 2, hi))
-        if QMessageBox.question(self, "Pace correction",
-                                f"Correct the Pace table with {len(self.pairs)} Pace"
-                                f"{'s' if len(self.pairs) != 1 else ''}?\n\n{example}\n\n"
-                                "Only the Paces shown change, not the jet speeds. "
-                                "The current file is kept as a backup.") != QMessageBox.Yes:
+            for i in entries:
+                bad.setdefault(i, f"These Paces can't correct the table: {why}")
+            new = base
+        self.new, self.entries = new, entries
+        paces = self._paces(new)
+        red = {k + 1 for k in range(len(paces) - 1) if paces[k + 1] > paces[k] - 1e-6}
+        for i in entries:                                   # a typed Pace in a red pair: its box too
+            if i in red or i + 1 in red:
+                bad.setdefault(i, f"{self._name(i)}: {pace_text(entries[i])} puts New out of order")
+        self.bad = set(bad)
+        self._red = red
+        self._paint()
+        self._show_new(red)
+        self.graph.show_paces(now, paces, entries, red)
+        note = (f"<span style='color:{self.RED}'>" + "<br>".join(dict.fromkeys(bad.values()))
+                + "</span>" if bad else "")
+        if note != self.note.text():
+            self.note.setText(note)
+            self.note.setVisible(bool(note))
+            if hasattr(self, "timer"):          # on screen: the table makes room for it, or takes it back
+                self._fit()
+        # Good: kept pending, in use by the pool. Red: a warning, the last
+        # good changes stay in use; Back and Make permanent wait (Bill,
+        # 2026-10-29: "A red value should be a warning and the 'Back' and
+        # 'Make permanent' buttons would be grayed out until it's fixed.")
+        if not bad:
+            pend = None
+            if entries or self._drag_moved() or self.copied:
+                pend = {"typed": [(round(p, 4), round(self.V[i], 3)) for i, p in sorted(entries.items())],
+                        "table": [(round(float(p), 4), float(v)) for p, v in new]}
+                if self.drag:
+                    pend["bodyDrag"], pend["deltaBodyDrag"] = (round(s.value(), 2) for s in self.spins)
+                if self.copied:
+                    pend["copied"] = self.before
+            if pend != self.app.pending:
+                try:
+                    self.app.save_pending(pend)
+                except Exception as e:
+                    print("Pace correction: couldn't keep the changes:", e)
+        self.back_btn.setEnabled(not bad)
+        # Greyed until there is something pending, so after Make permanent
+        # until a further entry (Bill, 2026-10-31: "'Make permanent' button
+        # should be greyed out after a save until there are further entries.
+        # I know I changed my mind on this."; before, 2026-10-29: "I need the
+        # save button to be active always"), and while a value is red
+        self.save_btn.setEnabled(not bad and self.app.pending is not None)
+
+    def _drag_defaults(self):
+        self.spins[0].setValue(BODY_DRAG)
+        self.spins[1].setValue(DELTA_BODY_DRAG)
+
+    # -- Make permanent ------------------------------------------------------
+
+    def _make_permanent(self):
+        if not self.save_btn.isEnabled():
             return
-        path = app.calibration_path
-        stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        base, ext = os.path.splitext(path)
+        # Which table, named (Bill, 2026-10-30: "It should say which table,
+        # pools table or Bill_G's table."): a stick in, the swimmer's own
+        # table on it, never the pool's
+        name = self.app.swimmer_name()
+        which = (f"{name}'s stored Paces (on the USB stick)" if name else
+                 "the pool's Master Pace table (stored, in the calibration file)")
+        also = (" The pool's Master table is not changed." if name else
+                " Swimmers' own tables on their USB sticks are not changed.")
+        if QMessageBox.question(self, "Make permanent",
+                                f"This will overwrite {which} with Your pending Paces."
+                                + also + "\n\nSwim Plot and the calendar will show "
+                                + ("all your swims" if name else "all swims made without a USB stick")
+                                + ", earlier ones too, in these Paces.") != QMessageBox.Yes:
+            return
+        # Whatever New shows is written, even when it's the same as Now
+        # (Bill, 2026-10-29: "whatever is in the New column overwrites the
+        # stored table, even if it is the same")
+        pend = self.app.pending
+        if pend is None:
+            pend = {"typed": [], "table": [(round(float(p), 4), float(v)) for p, v in self.new]}
+            if self.drag:
+                pend["bodyDrag"], pend["deltaBodyDrag"] = (round(s.value(), 2) for s in self.spins)
         try:
-            with open(path) as f:
-                text = f.read()
-            with open(f"{base}_before_{stamp}{ext}", "w") as f:
-                f.write(text)
-            cal = load_calibration(path)
-            cal["pace_voltage"] = [(float(p), float(v)) for p, v in new]
-            save_calibration(path, cal)
-            with open(os.path.join(os.path.dirname(path), f"calibration_correction_{stamp}.csv"), "w",
-                      newline="") as f:
-                w = csv.writer(f)
-                w.writerow(["pair", "should_be", "reads", "ratio"])
-                for i, (fp, sp) in enumerate(self.pairs):
-                    w.writerow([i + 1, pace_text(fp), pace_text(sp), f"{fp / sp:.4f}"])
-                w.writerow([])
-                w.writerow(["volts", "pace_before", "pace_after"])
-                for (p0, v), (p1, _) in zip(sorted(old, key=lambda r: r[1]), new):
-                    w.writerow([f"{v:.3f}", pace_text(p0), pace_text(p1)])
+            self.app.make_pace_permanent(pend)
         except Exception as e:
-            QMessageBox.warning(self, "Pace correction", f"Couldn't save the calibration file:\n{e}")
+            QMessageBox.warning(self, "Pace correction", f"Couldn't save the Pace table:\n{e}")
             return
-        app.reload_calibration()
-        print(f"Pace correction saved: {len(self.pairs)} pairs, backup {os.path.basename(base)}_before_{stamp}{ext}")
+        window = self.parent()                  # open again on the new Now
         self.close_panel()
+        QTimer.singleShot(0, window.openPaceCorrection)
 
     def close_panel(self):
+        """Back: the pool screen again, the changes still pending (Bill,
+        2026-10-29: "'Cancel' is replaced by 'Back'. The main screen comes
+        back but settings are not erased.")."""
         self.timer.stop()
+        self.app.pace_correcting = False
+        self.pace_box.hide()
+        self.pace_box.deleteLater()
         super().close_panel()
 
 
@@ -6523,7 +8562,7 @@ class SwimDateRangeDialog(QDialog):
         # two calendars.
         outer_margin = 20      # dialog layout margins (both sides)
         cal_width = self.app.window_w - outer_margin
-        reserved_v = 160       # labels + button row + layout spacing
+        reserved_v = 190       # the dataset choice, labels, button row, layout spacing
         cal_height = max(200, (self.app.window_h - reserved_v) // 2)
 
         layout = QVBoxLayout()
@@ -6543,8 +8582,37 @@ class SwimDateRangeDialog(QDialog):
         # Avg-pace cache + loaded-months set are shared (same dict/set
         # object) between both calendars, so browsing to a given month in
         # either one makes it instantly available in the other too.
-        self._avg_pace_cache = {}
+        self._avg_pace_cache, self._avg_read_times = self.app.avg_pace_store()
         self._avg_pace_months_loaded = set()
+
+        # Which table the swims are read in, centered at the top (Bill,
+        # 2026-11-01: "put the selector centered at the top, moving the
+        # calendars down.: "Use: Swimmer dataset   Master dataset (coach)"
+        # and two selector dots underneath, one or the other. Swimmer
+        # dataset as the default."). With no stick both are the Master's:
+        # greyed.
+        grid = QtWidgets.QGridLayout()
+        grid.setContentsMargins(0, 0, 0, 0)     # (its room to the calendars: reserved_v)
+        grid.setHorizontalSpacing(24)
+        grid.setVerticalSpacing(2)
+        grid.addWidget(QLabel("Use:"), 0, 0, Qt.AlignCenter)
+        self.dataset_btns = QtWidgets.QButtonGroup(self)
+        for col, text in ((1, "Swimmer dataset"), (2, "Master dataset (coach)")):
+            grid.addWidget(QLabel(text), 0, col, Qt.AlignCenter)
+            dot = QtWidgets.QRadioButton()
+            dot.setStyleSheet("QRadioButton::indicator { width: 22px; height: 22px; }")
+            self.dataset_btns.addButton(dot, col - 1)
+            grid.addWidget(dot, 1, col, Qt.AlignCenter)
+        self.dataset_btns.button(1 if getattr(self.app, "plot_master", False) else 0).setChecked(True)
+        self.dataset_btns.idToggled.connect(self._dataset_chosen)
+        self.dataset_box = QWidget()
+        self.dataset_box.setLayout(grid)
+        self.dataset_box.setEnabled(self.app.swimmer_name() is not None)
+        top = QHBoxLayout()
+        top.addStretch(1)
+        top.addWidget(self.dataset_box)
+        top.addStretch(1)
+        layout.addLayout(top)
 
         from_col = QVBoxLayout()
         from_col.addWidget(QLabel("From                        Average Pace (blue)"))
@@ -6556,7 +8624,8 @@ class SwimDateRangeDialog(QDialog):
         self.from_cal.setDataDates(data_dates)
         self._keep_highlight_visible(self.from_cal)
         self._style_calendar_dates(self.from_cal, data_dates)
-        self.from_cal.setAvgPaceSource(self.app.data_dir, self._avg_pace_cache, self._avg_pace_months_loaded)
+        self.from_cal.setAvgPaceSource(self.app.data_dir, self._avg_pace_cache, self._avg_pace_months_loaded,
+                                       self.app.plot_pace_from_voltage(), self._avg_read_times)
         from_col.addWidget(self.from_cal)
         layout.addLayout(from_col)
 
@@ -6570,7 +8639,8 @@ class SwimDateRangeDialog(QDialog):
         self.to_cal.setDataDates(data_dates)
         self._keep_highlight_visible(self.to_cal)
         self._style_calendar_dates(self.to_cal, data_dates)
-        self.to_cal.setAvgPaceSource(self.app.data_dir, self._avg_pace_cache, self._avg_pace_months_loaded)
+        self.to_cal.setAvgPaceSource(self.app.data_dir, self._avg_pace_cache, self._avg_pace_months_loaded,
+                                     self.app.plot_pace_from_voltage(), self._avg_read_times)
         to_col.addWidget(self.to_cal)
         layout.addLayout(to_col)
 
@@ -6620,13 +8690,55 @@ class SwimDateRangeDialog(QDialog):
         # across Qt5) — if it ever fails, we just skip the cursor move.
         QTimer.singleShot(0, lambda: self._position_cursor_on_today(self.from_cal))
 
+    def _dataset_chosen(self, which, checked):
+        """Swimmer / Master dataset: the averages worked out again in it
+        (the plot that follows reads app.plot_master too)."""
+        if not checked:
+            return
+        self.app.plot_master = which == 1
+        # the other dataset's own store (kept too: switching back is quick)
+        self._avg_pace_cache, self._avg_read_times = self.app.avg_pace_store()
+        today = self.app.plot_pace_from_voltage()
+        for cal in (self.from_cal, self.to_cal):
+            cal._today = today
+            cal._avg_pace_cache, cal._avg_read_times = self._avg_pace_cache, self._avg_read_times
+            cal._on_page_changed(cal.yearShown(), cal.monthShown())
+
     def _ok_if_data(self):
         """OK: open the plot only if a day in the range has swim data
         (green dates); otherwise say so and stay on the calendar."""
         from_date, to_date = self.get_range()
         if any(from_date <= d <= to_date for d in self._data_dates):
             self.no_data_lbl.setText("")
-            self.accept()
+            # The plot made here, the calendar staying on screen with the
+            # progress box (as the averages'); openSwimPlot shows it ready
+            days = (to_date - from_date).days + 1
+            box = QtWidgets.QProgressDialog("Please wait: reading your swims...", None, 0, days + 1, self)
+            box.setWindowTitle("Swim Plot")
+            box.setWindowModality(Qt.ApplicationModal)
+            box.setMinimumDuration(0)
+            box.setAutoClose(False)
+            box.setMinimumWidth(320)
+            box.setValue(0)
+            box.show()
+            QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+
+            def progress(k, n, d):
+                box.setLabelText(f"Please wait: reading your swims...\n(day {k} of {n})")
+                box.setValue(k)
+                QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                if k == n:
+                    box.setLabelText("Please wait: preparing the plot...")
+                    QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+
+            self.plot = SwimPlotWindow(self.app, self.parent(), from_date, to_date)
+            try:
+                self.plot.prepare(progress)
+            finally:
+                box.close()
+                box.deleteLater()
+            if self.isVisible():                # (not closed meanwhile: the stick pulled)
+                self.accept()
         else:
             self.no_data_lbl.setText("No swims on the chosen date(s). Pick a green date.")
 
@@ -6722,6 +8834,7 @@ class SwimPlotWindow(QDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setFixedSize(self.app.window_w, self.app.window_h)
         self.move(0, 0)
+        pool_fullscreen(self, self.app)
 
         # --- tuning variables ---
         self.plotDataInterval_sec = 2.0   # downsample interval (must be even)
@@ -6753,8 +8866,65 @@ class SwimPlotWindow(QDialog):
         self.setLayout(self.layout)
 
         # Auto-load data and jump straight to the video screen once the
-        # window loads.
-        QTimer.singleShot(0, self.on_open)
+        # window is shown (showEvent): it may be prepared first, out of
+        # sight, while the calendar shows the progress (prepare)
+        self._opened = False
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        if not self._opened:
+            self._opened = True
+            QTimer.singleShot(0, self.on_open)
+
+    def prepare(self, progress=None):
+        """The swims read and the plot's arrays made before the window is
+        shown, the calendar staying on screen with its progress box (Bill,
+        2026-11-01: "the 2nd please wait is a full screen. Could you replace
+        that with another pop up like the first one. Just stay on the
+        calendar screen until the popup goes away."). progress(day, days, d)
+        per day read. True if there's something to show."""
+        # The same days again (back from the plot to the calendar and OK, or
+        # Swim Plot opened again): the plot as prepared last time, kept while
+        # PoolWind runs, as the days themselves (load_csv_range), if no log
+        # changed (Bill, 2026-11-01: "If I have a plot loaded and am
+        # viewing, go back to calendar, and then go back to plot without
+        # changing dates, I still get a please wait.")
+        times = []
+        d = self.from_date
+        while d <= self.to_date:
+            try:
+                times.append(os.path.getmtime(os.path.join(self.app.data_dir, f"{d.isoformat()}.csv")))
+            except OSError:
+                times.append(None)
+            d += timedelta(days=1)
+        key = (self.app.data_dir, bool(getattr(self.app, "plot_master", False)),
+               self.from_date, self.to_date, tuple(times))
+        store = self.app.__dict__.setdefault("_built_store", {})
+        kept = store.get(key)
+        if kept is not None:
+            for name, value in kept.items():
+                setattr(self, name, value.copy() if isinstance(value, np.ndarray) else value)
+            ok = True
+        else:
+            self._progress_cb = progress
+            try:
+                ok = bool(self.build_arrays())
+                if ok:
+                    self._prepare_display_arrays()
+            finally:
+                self._progress_cb = None
+            if ok:
+                names = ("derived_dt", "short_gap_array", "full_gap_array", "avg_pace", "total_dist",
+                         "X_idx", "X_time", "X_rtime", "X_src", "X_pace", "X_dist", "X_seg", "X_frame", "X_date",
+                         "X_comh", "X_comw", "X_zone", "X_zones")
+                while len(store) >= 3:              # the last three kept (a month is a few MB)
+                    store.pop(next(iter(store)))
+                store[key] = {n: (getattr(self, n).copy() if isinstance(getattr(self, n), np.ndarray)
+                                  else getattr(self, n)) for n in names if hasattr(self, n)}
+        self._prepared = ok
+        if ok and getattr(self, "loading_label", None) is not None:
+            self.loading_label.setText("")       # (ready: no full-screen "Please wait")
+        return ok
 
     def build_arrays(self):
         # Load CSV(s) for the selected date range (epoch timestamps),
@@ -6772,6 +8942,9 @@ class SwimPlotWindow(QDialog):
         progress_state = {"last_update": 0.0}
 
         def _progress(day_num, total_days, d):
+            if getattr(self, "_progress_cb", None) is not None:
+                self._progress_cb(day_num, total_days, d)
+                return
             if getattr(self, "loading_label", None) is None:
                 return
             now = time.time()
@@ -6826,8 +8999,18 @@ class SwimPlotWindow(QDialog):
         # First row goes into both arrays
         last_ch, last_cw = comh_raw[0], comw_raw[0]
         last_zn, last_zs = zone_raw[0], zones_raw[0]
-        short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw, last_zn, last_zs])
-        full_rows.append([last_t,      last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw, last_zn, last_zs])
+        # Two more columns on every row of both arrays (Bill, 2026-11-01:
+        # "Compress has got to show all gaps as (3 sec?) ... yet the legend
+        # and coordinate box can't. They still need to show the same values
+        # for every spot picked in the swim."): the REAL time (the gap
+        # fillers of the compressed array: the moment the gap began), and
+        # the source position -- the CSV row number, a filler a fraction
+        # between the rows its gap lies between -- so a Compress/Expand
+        # puts the cursor on the same spot of the swim in the other array.
+        short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw, last_zn, last_zs,
+                           last_real_t, 0.0])
+        full_rows.append([last_t,      last_p, last_d, last_seg, last_frame, last_date, last_ch, last_cw, last_zn, last_zs,
+                           last_real_t, 0.0])
 
         # Track last normal delta for synthetic time
         last_delta_real = dt
@@ -6910,15 +9093,17 @@ class SwimPlotWindow(QDialog):
                 full_fill_step  = (real_gap / full_fill_count) if full_fill_count > 0 else dt
 
                 t_full = last_t
-                for _ in range(full_fill_count):
+                for k in range(full_fill_count):
                     t_full += full_fill_step
-                    full_rows.append([t_full, 7.0, last_d, last_seg, last_frame, last_date] + [float("nan")] * 4)
+                    full_rows.append([t_full, 7.0, last_d, last_seg, last_frame, last_date] + [float("nan")] * 4
+                                     + [t_full, (i - 1) + (k + 1) / (full_fill_count + 1)])
 
                 # ====================================================
                 # SHORT-GAP FILL (SYNTHETIC TIME — FROZEN)
                 # ====================================================
-                for _ in range(short_fill):
-                    short_rows.append([last_syn_t, 7.0, last_d, last_seg, last_frame, last_date] + [float("nan")] * 4)
+                for k in range(short_fill):
+                    short_rows.append([last_syn_t, 7.0, last_d, last_seg, last_frame, last_date] + [float("nan")] * 4
+                                      + [last_real_t, (i - 1) + (k + 1) / (short_fill + 1)])
 
                 # ====================================================
                 # ADVANCE TIMELINES AFTER GAP
@@ -6960,9 +9145,9 @@ class SwimPlotWindow(QDialog):
             last_date  = new_date
 
             full_rows.append([last_t,     last_p, last_d, last_seg, last_frame, last_date,
-                              comh_raw[i], comw_raw[i], zone_raw[i], zones_raw[i]])
+                              comh_raw[i], comw_raw[i], zone_raw[i], zones_raw[i], new_real_t, float(i)])
             short_rows.append([last_syn_t, last_p, last_d, last_seg, last_frame, last_date,
-                               comh_raw[i], comw_raw[i], zone_raw[i], zones_raw[i]])
+                               comh_raw[i], comw_raw[i], zone_raw[i], zones_raw[i], new_real_t, float(i)])
 
         # ------------------------------------------------------------
         # Insert Idx as column 0
@@ -7009,6 +9194,8 @@ class SwimPlotWindow(QDialog):
         self.X_comw  = array_in[:, 8]   # swimmer tick CoM_w (-1: none, NaN: unknown)
         self.X_zone  = array_in[:, 9]   # jet zone (-1: none, NaN: before v15.2 / gap)
         self.X_zones = array_in[:, 10]  # number of zones then
+        self.X_rtime = array_in[:, 11]  # real time (the plot's X_time is frozen in compressed gaps)
+        self.X_src   = array_in[:, 12]  # CSV row (a gap filler: a fraction between two)
 
         # ------------------------------------------------------------
         # SMOOTH X_pace FOR DISPLAY (does not affect runtime data)
@@ -7020,9 +9207,11 @@ class SwimPlotWindow(QDialog):
             real_mask  = ~gap_mask
 
             if real_mask.sum() > 11:
-                # Interpolate across gap markers so they don't bleed into neighbors
-                idx_all  = np.arange(len(pace_work))
-                pace_work = np.interp(idx_all, idx_all[real_mask], pace_work[real_mask])
+                # Smoothed over the swim's own rows only, the gap fillers
+                # left out, so every spot of the swim has the same Pace
+                # compressed or expanded (the fillers differ in number; up
+                # to now they were interpolated across and smoothed with)
+                real_pace = pace_work[real_mask]
 
                 # Smoothing window: the same ~6 seconds at any recording
                 # rate (was 31 rows: 6 s at 5 rows/s but 2 s at 15).
@@ -7031,7 +9220,7 @@ class SwimPlotWindow(QDialog):
                 win = max(5, int(round(6.0 / dt)) | 1)
                 if win >= real_mask.sum():
                     win = max(5, (int(real_mask.sum()) - 1) | 1)
-                pace_work = savgol_filter(pace_work, window_length=win, polyorder=2)
+                pace_work[real_mask] = savgol_filter(real_pace, window_length=win, polyorder=2)
 
             # Restore gap spikes exactly
             pace_work[gap_mask] = 7.0
@@ -7051,7 +9240,11 @@ class SwimPlotWindow(QDialog):
         # there's no separate big-plot screen to visit first anymore.
         QApplication.processEvents()
 
-        if not self.build_arrays():
+        prepared = getattr(self, "_prepared", None)
+        loaded = prepared if prepared is not None else self.build_arrays()
+        if not self.isVisible():
+            return          # closed while loading (the USB stick pulled: openSwimPlot)
+        if not loaded:
             # No data for the selected date(s) — nothing to show.
             if getattr(self, "loading_label", None) is not None:
                 self.loading_label.setText("No data for the selected date(s).")
@@ -7060,7 +9253,8 @@ class SwimPlotWindow(QDialog):
             self.layout.addWidget(back_btn, alignment=Qt.AlignCenter)
             return
 
-        self._prepare_display_arrays()
+        if prepared is None:
+            self._prepare_display_arrays()
 
         if getattr(self, "loading_label", None) is not None:
             self.layout.removeWidget(self.loading_label)
@@ -7192,7 +9386,20 @@ class SwimPlotWindow(QDialog):
 
         overlay.setGeometry(overlay_x, overlay_y, overlay_w, overlay_h)
         overlay.show()
-        QTimer.singleShot(0, overlay.raise_)
+
+        def _focus_overlay():
+            # The window made active and the plot box given the focus when
+            # it opens: back from the calendar no window was active, so the
+            # box drew grey, without its legend, until clicked (Bill,
+            # 2026-11-01: "would you put the focus on the plot box?")
+            overlay.raise_()
+            win = self.app.window
+            win.raise_()
+            win.activateWindow()
+            overlay.setFocusPolicy(Qt.ClickFocus)
+            overlay.setFocus(Qt.OtherFocusReason)
+            overlay.update()
+        QTimer.singleShot(0, _focus_overlay)
 
         # ------------------------------------------------------------
         # MINI PLOTS inside overlay
@@ -7228,7 +9435,7 @@ class SwimPlotWindow(QDialog):
             ax_pace.set_ylim(pace_bottom, max(0, pace_top))
         ax_pace.set_ylabel("Pace (min/100 yd)", fontsize=7)
         ax_pace.set_xlabel(
-            f"Time  overall: Avg Pace = {Utils.DecimalToTime(getattr(self, 'avg_pace', 0.0))}",
+            f"Avg Pace overall : {Utils.DecimalToTime(getattr(self, 'avg_pace', 0.0))}",
             fontsize=7, loc='left')
         ax_pace.tick_params(labelsize=6)
 
@@ -7245,9 +9452,9 @@ class SwimPlotWindow(QDialog):
         from matplotlib.ticker import MaxNLocator
 
         def mini_time_fmt(x, pos):
-            idx = int(np.clip(round(x), 0, len(self.X_time) - 1))
-            t = self.X_time[idx]
-            return f"{int(t//3600)}:{int((t%3600)//60):02d}:{int(t%60):02d}"
+            idx = int(np.clip(round(x), 0, len(self.X_rtime) - 1))
+            t = self.X_rtime[idx]
+            return f"{int(t//3600)}:{int((t%3600)//60):02d}"   # hours:minutes (Bill, 2026-11-01)
 
         def mini_dist_fmt(x, pos):
             idx = int(np.clip(round(x), 0, len(self.X_dist) - 1))
@@ -7302,39 +9509,68 @@ class SwimPlotWindow(QDialog):
 
         ax_pace.set_title(_day_title(start_idx), fontsize=8)
         ax_mph.set_title(_day_title(start_idx), fontsize=8)
+        # Which view this is, on the date's line (Bill, 2026-11-01)
+        ax_pace.set_title("PACE", fontsize=8, loc='left', fontweight='bold')
+        ax_mph.set_title("MPH", fontsize=8, loc='left', fontweight='bold')
 
-        # Floating coordinate box.
+        # Floating coordinate box, with its legend (Time Pace / Miles MPH)
+        # in small type just above it, the size of the axis line beside it
+        # (Bill, 2026-11-01).
         self.coord_label_mini = QLabel(overlay)
+        self.coord_label_mini.setTextFormat(Qt.RichText)
         self.coord_label_mini.setStyleSheet(
             "background-color: rgba(200,200,200,160);"
             "border: 1px solid black;"
-            "padding: 1px;"
+            "padding: 0px 2px;"
+            "font-size: 11px;"
         )
+        self.coord_legend_mini = QLabel(overlay)
+        self.coord_legend_mini.setTextFormat(Qt.RichText)
+        self.coord_legend_mini.setStyleSheet(
+            "background: transparent; border: none; padding: 0px 3px;"
+            "font-size: 10px; font-weight: bold;")
         self.coord_label_mini.show()
         self.coord_label_mini.raise_()
+        self.coord_legend_mini.show()
+        self.coord_legend_mini.raise_()
+
+        def _two_cols(a, b, width=None):
+            w = f" width={width}" if width else ""
+            return (f"<table cellspacing=0 cellpadding=0{w}><tr><td>{a}</td>"
+                    f"<td align=right>&nbsp;&nbsp;&nbsp;{b}</td></tr></table>")
+
+        def _coord_text(a_name, b_name, a_val, b_val):
+            self.coord_label_mini.setText(_two_cols(a_val, b_val))
+            self.coord_label_mini.adjustSize()
+            # legend's columns over the values': same width, left/right ends
+            self.coord_legend_mini.setFixedWidth(self.coord_label_mini.width())
+            self.coord_legend_mini.setText(_two_cols(a_name, b_name, "100%"))
+            self.coord_legend_mini.adjustSize()
 
         def position_mini_label():
             margin = 8
             self.coord_label_mini.adjustSize()
-            self.coord_label_mini.move(
-                overlay.width() - self.coord_label_mini.width() - margin,
-                overlay.height() - self.coord_label_mini.height() - 2
-            )
+            x = overlay.width() - self.coord_label_mini.width() - margin
+            y = overlay.height() - self.coord_label_mini.height() - 2
+            self.coord_label_mini.move(x, y)
+            self.coord_legend_mini.move(x, y - self.coord_legend_mini.height())
 
         def update_mini_label(ni):
-            t = self.X_time[ni]
+            t = self.X_rtime[ni]
             h = int(t // 3600); m = int((t % 3600) // 60); s = int(t % 60)
             if self._mini_show_pace:
-                self.coord_label_mini.setText(
-                    f"({h}:{m:02d}:{s:02d}, {Utils.DecimalToTime(self.X_pace[ni])})")
+                _coord_text(
+                    "Time", "Pace", f"{h}:{m:02d}:{s:02d}",
+                    Utils.DecimalToTime(self.X_pace[ni]))
             else:
                 mph_v = 0 if self.X_pace[ni] >= 7.0 else \
                         (0.05681818 / self.X_pace[ni]) * 100
-                self.coord_label_mini.setText(f"({self.X_dist[ni]:.3f}, {mph_v:.2f})")
+                _coord_text(
+                    "Miles", "MPH", f"{self.X_dist[ni]:.3f}", f"{mph_v:.2f}")
             position_mini_label()
 
         # Toggle between pace / MPH (button names the OTHER view)
-        overlay.toggle_btn.setText("MPH" if self._mini_show_pace else "Pace")
+        overlay.toggle_btn.setText("goto MPH" if self._mini_show_pace else "goto Pace")
         update_mini_label(start_idx)
 
         def on_toggle():
@@ -7342,11 +9578,11 @@ class SwimPlotWindow(QDialog):
             if self._mini_show_pace:
                 mini_canvas_mph.hide()
                 mini_canvas_pace.show()
-                overlay.toggle_btn.setText("MPH")
+                overlay.toggle_btn.setText("goto MPH")
             else:
                 mini_canvas_pace.hide()
                 mini_canvas_mph.show()
-                overlay.toggle_btn.setText("Pace")
+                overlay.toggle_btn.setText("goto Pace")
             update_mini_label(_ps['idx'])
         overlay.toggle_btn.clicked.connect(on_toggle)
         overlay.plot_btn.clicked.connect(self.on_close)
@@ -7361,11 +9597,37 @@ class SwimPlotWindow(QDialog):
         overlay.compress_btn.setText("Expand Gaps" if self.compress_gaps_checked else "Compress Gaps")
 
         def on_compress_toggle(checked):
+            # The cursor stays on the same spot of the swim and at the same
+            # place on the screen; the view keeps the same stretch of the
+            # swim's width (Bill, 2026-11-01: "wherever the cursor was
+            # located needs to stay where it when the button is toggled")
+            old_src = self.X_src
+            src = float(old_src[_ps['idx']])
+            x0, x1 = ax_pace.get_xlim()
+            frac = (self.X_idx[_ps['idx']] - x0) / (x1 - x0) if x1 > x0 else 0.5
+
+            def src_at(x):
+                return float(np.interp(x, self.X_idx, old_src))
+            s0, s1 = src_at(x0), src_at(x1)
+            # (beyond the data's ends -- the plot's margins -- kept as rows)
+            pad0 = max(0.0, self.X_idx[0] - x0)
+            pad1 = max(0.0, x1 - self.X_idx[-1])
+
             self.compress_gaps_checked = checked
-            preserved_idx = _ps['idx']
             self._prepare_display_arrays()
+            new_idx = int(np.clip(np.searchsorted(self.X_src, src), 0, len(self.X_src) - 1))
+            if new_idx > 0 and abs(self.X_src[new_idx - 1] - src) <= abs(self.X_src[new_idx] - src):
+                new_idx -= 1
+
+            def x_at(sv):
+                return float(np.interp(sv, self.X_src, self.X_idx))
+            span = (x_at(s1) + pad1) - (x_at(s0) - pad0)
+            if span <= 0:
+                span = x1 - x0
+            nx = self.X_idx[new_idx]
+            self._shared_xlim = (nx - frac * span, nx + (1 - frac) * span)
             self._teardown_video_overlay()
-            self._build_video_overlay(start_idx=preserved_idx)
+            self._build_video_overlay(start_idx=new_idx)
         overlay.compress_btn.toggled.connect(on_compress_toggle)
 
         # Cached VideoCapture — reopen only when (date, segment) changes.
@@ -7762,8 +10024,8 @@ class DraggableOverlay(QFrame):
         handle_layout.setContentsMargins(4, 0, 4, 0)
         handle_layout.setSpacing(6)
 
-        self.toggle_btn = QPushButton("MPH", self.handle)
-        self.toggle_btn.setFixedSize(40, 18)
+        self.toggle_btn = QPushButton("goto MPH", self.handle)   # names the OTHER view (Bill, 2026-11-01)
+        self.toggle_btn.setFixedSize(62, 18)
         self.toggle_btn.setStyleSheet("font-size: 10px; padding: 0px;")
         handle_layout.addWidget(self.toggle_btn)
 
@@ -7850,13 +10112,15 @@ if print_device != "":
 # PoolWind calibration: measures this pool's pace table (pace_voltage) and
 # saves it in the PoolWind calibration file.
 #
-# Initial voltage scan, once for each setup (the other modes stay grayed
-# out until it is done, 'InitialCalFinished' in the calibration file): the
+# Initial voltage scan, first for each setup (the other modes stay grayed
+# out until it is done, 'InitialCalFinished' in the calibration file), and
+# again whenever the builder thinks it's needed (it asks Replace or Cancel
+# first, since v15.6): the
 # jet is run from its slowest to its fastest speed, the pool's voltage range
 # and number of steps are measured, the pace table is rewritten with one row
 # per measured step (PoolWind's zones are the rows; the paces follow the
 # current table's shape, moved to the same percentage of the new range on
-# another pool) and the safety limits are fitted the same way.
+# another pool); its first and last rows are the jet's limits.
 #
 # Pace Entry mode: the program steps the jet from its slowest speed up, one
 # step at a time, and at each step the user types the Pace Display reading.
@@ -7866,16 +10130,18 @@ if print_device != "":
 # steps in between are filled in from the measured ones.
 #
 # Pace correction is in PoolWind's menu (PaceCorrectionPanel), done while
-# swimming; correct_table below does the arithmetic.
+# swimming; fix_table below does the arithmetic.
 #
 #     python3 poolwind.py --calibrate                 the pool (real relays, sensor and camera)
-#     python3 poolwind.py --calibrate --simulate      desk test: simulated jet, Pace Display and balls
 #     python3 poolwind.py --calibrate --cal FILE      a calibration file other than this
 #                                                   program's own (see below)
 #     python3 poolwind.py --calibrate --window        a window instead of full screen
-#     python3 poolwind.py --calibrate --simulate --write-cal
-#                                                   desk test that saves into the calibration
-#                                                   file itself (with a backup): test folders only
+#
+# Always the real jet: the simulated jet, Pace Display and balls are gone
+# (v15.7; Bill, 2026-10-31: "Without the pump running, the pool valve
+# happily moves to whatever position the voltage sent to it calls for
+# under no load." "maybe get rid of the calibration simulations but keep
+# the original simulations for now").
 #
 # The calibration file is named after this program, like PoolWind's own:
 # poolwind_calibrate.py -> poolwind_calibration.txt; the author's versioned
@@ -7928,10 +10194,10 @@ JUMP_READS = 3               # ...seen on this many reads in a row
 NO_STEP_S = 4.0              # UP held this long with no step: the jet is at its fastest
 BOTTOM_QUIET_S = 3.5         # DN held this long with no step: the jet is at its slowest
 DOWN_TIMEOUT_S = 90.0        # longest DN may be held
+END_SLACK_V = 0.01           # Finish screen: a step this close outside the current table's ends is its end step
 SETTLE_S = 3.0               # steady this long after a step before the reading is taken
 AVERAGE_S = 1.5              # the step's voltage: the average over this last part
 RELAY_WATCHDOG_S = 1.0       # the loop stalled this long: let go of UP/DN
-DEFAULT_MAX_VOLTS = 2.6      # never step above this (the user can raise it to 3.2)
 MIN_VOLTS = 0.5              # below this the pump is off or the Pace cable is unplugged
 # The voltages above are the author's pool's. Another pool's voltage range
 # is measured by the initial voltage scan, and they are scaled to it.
@@ -7939,18 +10205,30 @@ AUTHOR_RANGE = (1.185, 3.2)  # the author's pool: slowest and fastest step's vol
 AUTHOR_STEP_V = 0.04
 SCAN_NOISE_S = 2.0           # the scan first reads the still voltage this long...
 SCAN_NOISE_K = 8             # ...and a step is a change this many times its noise (at least JUMP_V)
-SAME_STEP_SIZE = 0.15         # ...and its step size within this fraction of the table's
 NO_VOLTAGE = 0.2             # below this the pump is off or the cable is unplugged, on any pool
-SAME_POOL_STEPS = 2          # a scanned range within this many steps of the table's own at both
-                             # ends is the same pool: the table is kept (pump on / off moves the
-                             # author's bottom step about one step)
+CONT_STEPS = 8               # the scan's first steps up, to tell steps from a continuous rise...
+CONT_SHARE = 0.75            # ...this share of them smooth: the voltage rises continuously
+CONT_RISE = 0.5              # a step is smooth if the voltage rose this part of a step between jumps...
+CONT_GAP_S = 0.3             # ...or the jump came this soon after the one before (a remote steps ~1 a second)
+# The Pace curve every scan gives, the calibration started over (Bill,
+# 2026-10-26): fitted to the author's original Pace Display table between
+# 1.229 and 2.515 V -- speed (yd/min) = s0 + k*ln(1 + e^((V - v0)/w)) --
+# and stretched over the scanned range, 7:00 at the slowest step and 1:00
+# at the top, where the builder stopped the scan (pace_curve below).
+PACE_CURVE = (14.548, 3.100, 1.3461, 0.0572)    # s0, k, v0, w
+PACE_CURVE_V = (1.229, 2.515)                   # the stretch of the original table it follows
+PACE_CURVE_ENDS = (7.0, 1.0)                    # slowest step, top: min/100 yd
 
 PIN_UP, PIN_DN, PIN_PUMP = 17, 18, 27
 PUMP_PULSE_S = 2.0
 
-CAL_KEYS = ("pace_voltage", "SafetyVoltageLimits", "swimAreaPoints",
-            "usableSwimLength", "middleSwimZone %", "recordRawVideo",
-            "InitialCalFinished", "jetVoltageRange", "jetSteps", "# zones or auto")
+CAL_BUILDER_KEYS = ("usableSwimLength", "middleSwimZone %")   # as App's
+CAL_DERIVED_KEYS = ("pace_voltage", "swimAreaPoints", "InitialCalFinished", "PacesFromFormula", "jetVoltageRange", "jetStepVolts", "jetSteps",
+                    "bodyDrag", "deltaBodyDrag", "PingPongBalls", "PacesPending",
+                    "logsTable", "rulerAdded")
+CAL_KEYS = CAL_BUILDER_KEYS + CAL_DERIVED_KEYS
+DROPPED_CAL_KEYS = ("# zones or auto", "recordRawVideo")              # as App's: never written
+POOL_SETTING_DEFAULTS = {"usableSwimLength": 162, "middleSwimZone %": 35}   # the calibration window's
 
 # ----------------------------------------------------------------------
 # PingPong. Tested on the author's pool (2026-10-19, fluorescent orange
@@ -7969,7 +10247,7 @@ BALL_VAL_MIN = 150           # ...and this bright
 BALL_MIN_PX = 8              # a ball is 40-130 pixels in the picture
 BALL_MAX_PX = 400            # bigger than this is an arm or a body
 LANE = (0.20, 0.85)          # balls are looked for across this part of the width
-START_FRAC = 0.16            # timing starts here (about 2 ft from the jet on a 162 in area)...
+START_FRAC = 0.10            # timing starts here (about 16 in from the jet on a 162 in area)...
 END_FRAC = 0.70              # ...and ends here (about 9.5 ft)
 MIN_TRACK_POINTS = 6         # points inside the timed stretch for a drop to count
 LOST_S = 0.4                 # a ball not seen this long is a new one
@@ -7978,17 +10256,127 @@ DEFAULT_DROPS = 5            # balls per measured step (a pack holds 5)
 MIN_GOOD_DROPS = 3           # drops within DROP_AGREE of their median needed
 DROP_AGREE = 0.10
 DEFAULT_EVERY = 3            # drop balls at every 3rd step, fill in the rest
+REVIEW_IDLE_S = 300.0        # Pace Entry at the bottom: a row driven to, nothing typed: wind down
+                             # (5 s planned; 5 minutes "until the bugs are worked out", Bill, 2026-10-29)
+SETTLE_MAX_S = 8.0           # Pace Entry: a voltage still swinging after this long is taken (its average)
+STEADY_S = 0.7               # Pace Entry: steps and stillness judged on the voltage over this long
+# The bottom step is 7:00 (the scan's assumption, PACE_CURVE_ENDS) and the
+# first balls go in at step 4, the steps between filled in (Bill,
+# 2026-10-27: "at the very lowest voltage from the initialization scan, the
+# Pace is 7:00. It may not be true but it is a starting point. So maybe we
+# can just interpolate using that and the step 1 and step 4 measurements."):
+# at the bottom the voltage swings ~200 mV and the standing waves hold the
+# balls back (the 17:40 run read step 4 slower than step 1, though Bill
+# "definitely heard the propeller go faster between steps").
+FIRST_BALL_STEP = 4
+# START_FRAC was 0.16 until 2026-10-27, Bill: "Once the ball gets over the
+# first standing wave about a foot out, its tiny mass gets to speed almost
+# instantly. Towards the back it often drifts off to the side and away and it
+# looks like the current rear finish line is in a good place."
 
-# The surface carries a ball faster than the Pace Display's pace: Pace
-# Display pace = ball pace x this factor (by ball pace, min/100 yd), from
-# the author's pool (2026-10-19): table 4:06 / 2:26 / 1:52 against median
-# ball paces 2:44 / 1:36 / 1:06. Measured on ONE pool; held flat past the
-# ends.
-BALL_FACTOR = [(1.10, 1.68), (1.60, 1.52), (2.733, 1.50)]
+# The ball rides on the surface, the swimmer's body lower down in slower
+# water: Pace = ball pace x a factor, by jet step (Bill, 2026-10-27: "I would
+# rather work from physics rather than from old Pace tables"). bodyDrag is
+# the factor at the fastest step; deltaBodyDrag is how much more at the
+# slowest, where the body is deeper ("It's harder to keep legs up when
+# swimming slow") and further back ("Energy still spreads out toward the
+# rear and then down to the return ducts"); in between, along the steps.
+# Defaults from the author's pool; the calibration file keeps the user's.
+# (Before: 1.50 to 1.68 by ball pace, matched to the Pace Display.)
+BODY_DRAG = 1.5
+DELTA_BODY_DRAG = 0.18
 
 
-def ball_factor(ball_pace):
-    return interp(ball_pace, [b for b, _ in BALL_FACTOR], [f for _, f in BALL_FACTOR])
+def drag_factor(step, steps, body=BODY_DRAG, delta=DELTA_BODY_DRAG):
+    """The factor for jet step `step` of `steps` (1 = the slowest)."""
+    return body + delta * (steps - step) / (steps - 1) if steps > 1 else body
+
+
+def ball_table(volts, balls, body, delta):
+    """Paces for the steps at `volts` (slowest first): each ball step's
+    ball pace x drag_factor, the bottom step always 7:00 (FIRST_BALL_STEP;
+    balls dropped there before 2026-10-27 aren't used), the steps between
+    filled in (speed along a straight line in voltage, as PingPong does);
+    None above the last ball step. balls: [(step, volts, ball pace, drops
+    that agree), ...]."""
+    n = len(volts)
+    paces = [None] * n
+    for step, _, ball, _ in balls:
+        if step > 1:
+            paces[step - 1] = round(ball * drag_factor(step, n, body, delta), 4)
+    if balls and n:
+        paces[0] = PACE_CURVE_ENDS[0]
+    known = [i for i, p in enumerate(paces) if p is not None]
+    for a, b in zip(known, known[1:]):
+        for i in range(a + 1, b):
+            speed = (interp(volts[i], [volts[a], volts[b]], [1.0 / paces[a], 1.0 / paces[b]])
+                     if volts[b] > volts[a] else 1.0 / paces[a])
+            paces[i] = round(1.0 / speed, 4)
+    return paces
+
+
+def add_ruler(vault, table):
+    """Logs from before v15.7 given the ruler (columns 10-11): the voltage
+    where table (the Pace table they were swum with) gives the row's
+    logged Pace, and the table's Pace there, so Swim Plot can show them in
+    today's table too (Bill, 2026-10-30: "What about the user swim files
+    that had two new columns added?"). Rows that have it already, rows of
+    3 columns and rows that don't read are left as they are; each log
+    written whole, then put in place. Returns (logs changed, rows)."""
+    rows = sorted(((float(p), float(v)) for p, v in table), key=lambda r: r[1])
+    tv, tp = [v for _, v in rows], [p for p, _ in rows]
+    by_pace = sorted(zip(tp, tv))
+    pa, va = [p for p, _ in by_pace], [v for _, v in by_pace]
+    files = done = 0
+    for path in sorted(glob.glob(os.path.join(vault, "????-??-??.csv"))):
+        out, changed = [], False
+        with open(path) as f:
+            for line in f:
+                parts = line.rstrip("\n").split(",")
+                try:
+                    pace = float(parts[1])
+                    ok = len(parts) in (5, 7, 9) and pace > 0
+                except (IndexError, ValueError):
+                    ok = False
+                if ok:
+                    parts += ["nan"] * (9 - len(parts))     # (CoM, zone columns: none logged then)
+                    volts = round(interp(pace, pa, va), 3)
+                    parts += [f"{volts:.3f}", f"{interp(volts, tv, tp):.4f}"]
+                    done += 1
+                    changed = True
+                out.append(",".join(parts))
+        if changed:
+            with open(path + ".tmp", "w") as f:
+                f.write("\n".join(out) + "\n")
+            os.replace(path + ".tmp", path)
+            files += 1
+    return files, done
+
+
+def redo_in_today(pace, dist, volts, table_pace, today):
+    """A log's Paces and distances in today's calibration (v15.7, Bill,
+    2026-10-29: "drop the calendar choice ... what they will be shown will
+    deoend on the choice"): each row's Pace x today's table at its voltage
+    / the table's Pace it was logged with (the row's ruler, columns 10-11),
+    the distance from the same speeds. Rows logged before v15.7 (no ruler)
+    stay as swum. today: volts -> Pace (the table in use). Returns (paces,
+    distances, every row redone?)."""
+    f, redone = [], True
+    for v, tp in zip(volts, table_pace):
+        if v == v and tp == tp and v > 0 and tp > 0:          # (NaN != NaN: no ruler)
+            f.append(today(v) / tp)
+        else:
+            f.append(1.0)
+            redone = False
+    if all(abs(k - 1.0) < 1e-9 for k in f):
+        return list(pace), list(dist), redone
+    paces = [p * k for p, k in zip(pace, f)]
+    dists, acc = [], 0.0
+    for i, d in enumerate(dist):
+        # speed is 1 / Pace: each stretch's distance over the two rows' factors
+        acc = d / f[0] if i == 0 else acc + max(0.0, d - dist[i - 1]) * (1 / f[i - 1] + 1 / f[i]) / 2
+        dists.append(acc)
+    return paces, dists, redone
 
 
 def pace_text(p):
@@ -8033,13 +10421,14 @@ def interp(x, xs, ys):
 
 
 # ----------------------------------------------------------------------
-# Pace Correction: the swimmer holds a steady pace in PoolWind (Hold) and
-# notes the pace they feel and the pace the monitor shows, at as many
-# speeds as they like. Each pair gives a ratio, felt / shown, at its shown
-# pace. Every pace in the table is multiplied by the ratio at that pace:
-# straight lines between the pairs, carried on past the first and last
-# pair along the end lines (one pair: the same ratio everywhere). So
-# after the correction each pair's speed shows the pace that was felt.
+# Pace correction (PoolWind's menu): the swimmer fixes the Paces they
+# know at as many zones as they like (fix_table). Every pace in the table
+# between two fixed speeds keeps its place in the table's own curve, the
+# same fraction of the way from one fixed Pace to the next. So after the
+# correction each fixed speed shows its fixed Pace, the curve keeps its
+# shape and stays in order. (Before 2026-10-30: the ratio new / old in
+# straight lines; before v15.6: pairs of felt and shown pace,
+# correct_table.)
 # ----------------------------------------------------------------------
 def rescale(v, src, dst):
     """A voltage on the pool whose range is src -> the voltage at the same
@@ -8047,44 +10436,60 @@ def rescale(v, src, dst):
     return dst[0] + (v - src[0]) * (dst[1] - dst[0]) / (src[1] - src[0])
 
 
-RATIO_LIMITS = (0.5, 2.0)        # a ratio outside these is almost surely a typo
+def pace_curve(v, lo, hi):
+    """The Pace at v volts on a pool scanned from lo to hi volts: the
+    original curve's shape at the same percentage of its range, with
+    PACE_CURVE_ENDS at lo and hi."""
+    s0, k, v0, w = PACE_CURVE
+    curve = lambda x: 100.0 / (s0 + k * math.log1p(math.exp((x - v0) / w)))
+    a, b = PACE_CURVE_V
+    slow, fast = PACE_CURVE_ENDS
+    g = curve(rescale(v, (lo, hi), (a, b)))
+    return fast + (g - curve(b)) * (slow - fast) / (curve(a) - curve(b))
 
 
-def correction_ratios(pairs):
-    """[(felt, shown), ...] -> (shown paces ascending, their ratios); pairs
-    with the same shown pace are averaged."""
-    by_shown = {}
-    for felt, shown in pairs:
-        by_shown.setdefault(round(shown, 4), []).append(felt / shown)
-    xs = sorted(by_shown)
-    return xs, [sum(by_shown[x]) / len(by_shown[x]) for x in xs]
 
 
-def correct_table(table, pairs, project=True):
-    """table [(pace, volts), ...] corrected by the pairs. With project, the
-    ratio follows the end lines past the first and last pair; otherwise it
-    is held flat there. Returns (new table, note); the table is None if the
-    result isn't usable (a pace that doesn't get faster as the voltage
-    rises, or a ratio outside RATIO_LIMITS)."""
-    xs, rs = correction_ratios(pairs)
+def fix_table(table, fixed):
+    """table [(pace, volts), ...] with the paces `fixed` [(pace, volts),
+    ...] exactly at their volts (Pace correction): between two fixed
+    paces each pace keeps its place in the table's own curve, the same
+    fraction of the way from one to the other (in proportion, logs) as
+    in the table; past the first and last, the ratio new / old there held.
+    The table's shape is kept and New always gets faster as the voltage
+    rises when the table does and the fixed paces do (Bill, 2026-10-30:
+    "Is there some function that could best fit an ill fitting curve
+    with the master curve while the newly edited point values remain
+    fixed?" Before: the ratio new / old in straight lines between the
+    fixed paces, which could put two zones out of order where the table
+    flattens). None fixed: the table as it is. Returns (new table, note);
+    the table is None if the fixed paces are out of order. (No more
+    "more than twice" limit, Bill, 2026-10-30: "If it was an error, the
+    red box check is enough warning to the user.")"""
+    rows = sorted(table, key=lambda r: r[1])
+    tv = [v for _, v in rows]
+    tp = [p for p, _ in rows]
+    pts = sorted((v, p, interp(v, tv, tp)) for p, v in fixed)      # (volts, fixed pace, the table's)
 
-    def ratio(p):
-        if len(xs) == 1:
-            return rs[0]
-        if project and p < xs[0]:
-            return rs[0] + (p - xs[0]) * (rs[1] - rs[0]) / (xs[1] - xs[0])
-        if project and p > xs[-1]:
-            return rs[-1] + (p - xs[-1]) * (rs[-1] - rs[-2]) / (xs[-1] - xs[-2])
-        return interp(p, xs, rs)
+    def placed(p, v):
+        if v <= pts[0][0]:
+            return p * pts[0][1] / pts[0][2]
+        if v >= pts[-1][0]:
+            return p * pts[-1][1] / pts[-1][2]
+        k = max(j for j in range(len(pts)) if pts[j][0] <= v)
+        (v0, f0, t0), (v1, f1, t1) = pts[k], pts[k + 1]
+        if abs(math.log(t1 / t0)) < 1e-9:                         # the table flat here: by volts
+            x = (v - v0) / (v1 - v0)
+        else:
+            x = math.log(p / t0) / math.log(t1 / t0)
+        return math.exp(math.log(f0) + x * math.log(f1 / f0))
 
     new = []
-    for p, v in sorted(table, key=lambda r: r[1]):
-        r = ratio(p)
-        if not RATIO_LIMITS[0] <= r <= RATIO_LIMITS[1]:
-            return None, f"the correction would be {r:.2f}x at {pace_text(p)}"
-        new.append((round(p * r, 4), v))
-    for (p0, v0), (p1, v1) in zip(new, new[1:]):
-        if v1 > v0 + 1e-9 and p1 > p0 + 1e-9:
+    for p, v in rows:
+        q = placed(p, v) if pts else p
+        new.append((round(q, 4), v))
+    for k, ((p0, v0), (p1, v1)) in enumerate(zip(new, new[1:])):
+        if v1 > v0 + 1e-9 and p1 > p0 + 1e-9 and tp[k + 1] <= tp[k] + 1e-9:
             return None, f"{pace_text(p1)} at {v1:.3f} V would be slower than {pace_text(p0)} at {v0:.3f} V"
     return new, ""
 
@@ -8094,8 +10499,6 @@ def correct_table(table, pairs, project=True):
 # (active low: 0 = relay on).
 # ----------------------------------------------------------------------
 class RealJet:
-    simulated = False
-
     def __init__(self):
         import board
         import adafruit_ina260
@@ -8153,64 +10556,6 @@ class RealJet:
             pass
 
 
-class SimulatedJet:
-    """A pretend pool for desk tests: steps of 0.04 V from 1.185 V, the
-    remote's hold timing, the sensor's noise, and a Pace Display that
-    follows the author's table (1:00 from 2.5 V up). low, step and steps
-    make it another pool's voltages (same speeds, same Pace Display)."""
-    simulated = True
-    STEP_V = 0.04
-    LOW_V = 1.185
-    STEPS = 51                      # up to about 3.2 V
-    TABLE = [(7.0, 1.185), (6.4, 1.288), (5.4, 1.4), (4.5667, 1.489), (3.825, 1.562),
-             (3.25, 1.643), (2.75, 1.73), (2.4333, 1.796), (2.2667, 1.876), (2.1167, 1.953),
-             (1.9833, 2.037), (1.8667, 2.115), (1.7667, 2.188), (1.6667, 2.304),
-             (1.46, 2.43), (1.0, 2.5)]
-
-    def __init__(self, low=None, step=None, steps=None):
-        self.low = self.LOW_V if low is None else low
-        self.step = self.STEP_V if step is None else step
-        self.steps = self.STEPS if steps is None else steps
-        self.k = 12                 # start part way up, as a pool left running would
-        self.held = None
-        self.next_step = 0.0
-
-    def volts(self):
-        return self.low + self.k * self.step
-
-    def read(self):
-        now = time.time()
-        if self.held and now >= self.next_step:
-            self.k = max(0, min(self.steps - 1, self.k + (1 if self.held == "UP" else -1)))
-            self.next_step = now + random.uniform(0.9, 1.0)
-        return self.volts() + random.gauss(0.0, 0.0013)
-
-    def _hold(self, which):
-        if self.held != which:
-            self.held = which
-            self.next_step = time.time() + random.uniform(0.22, 1.71)
-
-    def up(self):
-        self._hold("UP")
-
-    def dn(self):
-        self._hold("DN")
-
-    def off(self):
-        self.held = None
-
-    def pump(self, on):
-        pass
-
-    def display_pace(self):
-        v = rescale(self.volts(), (self.low, self.low + (self.steps - 1) * self.step),
-                    (self.LOW_V, self.LOW_V + (self.STEPS - 1) * self.STEP_V))
-        return interp(v, [b for _, b in self.TABLE], [a for a, _ in self.TABLE])
-
-    def close(self):
-        pass
-
-
 # ----------------------------------------------------------------------
 # PingPong: the camera, the ball finder and the ball timer
 # ----------------------------------------------------------------------
@@ -8258,45 +10603,6 @@ class RealCamera:
 
     def close(self):
         self.cap.release()
-
-
-class SimulatedCamera:
-    """Blue water; drop() sends an orange ball down the pool at the
-    simulated jet's speed (Pace Display pace / ball_factor, give or take 3%,
-    a little slower past the end line, near the back wall)."""
-
-    def __init__(self, jet, usable_pool_length):
-        self.jet = jet
-        self.in_per_px = usable_pool_length / WORK_H
-        rng = np.random.default_rng(1)
-        water = np.empty((WORK_H, WORK_W, 3), np.uint8)
-        water[:] = (190, 160, 110)
-        self.water = np.clip(water + rng.normal(0, 6, water.shape), 0, 255).astype(np.uint8)
-        self.balls = []                # [y, x, px/s]
-        self._last = time.time()
-
-    def drop(self):
-        p = self.jet.display_pace()
-        b = p / 1.5
-        for _ in range(6):
-            b = p / ball_factor(b)
-        px_s = 60.0 / b / self.in_per_px * random.uniform(0.97, 1.03)
-        self.balls.append([4.0, WORK_W * random.uniform(0.45, 0.6), px_s])
-
-    def read(self):
-        time.sleep(max(0.0, 1.0 / CAMERA_FPS - (time.time() - self._last)))
-        t = time.time()
-        dt, self._last = t - self._last, t
-        img = self.water.copy()
-        for b in self.balls:
-            b[0] += b[2] * dt * (0.93 if b[0] > END_FRAC * WORK_H else 1.0)
-            b[1] += random.gauss(0, 0.4)
-            cv2.circle(img, (int(b[1]), int(b[0])), 5, (40, 140, 255), -1)
-        self.balls = [b for b in self.balls if b[0] < WORK_H - 8]
-        return t, img
-
-    def close(self):
-        pass
 
 
 class CameraThread:
@@ -8410,28 +10716,19 @@ def save_calibration(path, cal):
     """Same layout as PoolWind's own save; written to a temporary file
     first, so a power cut can't leave a half-written file."""
     lines = [
-        "# PoolWind calibration -- SAFETY-CRITICAL, technician changes only.",
-        "# Written by the program (Set Swim Area) and the calibration tool.",
-        "# pace_voltage: (pace min/100 yd, Pace Display volts) measured on this",
-        "# pool. SafetyVoltageLimits: the jet is never driven outside these volts.",
-        "# swimAreaPoints: the swim area's corners in the camera picture (Set",
-        "# Swim Area). usableSwimLength: the swim area's length in inches, from the back",
-        "# wall to the jet unit's edge (not the whole pool). middleSwimZone %: the",
-        "# center lane's width, side to side, as a percent of the swim area.",
-        "# recordRawVideo: record the camera's full, uncorrected video (large",
-        "# files) -- developer tool, used only when developerMode is on.",
-        "# InitialCalFinished: the calibration tool's initial voltage scan is done.",
-        "# jetVoltageRange: the slowest and fastest step's volts it measured;",
-        "# jetSteps: the number of steps between them (the scan writes one",
-        "# pace_voltage row per step: PoolWind's zones are the rows). # zones or",
-        "# auto: 'auto' = one zone per step between the swimmer's limits, or a",
-        "# number of zones spread over them (out of range: 'auto').",
-        "# Read at program start.",
+        "# PoolWind calibration: the pool's Master data -- SAFETY-CRITICAL.",
+        "# Close PoolWind before changing it: it's read when PoolWind starts.",
+        "# What the lines mean: the setup guide, section 5.",
         "{",
     ]
     items = [(k, cal[k]) for k in CAL_KEYS if k in cal]
-    items += [(k, v) for k, v in cal.items() if k not in CAL_KEYS]
+    items += [(k, v) for k, v in cal.items() if k not in CAL_KEYS and k not in DROPPED_CAL_KEYS]
+    group = ""
     for n, (key, value) in enumerate(items):
+        g = cal_group(key, CAL_BUILDER_KEYS, CAL_DERIVED_KEYS)
+        if g != group:
+            group = g
+            lines += ["", g]
         lead = "" if n == 0 else ","
         if key == "pace_voltage":
             rows = ",\n".join(f"    {tuple(r)!r}" for r in value)
@@ -8444,6 +10741,38 @@ def save_calibration(path, cal):
     with open(tmp, "w") as f:
         f.write("\n".join(lines) + "\n")
     load_calibration(tmp)          # PoolWind must be able to read it: else stop, old file untouched
+    os.replace(tmp, path)
+
+
+WELCOME_KEYS = ("choice", "poolTable", "oldTable", "oldDrag")   # the welcome screen's, no longer written
+
+
+def save_swimmer_file(path, d):
+    """A swimmer's Pace table file on their stick (App._load_swimmer),
+    written to a temporary file first like the calibration file."""
+    lines = [
+        "# PoolWind: this swimmer's Pace table (v15.7). pace_voltage: (pace",
+        "# min/100 yd, volts) on the pool's jet steps, made from the pool's",
+        "# table the first time and changed by Pace correction. bodyDrag,",
+        "# deltaBodyDrag: this swimmer's drag numbers (after a PingPong).",
+        "# PacesPending: Pace correction's changes not yet made permanent.",
+        "{",
+    ]
+    for n, (key, value) in enumerate(d.items()):
+        lead = "" if n == 0 else ","
+        if key in WELCOME_KEYS:
+            continue                   # the welcome screen's, gone (v15.7, 2026-10-30)
+        if key == "pace_voltage":
+            rows = ",\n".join(f"    {tuple(r)!r}" for r in value)
+            lines.append(f"{lead}'{key}': [\n{rows}\n]")
+        else:
+            lines.append(f"{lead}'{key}': {value!r}")
+        lines.append("")
+    lines.append("}")
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        f.write("\n".join(lines) + "\n")
+    load_calibration(tmp)          # readable: else stop, the old file untouched
     os.replace(tmp, path)
 
 
@@ -8465,8 +10794,9 @@ training. You can only measure an accurate Pace in a regular pool.</p>
     "choose_scan": """
 <p><b>First: Initial voltage scan</b>, once for each setup. Every pool
 sends different voltages. The scan runs the jet from its slowest to its
-fastest speed, finds your pool's voltage range, and fits PoolWind's safety
-limits, its settings and the shipped Pace table to it. Pace Entry and
+fastest speed, finds your pool's voltage range, and fits PoolWind's
+settings and the shipped Pace table to it (the jet is never driven outside
+the table). Pace Entry and
 PingPong need this to step your jet; they then replace the table's paces
 with your own. The rest of this screen stays grayed out until the scan is
 done.</p>
@@ -8474,19 +10804,25 @@ done.</p>
     "choose_modes": """
 <p>Choose how to measure:</p>
 <ul>
-<li><b>Pace Entry</b>: if your pool has a <b>Pace Display</b>, this will
-calibrate PoolWind to it. The program steps the jet up one step at a time;
-at each step you type the pace the display shows. About 30 steps, 15-20
-minutes.</li>
+<li><b>Pace Entry</b>: if your pool has a <b>Pace Display</b>, this
+calibrates PoolWind to it. It opens on the pool's table: tap a step and type
+the pace the display shows there, or let <b>Auto scan</b> step the jet up
+one step at a time while you type the pace at each. About 30 steps, 15-20
+minutes for a whole scan.</li>
 <li><b>PingPong</b>: measures your own pool. You drop orange ping-pong balls
 at the jet and the camera times them, at every 3rd of the about 30 steps
-(you can choose every step); the steps in between are filled in.
+(you can choose every step), from step 4 up; the slowest step is taken as
+7:00, and the steps in between are filled in.
 Collecting the balls is the tedious part. About 25-35 minutes. The new Pace
 table will only be estimated. You may want to correct it afterwards.</li>
 </ul>
+<p>Both make the pool's <b>Master</b> Pace table, its basic calibration.
+Swimmers who keep their own table on a USB stick keep it; Pace
+correction's <b>Copy Master values</b> gives them the new one.</p>
 <p><b>The Paces PoolWind shows don't feel right?</b> Close this and choose
 <b>Pace correction...</b> in PoolWind's menu: you swim at a Pace you know,
-move aside, and type the Pace it should be.</p>
+move aside, and type the Pace it should be. With a swimmer's USB stick in,
+it corrects that swimmer's own table; without one, the Master table.</p>
 """,
     "scan_ready": """
 <h3>Initial voltage scan: before you start</h3>
@@ -8539,12 +10875,13 @@ Check the picture below: the jet at the top, the back wall at the bottom.
 The two lines are where each ball's timing starts and ends.</li>
 <li>Turn the pool's <b>pump on</b> (the pool's remote, or <b>Pump On/Off</b>
 below).</li>
-<li>Check the <b>highest voltage</b> below; the program never steps the
-jet above it.</li>
 </ol>
 <p>Press <b>Start</b>. The program takes the jet down to its slowest speed,
 then asks for balls. The steps in between ball steps are stepped through on
-their own.</p>
+their own, up to the top of the pool's table (set by the voltage scan).</p>
+<p><b>Finish</b> any time ends the run: the steps above the last balls are
+filled in on to 1:00 at the top, marked ~, so the table keeps all the
+pool's steps.</p>
 <p><b>Stop</b> lets go of the buttons at once, any time.</p>
 """,
     "flow": """
@@ -8561,24 +10898,48 @@ sees.</p>
 <p>Leave the balls at the back wall; collect them when you need them. Balls
 drifting up the sides are ignored.</p>
 <p>When enough drops agree the program steps the jet up on its own.
-<b>Use drops</b> takes the drops so far (3 that agree are enough);
-<b>Clear drops</b> starts this step's drops again.</p>
+<b>Use dropped</b> takes the drops so far (3 that agree are enough);
+<b>Clear dropped</b> starts this step's drops again.</p>
 """,
     "ready": """
-<h3>Pace Entry: before you start</h3>
+<h3>Edit manually or run Auto scan</h3>
+<p><b>Edit manually:</b> tap a step in the table. The jet goes there; when
+the Pace Display is steady, type the pace it shows, on the number pad or the
+keyboard: <b>1 4 8</b> is 1:48. A Pace that can't be right (not faster than
+the step below) turns <b>red</b>, and the jet goes there next. Tap another
+step while the jet is moving and it goes there instead. <b>&lt;</b>
+(Backspace) takes off a digit, <b>Clear</b> (Esc) all of them.</p>
+<p><b>Auto scan:</b> the table's Paces are cleared, the jet goes down to its
+slowest speed, then steps up one step at a time to the top of the table; you
+type the pace at each. About 30 steps, 15-20 minutes. You can stop any time
+with <b>Back</b>, or end the table at the last step typed with <b>Entry
+complete</b>. Before you start:</p>
 <ol>
 <li><b>Nobody in the pool.</b> The jet will go up to fast speeds.</li>
 <li>Turn the pool's <b>pump on</b> (the pool's remote, or <b>Pump On/Off</b>
 below).</li>
 <li>Stand where you can read the <b>Pace Display</b> and this screen.</li>
-<li>Check the <b>highest voltage</b> below. The program never steps the
-jet above it. 2.6 V is fast enough for nearly everyone; the Pace Display
-on the author's pool stays at 1:00 above about 2.5 V.</li>
 </ol>
-<p>Press <b>Start</b>. The program first takes the jet down to its slowest
-speed, then asks for the first reading.</p>
-<p><b>Stop</b> lets go of the buttons at once, any time. If the pool shows
-too much stress, press Stop, then Finish.</p>
+<p>Steps without a Pace are filled in when the table is saved: between the
+steps typed, and on to 1:00 at the fastest step and 7:00 at the slowest.
+<b>↺</b> puts a step back as it was.</p>
+<p><b>Finish</b> shows the new table beside the current one, to save it.</p>
+<p><b>This is the pool's basic calibration.</b> Save Table replaces the
+Master Pace table (the pool's own, in the calibration file), and with it
+any Pace corrections made to it before. Swimmers' own Pace tables on their
+USB sticks are not changed: Pace correction's <b>Copy Master values</b>
+gives a swimmer the new one.</p>
+""",
+    "edited": """
+<h3>Recorded</h3>
+<p>Tap another step to type it again, or press <b>Finish</b>. With nothing
+typed for a while, the jet goes down to its slowest speed by itself.</p>
+""",
+    "scan_end": """
+<h3>Auto scan finished</h3>
+<p>The jet is at its slowest speed. <b>Back</b> goes to the Edit screen,
+to look the table over, type steps again, or Finish. A step still red there
+(typed twice and still out of order) can be tapped and typed again.</p>
 """,
     "down": """
 <h3>Going down to the slowest speed</h3>
@@ -8587,17 +10948,41 @@ can take up to a minute.</p>
 """,
     "settle": """
 <h3>Waiting for the jet to settle</h3>
-<p>A few seconds after each step, so the voltage is steady.</p>
+<p>A few seconds after each step, so the voltage is steady. At the slowest
+speeds the voltage can keep swinging; then it is taken after 8 seconds, at
+its average.</p>
 """,
     "enter": """
 <h3>Type the Pace Display reading</h3>
-<p>Wait until the Pace Display is steady, then type the pace it shows on
-the number pad (for example <b>2:15</b>, or just <b>215</b>) and press
-<b>Record</b>. The program then steps the jet up once more.</p>
-<p>Typed a wrong number? Press <b>Clear</b>. To change a step already
-recorded, tap its row in the table, type the right pace and press
-<b>Fix row</b>.</p>
-<p>When the jet is as fast as you want to go, press <b>Finish</b>.</p>
+<p>Wait until the Pace Display is steady, then type the pace it shows, on
+the number pad or the keyboard: <b>1 4 8</b> is 1:48. The third digit
+records it and the jet steps up once more.</p>
+<p>A Pace that can't be right (not faster than the step below) turns
+<b>red</b> in the table; just go on: on the way down the jet stops at the
+red steps and asks again.</p>
+<p><b>&lt;</b> (Backspace) takes off a digit, <b>Clear</b> (Esc) all of
+them, before the third digit.</p>
+<p><b>Entry complete</b>: the last step you typed becomes the top of the
+table, the jet's fastest speed; the steps above it show <b>-----</b> and
+are left out of the table, but kept: the next Pace Entry shows them again
+to type. The jet goes down and the Finish screen shows the new table;
+nothing is saved until <b>Save Table</b>.</p>
+<p>To stop for now, press <b>Back</b>, then <b>Continue</b>: what you
+typed is kept and the jet goes down. <b>Continue Auto scan</b> on the Edit
+screen carries on from the last step typed; steps left without a Pace are
+filled in when the table is saved, on to 1:00 at the top (steps showing
+<b>-----</b> above the last one typed are left out).</p>
+""",
+    "drive": """
+<h3>Moving the jet</h3>
+<p>Holding <b>UP</b> or <b>DN</b> until the jet reaches the step, then a
+few seconds for it to settle.</p>
+""",
+    "refix": """
+<h3>Type this step's Pace</h3>
+<p>Wait until the Pace Display is steady, then type the pace it shows:
+<b>1 4 8</b> is 1:48. It is taken as right and the table is checked again:
+if a step turns red, the jet goes there next, the one above first.</p>
 """,
     "up": """
 <h3>Stepping up</h3>
@@ -8610,6 +10995,11 @@ step.</p>
 <p><b>Resume</b> carries on from this step. <b>Finish</b> takes the jet
 down to its slowest speed and shows the results.</p>
 """,
+    "entry_paused": """
+<h3>Stopped</h3>
+<p>The buttons are released. The jet stays where it is.</p>
+<p><b>Resume</b> carries on from this step.</p>
+""",
     "winddown": """
 <h3>Taking the jet down</h3>
 <p>Holding <b>DN</b> until the jet is at its slowest speed.</p>
@@ -8618,13 +11008,12 @@ down to its slowest speed and shows the results.</p>
 
 
 class CalibrateWindow(QWidget):
-    def __init__(self, jet, cal_path, windowed, write_cal=False, camera_factory=None):
+    def __init__(self, jet, cal_path, windowed, camera_factory=None):
         super().__init__()
         self.jet = jet
         # PoolWind's menu (Calibrate pool...) hands in its own jet and a
         # camera_factory(swimAreaPoints) using its own camera, which it holds
         self.camera_factory = camera_factory
-        self.write_cal = write_cal     # simulated, yet saved into the calibration file (test folder)
         self.cal_path = cal_path
         self.cal = load_calibration(cal_path)
         self.points = []               # (volts, pace), one per recorded step
@@ -8633,6 +11022,7 @@ class CalibrateWindow(QWidget):
         self.camera = None             # CameraThread, PingPong only
         self.drops = []                # this step's drops: (ball pace, pace)
         self.drops_path = None
+        self.balls_raw = []            # PingPong: (step, volts, ball pace, drops that agree) per ball step
         self.state = "choose"
         self.hist = deque()            # (t, volts) of the last few seconds
         self.v = 0.0
@@ -8678,22 +11068,30 @@ class CalibrateWindow(QWidget):
         lay.setContentsMargins(8, 8, 8, 8)
 
         self.info = QTextBrowser()
-        self.info.setMinimumHeight(220)
+        self.info.setMinimumHeight(160)        # (PingPong's first screen fits the 800 px screen, Bill 2026-10-30)
         lay.addWidget(self.info, 3)
 
-        row = QHBoxLayout()
+        self.volt_row = QWidget()               # (PingPong has its own, beside the picture)
+        row = QHBoxLayout(self.volt_row)
+        row.setContentsMargins(0, 0, 0, 0)
         self.volt_label = QLabel("--- V")
         self.volt_label.setFont(big)
         row.addWidget(self.volt_label)
         row.addStretch(1)
+        self.warn_label = QLabel("There are warnings in the table below")   # Pace Entry: a red row
+        self.warn_label.setStyleSheet("color: #c00000; font-weight: bold;")
+        # on two lines beside the big voltage: one widened the window past
+        # the 600 px screen (641 px)
+        self.warn_label.setWordWrap(True)
+        self.warn_label.setAlignment(Qt.AlignCenter)
+        self.warn_label.setMaximumWidth(250)
+        self.warn_label.hide()
+        row.addWidget(self.warn_label)
+        row.addStretch(1)
         self.step_label = QLabel("")
         row.addWidget(self.step_label)
-        lay.addLayout(row)
+        lay.addWidget(self.volt_row)
 
-        self.sim_label = QLabel("")
-        self.sim_label.setStyleSheet("color: #a05000;")
-        self.sim_label.setVisible(self.jet.simulated)
-        lay.addWidget(self.sim_label)
 
         # Mode choice
         self.mode_box = QWidget()
@@ -8714,20 +11112,49 @@ class CalibrateWindow(QWidget):
             self.mode_btns.append(b)
         lay.addWidget(self.mode_box)
 
-        # Highest voltage
-        self.max_box = QWidget()
-        hb = QHBoxLayout(self.max_box)
-        hb.setContentsMargins(0, 0, 0, 0)
-        hb.addWidget(QLabel("Highest voltage:"))
-        self.max_spin = QDoubleSpinBox()          # range and step: _apply_pool_scale
-        self.max_spin.setDecimals(2)
-        self.max_spin.setSuffix(" V")
-        self.max_spin.setMinimumHeight(44)
-        hb.addWidget(self.max_spin)
-        hb.addStretch(1)
-        lay.addWidget(self.max_box)
+        # The pool's two settings, on the first screen, so the builder never
+        # opens the file (Bill, 2026-10-31: "There is plenty of room in the
+        # PoolWind calibration for the builder to edit these defaults and
+        # they won't even have to go to the file itself.")
+        self.pool_box = QtWidgets.QGroupBox("Pool settings")
+        gl = QGridLayout(self.pool_box)
+        gl.setContentsMargins(6, 4, 6, 4)
+        gl.setVerticalSpacing(2)
+        self.length_spin = QSpinBox()
+        self.length_spin.setRange(36, 600)
+        self.length_spin.setSuffix(" in")
+        self.lane_spin = QSpinBox()
+        self.lane_spin.setRange(10, 100)
+        self.lane_spin.setSuffix(" %")
+        notes = ("The length in inches from the surface of the jet to the rear of the pool "
+                 "(not the pool length).",
+                 "The width of the swim zone, as a percentage of the swim area's width. 35 % "
+                 "leaves enough room for the swimmer to swim in and still get out of it to "
+                 "step to the bench.")
+        for r, (name, spin, note) in enumerate((("Usable swim length:", self.length_spin, notes[0]),
+                                                ("Swim zone width:", self.lane_spin, notes[1]))):
+            gl.addWidget(QLabel(name), 2 * r, 0)
+            spin.setMinimumHeight(40)
+            spin.setMinimumWidth(110)
+            spin.valueChanged.connect(self._pool_settings_changed)
+            gl.addWidget(spin, 2 * r, 1)
+            lbl = QLabel(note)
+            lbl.setWordWrap(True)
+            lbl.setStyleSheet("color: #555; font-size: 11pt;")
+            gl.addWidget(lbl, 2 * r + 1, 0, 1, 3)
+        self.pool_save_btn = QPushButton("Save")
+        self.pool_save_btn.setMinimumHeight(40)
+        self.pool_save_btn.clicked.connect(self.save_pool_settings)
+        gl.addWidget(self.pool_save_btn, 0, 2, Qt.AlignRight)
+        gl.setColumnStretch(2, 1)
+        self._show_pool_settings()
+        lay.addWidget(self.pool_box)
 
-        # PingPong settings
+        # PingPong settings: stacked beside the picture with the voltage, the
+        # room above going to the table (Bill, 2026-10-30: "The displayed
+        # voltage and 'Balls per measured step' and the 'Measure every'
+        # entries can be stacked vertically and go to the right side of the
+        # pool picture and all moved up for even more space for the table.")
         self.pp_box = QWidget()
         pb = QGridLayout(self.pp_box)
         pb.setContentsMargins(0, 0, 0, 0)
@@ -8745,7 +11172,27 @@ class CalibrateWindow(QWidget):
         self.every_spin.setMinimumHeight(44)
         pb.addWidget(self.every_spin, 1, 1)
         pb.setColumnStretch(2, 1)
-        lay.addWidget(self.pp_box)
+
+        # PingPong results: the factor's two numbers; the table follows them
+        self.drag_box = QWidget()
+        db = QGridLayout(self.drag_box)
+        db.setContentsMargins(0, 0, 0, 0)
+        self.body_spin = QDoubleSpinBox()
+        self.delta_spin = QDoubleSpinBox()
+        for r, (spin, name, lo, hi, value) in enumerate((
+                (self.body_spin, "bodyDrag (fastest speed):", 1.0, 3.0, self.cal.get("bodyDrag", BODY_DRAG)),
+                (self.delta_spin, "deltaBodyDrag (more at the slowest):", -1.0, 1.0,
+                 self.cal.get("deltaBodyDrag", DELTA_BODY_DRAG)))):
+            db.addWidget(QLabel(name), r, 0)
+            spin.setRange(lo, hi)
+            spin.setDecimals(2)
+            spin.setSingleStep(0.01)
+            spin.setValue(value)
+            spin.setMinimumHeight(44)
+            spin.valueChanged.connect(self._drag_changed)
+            db.addWidget(spin, r, 1)
+        db.setColumnStretch(2, 1)
+        lay.addWidget(self.drag_box)
 
         # PingPong: the camera's picture and this step's drops
         self.ball_box = QWidget()
@@ -8755,8 +11202,12 @@ class CalibrateWindow(QWidget):
         self.preview.setFixedSize(180, 240)
         self.preview.setAlignment(Qt.AlignCenter)
         self.preview.setStyleSheet("background: #203040; color: white;")
-        bb.addWidget(self.preview)
+        bb.addWidget(self.preview, 0, Qt.AlignTop)
         right = QVBoxLayout()
+        self.pp_volt_label = QLabel("--- V")
+        self.pp_volt_label.setFont(big)
+        right.addWidget(self.pp_volt_label)
+        right.addWidget(self.pp_box)
         self.ball_label = QLabel("")
         self.ball_label.setFont(big)
         self.ball_label.setWordWrap(True)
@@ -8766,62 +11217,74 @@ class CalibrateWindow(QWidget):
         self.drops_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         right.addWidget(self.drops_label, 1)
         brow = QHBoxLayout()
-        self.use_btn = QPushButton("Use drops")
+        self.use_btn = QPushButton("Use dropped")      # (Bill, 2026-10-30)
         self.use_btn.clicked.connect(self.use_drops)
-        self.clear_btn = QPushButton("Clear drops")
+        self.clear_btn = QPushButton("Clear dropped")
         self.clear_btn.clicked.connect(self.clear_drops)
         brow.addWidget(self.use_btn)
         brow.addWidget(self.clear_btn)
         right.addLayout(brow)
-        self.sim_drop_btn = QPushButton("Drop a ball (simulated)")
-        self.sim_drop_btn.clicked.connect(lambda: self.camera and self.camera.camera.drop())
-        self.sim_drop_btn.setVisible(self.jet.simulated)
-        right.addWidget(self.sim_drop_btn)
-        for b in (self.use_btn, self.clear_btn, self.sim_drop_btn):
+        for b in (self.use_btn, self.clear_btn):
             b.setMinimumHeight(50)
         bb.addLayout(right, 1)
         lay.addWidget(self.ball_box)
 
-        # Pace entry: the typed pace and a number pad
+        # Pace entry: the typed pace and a number pad, half size beside the
+        # table, no Record (Bill, 2026-10-30: "the Entry box can be much
+        # smaller as well as the keypad, try about half size" ... "the
+        # Record button can go away")
+        work = QWidget()
+        wl = QHBoxLayout(work)
+        wl.setContentsMargins(0, 0, 0, 0)
         self.entry_box = QWidget()
-        eb = QHBoxLayout(self.entry_box)
+        eb = QVBoxLayout(self.entry_box)
         eb.setContentsMargins(0, 0, 0, 0)
-        left = QVBoxLayout()
+        mid = QtGui.QFont(f)
+        mid.setPointSize(16)
+        mid.setBold(True)
         self.pace_label = QLabel("")
-        self.pace_label.setFont(big)
+        self.pace_label.setFont(mid)
         self.pace_label.setAlignment(Qt.AlignCenter)
-        self.pace_label.setMinimumHeight(56)
+        self.pace_label.setFixedHeight(38)
         self.pace_label.setStyleSheet("border: 2px solid #888; background: white; color: black;")
-        left.addWidget(self.pace_label)
-        self.record_btn = QPushButton("Record")
-        self.record_btn.setMinimumHeight(60)
-        self.record_btn.setFont(big)
-        self.record_btn.clicked.connect(self.record)
-        left.addWidget(self.record_btn)
+        eb.addWidget(self.pace_label)
+        pad = QGridLayout()
+        pad.setSpacing(3)
+        small = QtGui.QFont(f)
+        small.setPointSize(12)
+        # 7 8 9 on top, 1 2 3 at the bottom, as on the keyboard ("The 0 key
+        # can stay where it is")
+        keys = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "<", "0", "Clear"]
+        for i, k in enumerate(keys):
+            kb = QPushButton(k)
+            kb.setFixedSize(48, 36)
+            kb.setFont(small)
+            kb.clicked.connect(lambda _=False, k=k: self._key(k))
+            pad.addWidget(kb, i // 3, i % 3)
+        eb.addLayout(pad)
         self.fix_btn = QPushButton("Fix row")
         self.fix_btn.setMinimumHeight(44)
         self.fix_btn.clicked.connect(self.fix_row)
-        left.addWidget(self.fix_btn)
-        eb.addLayout(left, 1)
-        pad = QGridLayout()
-        keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ":", "0", "Clear"]
-        for i, k in enumerate(keys):
-            kb = QPushButton(k)
-            kb.setMinimumSize(64, 50)
-            kb.clicked.connect(lambda _=False, k=k: self._key(k))
-            pad.addWidget(kb, i // 3, i % 3)
-        eb.addLayout(pad, 1)
-        lay.addWidget(self.entry_box)
+        eb.addWidget(self.fix_btn)
+        eb.addStretch(1)
+        wl.addWidget(self.entry_box)
 
-        # Table of recorded steps
-        self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(["Step", "Volts", "Pace"])
+        # Table of recorded steps; Pace Entry: ↺ puts a step back
+        self.table = QTableWidget(0, 4)
+        self.table.setHorizontalHeaderLabels(["Step", "Volts", "Pace", ""])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table.horizontalHeader().resizeSection(3, 40)
+        self.table.setColumnHidden(3, True)
         self.table.verticalHeader().setVisible(False)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QTableWidget.SingleSelection)
-        lay.addWidget(self.table, 2)
+        self.table.cellClicked.connect(self._row_clicked)
+        self.table.verticalScrollBar().valueChanged.connect(self._touch)
+        wl.addWidget(self.table, 1)
+        lay.addWidget(work, 2)
+        self.work = work
 
         # Controls
         row = QHBoxLayout()
@@ -8843,42 +11306,71 @@ class CalibrateWindow(QWidget):
                                     " border-radius: 3px; padding: 5px; }")
         self.pump_btn.clicked.connect(self.pump_toggle)
         self.quit_btn = QPushButton("Quit")
-        self.quit_btn.clicked.connect(self.close)
+        self.quit_btn.clicked.connect(self.quit)
+        self.back_btn = QPushButton("Back")             # Pace Entry's Scan screen
+        self.back_btn.clicked.connect(self.back)
+        self.complete_btn = QPushButton("Entry complete")     # ...the last step typed is the top
+        self.complete_btn.clicked.connect(self.entry_complete)
+        self.edit_btn = QPushButton("Edit table")       # ...its Finish screen
+        self.edit_btn.clicked.connect(self.edit_table)
         self.return_btn = QPushButton("Return")
         self.return_btn.clicked.connect(lambda: self._show_state("choose"))
-        for b in (self.start_btn, self.stop_btn, self.resume_btn, self.finish_btn,
-                  self.save_btn, self.pump_btn, self.return_btn, self.quit_btn):
+        for b in (self.start_btn, self.stop_btn, self.resume_btn, self.back_btn, self.complete_btn,
+                  self.finish_btn, self.save_btn, self.edit_btn, self.pump_btn, self.return_btn,
+                  self.quit_btn):
             b.setMinimumHeight(56)
             row.addWidget(b)
         lay.addLayout(row)
 
     def _show_state(self, state, extra=""):
+        if state != getattr(self, "state", None):
+            # Each screen in the terminal, to find a stall afterwards (Bill at
+            # the pool, 2026-10-26: PingPong stayed on "Step 13 done")
+            self._log(f"{state} at {getattr(self, 'v', 0.0):.3f} V")
         self.state = state
         pp = self.mode == "pingpong"
         if state == "choose":
             done = self._scan_done()
             text = TEXT["choose"] + ("" if done else TEXT["choose_scan"]) + TEXT["choose_modes"]
-            self.scan_btn.setVisible(not done)
+            # The scan can be run again any time (Bill, 2026-10-25): it
+            # asks first when it has been done, and is no longer bold
+            self.scan_btn.setStyleSheet("font-size: 14pt;" if done else
+                                        "font-weight: bold; font-size: 14pt;")
             for b in self.mode_btns:
                 b.setEnabled(done)
         else:
-            text = TEXT.get("pp_ready" if pp and state == "ready" else state, "")
+            text = TEXT.get("pp_ready" if pp and state == "ready" else
+                            "entry_paused" if self.mode == "entry" and state == "paused" else state, "")
+            if pp and state in ("up", "settle", "flow"):
+                extra = getattr(self, "_pp_note", "") + extra     # the last ball step's result
         self.info.setHtml(text + extra)
-        running = state in ("down", "settle", "enter", "flow", "balls", "up", "winddown",
+        running = state in ("down", "settle", "enter", "flow", "balls", "up", "winddown", "drive", "refix",
                             "scan_noise", "scan_down", "scan_up", "scan_winddown")
         self.mode_box.setVisible(state == "choose")
-        self.max_box.setVisible(state == "ready")
+        self.pool_box.setVisible(state == "choose")
+        self.work.setVisible(state != "choose")     # (empty there: the room goes to the text)
+        self.volt_label.setVisible(state != "choose")   # (Bill, 2026-10-29: "I see no need for the bold voltage display")
+        self.volt_row.setVisible(not pp)          # PingPong's is beside the picture
+        self._show_warning()
         self.pp_box.setVisible(pp and state == "ready")
+        self.drag_box.setVisible(pp and state == "results")
         self.ball_box.setVisible(pp and state not in ("choose", "results"))
         self.use_btn.setEnabled(state == "balls")
         self.clear_btn.setEnabled(state == "balls")
-        self.sim_drop_btn.setEnabled(state in ("ready", "flow", "balls", "paused"))
-        if pp and state != "balls":
+        if pp and state != "balls" and not (state in ("up", "settle", "flow") and getattr(self, "_pp_note", "")):
             self.ball_label.setText("")
         scan = self.mode == "scan"
         self.table.setVisible(not scan and state != "choose")
-        self.entry_box.setVisible(self.mode == "entry" and state in ("enter", "settle", "up", "paused", "results"))
-        self.record_btn.setEnabled(state == "enter")
+        if scan:
+            # The scan has no table below: its room to the text (Bill,
+            # 2026-10-31: "A lot of blank space there could be used for the
+            # table.")
+            self.layout().setStretchFactor(self.info, 1)
+            self.layout().setStretchFactor(self.work, 0)
+        entry = self.mode == "entry"
+        self.entry_box.setVisible(entry and state in ("enter", "settle", "up", "paused", "results", "drive",
+                                                      "refix"))
+        self.fix_btn.setVisible(not entry)       # Pace Entry: tap the row instead (v15.7)
         self.fix_btn.setEnabled(state in ("enter", "paused", "results"))
         self.start_btn.setVisible(state in ("ready", "scan_ready"))
         self.stop_btn.setVisible(running)
@@ -8893,11 +11385,86 @@ class CalibrateWindow(QWidget):
                                                         "scan_ready", "scan_paused", "scan_results"))
         self.return_btn.setVisible(state in ("scan_ready", "scan_results"))
         self.quit_btn.setVisible(not running)
+        self.back_btn.setVisible(False)
+        self.complete_btn.setVisible(False)
+        self.edit_btn.setVisible(False)
         if scan:
             self.step_label.setText(f"Steps counted: {self._scan_steps}" if state == "scan_up" or
                                     self._scan_stage == "up" else "")
         else:
             self.step_label.setText(f"Steps recorded: {len(self.points)}" if self.points else "")
+        if entry and state != "choose":
+            self._entry_screen(state)
+
+    def _pool_value(self, key):
+        return int(round(float(self.cal.get(key, POOL_SETTING_DEFAULTS[key]))))
+
+    def _show_pool_settings(self):
+        """The two spins as the file has them; Save greyed until one changes."""
+        for spin, key in ((self.length_spin, "usableSwimLength"), (self.lane_spin, "middleSwimZone %")):
+            spin.blockSignals(True)
+            spin.setValue(self._pool_value(key))
+            spin.blockSignals(False)
+        self._pool_settings_changed()
+
+    def _pool_changes(self):
+        return {k: spin.value() for spin, k in ((self.length_spin, "usableSwimLength"),
+                                                (self.lane_spin, "middleSwimZone %"))
+                if spin.value() != self._pool_value(k)}
+
+    def _pool_settings_changed(self, *_):
+        self.pool_save_btn.setEnabled(bool(self._pool_changes()))
+
+    def save_pool_settings(self):
+        changes = self._pool_changes()
+        if not changes:
+            return
+        self.cal.update(changes)
+        note = self._write_cal(self.cal)
+        self._pool_settings_changed()
+        QMessageBox.information(self, "Saved", note)
+
+    def _entry_screen(self, state):
+        """Pace Entry's three screens (Bill, 2026-10-29: "There should be
+        three screens: The "Edit" screen, The "Scan screen", and the
+        "Finish" screen"). Edit: the table, a row tapped to type it again,
+        Auto scan and Finish, the screen the same whatever the jet does
+        ("The screen should not change while doing manual edits"); Scan:
+        Auto scan running, Back; Finish: the new table against the current
+        one, Save Table, Edit table, Quit."""
+        scr = self.screen
+        edit, scan, fin = scr == "edit", scr == "scan", scr == "finish"
+        self.entry_box.setVisible(not fin)
+        self.table.setVisible(not fin)
+        self.layout().setStretchFactor(self.info, 1 if not fin else 3)     # the table the room cleared
+        self.layout().setStretchFactor(self.work, 3 if not fin else 0)
+        self.work.setVisible(not fin)            # (empty there: its room to the table above)
+        self._show_reverts()
+        self.start_btn.setText("Continue Auto scan" if self._scan_next else "Auto scan")
+        self.start_btn.setVisible(edit)
+        self.finish_btn.setText("Finish")
+        self.finish_btn.setVisible(edit)
+        self.back_btn.setVisible(scan)
+        self.complete_btn.setVisible(scan)
+        self.complete_btn.setEnabled(self._scan_row >= 2)
+        self.stop_btn.setVisible(False)          # ("'Stop' button isn't necessary")
+        self.resume_btn.setVisible(state == "paused" and not fin)
+        self.save_btn.setText("Save Table")
+        self.save_btn.setVisible(fin)
+        self.edit_btn.setVisible(fin)
+        self.pump_btn.setVisible(not fin)
+        self.quit_btn.setVisible(fin)
+        # The Finish screen: Save Table and Quit greyed until the jet is down
+        # (Bill, 2026-10-31: "taking jet down goes slow and allows exit
+        # before voltage is down.")
+        down = state != "winddown"
+        self.save_btn.setEnabled(down or not fin)
+        self.quit_btn.setEnabled(down or not fin)
+        self.step_label.setText(f"Auto scan: {self._scan_row} steps typed" if scan else
+                                "Taking the jet down..." if fin and not down else
+                                f"{len(self._filled()[0])} steps")
+        if fin:
+            self._results_info()
 
     def _scan_done(self):
         return bool(self.cal.get("InitialCalFinished", False))
@@ -8907,22 +11474,65 @@ class CalibrateWindow(QWidget):
         scanned one, or the author's pool (the shipped table) if none."""
         return tuple(self.cal.get("jetVoltageRange", AUTHOR_RANGE))
 
+    def _jet_step_v(self):
+        """One jet step in volts: from the steps' measured volts
+        ('jetStepVolts'), else the older 'jetSteps' over the scanned range;
+        None before a scan."""
+        volts = sorted(float(v) for v in self.cal.get("jetStepVolts") or ())
+        if len(volts) > 1:
+            return (volts[-1] - volts[0]) / (len(volts) - 1)
+        rng, n = self.cal.get("jetVoltageRange"), self.cal.get("jetSteps")
+        return (rng[1] - rng[0]) / n if rng and n else None
+
     def _apply_pool_scale(self):
         """The voltage limits above are the author's pool's: scale them to
         this pool's range and step size."""
         rng = self._pool_range()
-        n = self.cal.get("jetSteps")
-        step_v = (rng[1] - rng[0]) / n if n else \
+        step_v = self._jet_step_v() or \
             AUTHOR_STEP_V * (rng[1] - rng[0]) / (AUTHOR_RANGE[1] - AUTHOR_RANGE[0])
+        self.step_v = step_v
         self.jump_v = JUMP_V * step_v / AUTHOR_STEP_V
         self.min_volts = MIN_VOLTS * rng[0] / AUTHOR_RANGE[0]
-        lowest = rescale(1.5, AUTHOR_RANGE, rng)
-        self.max_spin.setRange(round(lowest, 2), round(max(rescale(3.2, AUTHOR_RANGE, rng), rng[1]), 2))
-        self.max_spin.setSingleStep(max(0.01, round(0.1 * step_v / AUTHOR_STEP_V, 2)))
-        self.max_spin.setValue(round(rescale(DEFAULT_MAX_VOLTS, AUTHOR_RANGE, rng), 2))
 
     def choose_entry(self):
+        """Pace Entry, the pool's Master table on show; a row tapped drives
+        the jet there to type it again, no Start needed (Bill, 2026-10-29:
+        "When Pace Entry opens, the space for the table is blank ... Could
+        we display this table instead of the blank area? Then it could be
+        edited without having to press 'Start'.")."""
         self.mode = "entry"
+        rows = sorted(((float(v), float(p)) for p, v in self.cal.get("pace_voltage", [])))
+        self.points = [(round(v, 3), round(p, 4)) for v, p in rows]
+        # The scan's steps above the table's top (cut there by Entry
+        # complete), without a Pace ("-----"), to be typed again; one left
+        # without is left out of the table at Save (_filled) (Bill,
+        # 2026-10-31: "where there are no more Data Entries to be made, just
+        # '-----' should be put in for Pace.")
+        self._beyond = len(self.points)         # the first row above the table's top
+        top = self.points[-1][0] if self.points else 0.0
+        for v in sorted(float(x) for x in self.cal.get("jetStepVolts") or ()):
+            if v > top + self.step_v / 2:
+                self.points.append((round(v, 3), None))
+        self.sources = ["table"] * self._beyond + [None] * (len(self.points) - self._beyond)
+        self._orig = list(self.points)          # ↺: the step as it was
+        self.table.setColumnHidden(3, False)
+        self.red, self._trusted, self._trust_n, self._fix_row, self._fix_queue = set(), {}, 0, None, []
+        self._asked = {}                        # re-entries per step since the last tap (_record_entry)
+        self._held_v, self._followed, self._why = None, None, ""
+        self.screen = "edit"                    # "edit", "scan" or "finish" (_entry_screen)
+        self._scan_row = 0                      # Auto scan: the row the next Pace typed goes into
+        self._scan_next = None                  # ...stopped part way: the row Continue Auto scan goes on with
+        self._scan_topped = False               # ...reached the top
+        self.session_path = temp_path(os.path.dirname(self.cal_path), "calibration_session_"
+                                      + datetime.now().strftime("%Y-%m-%d_%H%M%S") + ".csv")
+        self.table.setRowCount(0)
+        self.table.setRowCount(len(self.points))
+        self._mark_red()                        # (shows the rows)
+        for b in self.findChildren(QPushButton):        # the keyboard types into the Pace
+            b.setFocusPolicy(Qt.NoFocus)
+        self.table.setFocusPolicy(Qt.NoFocus)           # (a row clicked kept the keys: Bill, 2026-10-29)
+        self.table.setSelectionMode(QTableWidget.NoSelection)   # (the selection hid the red rows)
+        self.setFocus()
         self._show_state("ready")
 
     def choose_pingpong(self):
@@ -8934,9 +11544,7 @@ class CalibrateWindow(QWidget):
                                 "Set the swim area in PoolWind first (Set Swim Area).")
             return
         try:
-            if self.jet.simulated:
-                cam = SimulatedCamera(self.jet, length)
-            elif self.camera_factory is not None:
+            if self.camera_factory is not None:
                 cam = self.camera_factory(pts)
             else:
                 cam = RealCamera(pts)
@@ -8947,20 +11555,60 @@ class CalibrateWindow(QWidget):
         self.camera = CameraThread(cam)
         self.timer_balls = BallTimer(length)
         self.mode = "pingpong"
+        # The room Highest voltage left goes to the table (Bill, 2026-10-30:
+        # "the extra space gained can expand the table")
+        self.layout().setStretchFactor(self.info, 1)
+        self.layout().setStretchFactor(self.work, 3)
         self._show_state("ready")
 
     def _key(self, k):
-        t = self.pace_label.text()
+        """The number pad and the keyboard: digits only, the colon put in
+        by itself (1 4 8 = 1:48); in Pace Entry the third digit records
+        (Bill, 2026-10-29: "Pace Display is always 3 digits, so just by
+        entering three digits, the colon is inserted and the number is
+        entered. User doesn't need to press 'Record'.")."""
+        if self.mode == "entry" and self.state not in ("enter", "refix"):
+            return                              # the last entry is on show, nothing waiting for one
+        d = "".join(c for c in self.pace_label.text() if c.isdigit())
         if k == "Clear":
-            t = ""
-        elif len(t) < 5:
-            t += k
-        self.pace_label.setText(t)
+            d = ""
+        elif k == "<":
+            d = d[:-1]
+        elif k.isdigit() and len(d) < 3:
+            d += k
+        self.pace_label.setText(d if len(d) < 1 else f"{d[0]}:{d[1:]}")
+        self._touch()
+        if self.mode == "entry" and len(d) == 3 and self.state in ("enter", "refix"):
+            QTimer.singleShot(0, self.record)
+
+    def keyPressEvent(self, event):
+        """Pace Entry from the keyboard too (Bill, 2026-10-29: "Can't enter
+        from keyboard"): digits, Backspace, Enter (Record), Esc (Clear)."""
+        k = event.key()
+        if self.mode == "entry" and self.entry_box.isVisible():
+            if event.text().isdigit():
+                self._key(event.text())
+                return
+            if k == Qt.Key_Backspace:
+                self._key("<")
+                return
+            if k == Qt.Key_Escape:
+                self._key("Clear")
+                return
+            if k in (Qt.Key_Return, Qt.Key_Enter) and self.state in ("enter", "refix"):
+                self.record()
+                return
+        super().keyPressEvent(event)
 
     # ------------------------------------------------------------------
     # Initial voltage scan
     # ------------------------------------------------------------------
     def choose_scan(self):
+        # Bill, 2026-10-25: "we shouldn't make it a one time initial
+        # calibration. It should be able to run anytime the builder thinks
+        # it's necessary"
+        if self._scan_done() and not self._ask_replace_scan():
+            return
         self.mode = "scan"
         self.scan = None
         self._scan_stage = None
@@ -9009,6 +11657,8 @@ class CalibrateWindow(QWidget):
             else:
                 self._jump_reads = 0
             if self._jump_reads >= JUMP_READS:
+                if self.v > self._level and self._continuous_rise(now):
+                    return
                 # UP stays held: the remote repeats about once a second.
                 # The step just left: the average of its readings (the
                 # first few, still settling, and the jump's own left out)
@@ -9029,9 +11679,42 @@ class CalibrateWindow(QWidget):
                 self._hold(None)
                 self._scan_top(now, "")
 
+    def _continuous_rise(self, now):
+        """The scan's check: does the voltage rise in steps (the author's
+        pool) or continuously? A step up is smooth when the voltage kept
+        rising between the jumps, or the jump came too soon after the one
+        before for a remote's repeat. Most of the first CONT_STEPS smooth:
+        continuous -- this version supports steps only, so the scan stops,
+        the jet goes down, and the builder is told to work it out with
+        Claude (CLAUDE.md has the plan). True when it stopped. (Bill,
+        2026-11-01: "We should only put in a small 'discrete vs continuous'
+        check in the initialization scan and have it quit if it detects
+        'continous' with a box saying it's continous and the bulder should
+        use Claude to work it out.")"""
+        if getattr(self, "_scan_kinds", None) is None:
+            return False                       # (a Resume after the check)
+        core = self._plateau[3:-JUMP_READS]
+        smooth = now - self._level_t < CONT_GAP_S
+        if not smooth and len(core) >= 4:
+            slope = np.polyfit(np.arange(len(core)), np.asarray(core, float), 1)[0]
+            smooth = slope * (len(core) - 1) > CONT_RISE * self.scan_thr
+        self._scan_kinds.append(bool(smooth))
+        if len(self._scan_kinds) < CONT_STEPS:
+            return False
+        kinds, self._scan_kinds = self._scan_kinds, None      # checked once
+        if sum(kinds) < CONT_SHARE * len(kinds):
+            return False
+        print(f"Scan: the voltage rises continuously ({sum(kinds)} of {len(kinds)} steps smooth); stopped")
+        self._scan_continuous = True
+        self._hold(None)
+        self._scan_top(now, "continuous")
+        return True
+
     def _scan_up(self):
         if self._scan_stage != "up":            # not a Resume
             self._scan_volts = [self.scan_lo]
+            self._scan_kinds = []
+            self._scan_continuous = False
         self._plateau = []
         self._scan_stage = "up"
         self._level = self.v
@@ -9055,6 +11738,19 @@ class CalibrateWindow(QWidget):
         lo, hi, n = self.scan_lo, self.scan_hi, self._scan_steps
         self._scan_stage = None
         self.scan = None
+        if getattr(self, "_scan_continuous", False):
+            self._scan_continuous = False
+            text = ("Your pool's jet speed voltage rises continuously, not in steps like the "
+                    "author's pool. This version of PoolWind supports pools with steps only, so "
+                    "the scan stopped and the jet was taken back down. Nothing was saved.\n\n"
+                    "PoolWind has to be modified for your pool. Double-click the Claude icon on "
+                    "the desktop and tell Claude: \"The voltage scan says my pool's voltage rises "
+                    "continuously.\" Claude has the plan for it (CLAUDE.md, Known problems).")
+            QMessageBox.warning(self, "Continuous voltage", text)
+            self._show_state("scan_results", "<h3>The voltage rises continuously</h3>"
+                             + "".join(f"<p>{t}</p>" for t in text.split("\n\n"))
+                             + f"<p>Slowest {lo:.3f} V; the scan stopped at {hi:.3f} V.</p>")
+            return
         if n < 2 or hi - lo < 4 * self.scan_thr:
             self._show_state("scan_results", f"<h3>The scan didn't find the jet's steps</h3><p>Slowest "
                              f"{lo:.3f} V, fastest {hi:.3f} V, {n} steps counted. Is the pump on, and does "
@@ -9062,42 +11758,26 @@ class CalibrateWindow(QWidget):
                              "Return to try again.</p>")
             return
         step_v = (hi - lo) / n
-        src = self._pool_range()
         old = [(float(p), float(v)) for p, v in self.cal.get("pace_voltage", [])]
-        safety = tuple(self.cal.get("SafetyVoltageLimits", ()))
-        # The same pool as the table's: the slowest step and the step size
-        # match (a stopped scan never reaches the top, so the top can't tell)
-        src_n = self.cal.get("jetSteps")
-        src_step = (src[1] - src[0]) / src_n if src_n else AUTHOR_STEP_V
         stopped = bool(self._scan_why)
-        same = (abs(lo - src[0]) <= SAME_POOL_STEPS * step_v
-                and abs(step_v - src_step) <= SAME_STEP_SIZE * src_step)
-        if same:
-            move = lambda v: v
-        elif stopped:
-            # Another pool, its top not known: step for step from the bottom
-            move = lambda v: lo + (v - src[0]) * step_v / src_step
-        else:
-            # Another pool, scanned to its top: the same percentage of its range
-            move = lambda v: rescale(v, src, (lo, hi))
-        shape = [(p, move(v)) for p, v in old]
-        new_safety = tuple(round(move(v), 3) for v in safety)
-        if stopped and new_safety and new_safety[1] > hi:
-            # Where the scan was stopped is the ceiling: never driven faster
-            new_safety = (min(new_safety[0], round(hi, 3)), round(hi, 3))
         volts = [round(v, 3) for v in self._scan_volts]
         if len(volts) != n + 1:                 # a stale step the other way: spread evenly instead
             volts = [round(lo + k * step_v, 3) for k in range(n + 1)]
         # The new table: one row per jet step, at the step's measured volts,
-        # its pace from the current table's shape (held flat past its ends).
-        # PoolWind's zones are these rows.
-        shape.sort(key=lambda r: r[1])
-        sv, sp = [v for _, v in shape], [p for p, _ in shape]
-        table = [(round(interp(v, sv, sp), 4), v) for v in volts]
+        # its pace from PoolWind's Pace curve: 7:00 at the slowest step, 1:00
+        # at the top (Bill, 2026-10-26). Always: a scan starts the
+        # calibration over, whatever tables were made before (Bill,
+        # 2026-10-31: "At this point we are completely starting over and
+        # should use the downloaded Pace-volt table no matter how many other
+        # calibrations had been taken place. I may have wanted to use the
+        # latest calibration data at some point, but that wasn't a good
+        # idea." Before: once corrected, a later scan kept the table's
+        # Paces). PoolWind's zones are these rows.
+        table = [(round(pace_curve(v, volts[0], volts[-1]), 4), v) for v in volts]
         self.scan = {"range": (round(lo, 3), round(hi, 3)), "steps": n, "table": table,
-                     "safety": new_safety, "same": same}
+                     "formula": True}
         stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-        self.session_path = os.path.join(os.path.dirname(self.cal_path), "calibration_scan_" + stamp + ".csv")
+        self.session_path = temp_path(os.path.dirname(self.cal_path), "calibration_scan_" + stamp + ".csv")
         try:
             with open(self.session_path, "w", newline="") as f:
                 w = csv.writer(f)
@@ -9120,44 +11800,50 @@ class CalibrateWindow(QWidget):
         if stopped:
             html += (f"<p>You stopped the scan at <b>{hi:.3f} V</b>: that is your pool's top speed for "
                      "PoolWind. The table ends there, and PoolWind never drives the jet faster.</p>")
-        if same:
-            html += (f"<p>Your pool's slowest step ({lo:.3f} V) and step size ({step_v:.3f} V) match the pool "
-                     f"the current table was made on, so its pace at each voltage stays the same.</p>")
         else:
-            html += (f"<p>The current table was made on a pool from {src[0]:.3f} V, with steps of "
-                     f"{src_step:.3f} V. Its shape is moved to your pool "
-                     + ("step for step from your slowest speed.</p>" if stopped else
-                        "at the same percentage of your range.</p>"))
-        if safety and new_safety != safety:
-            html += (f"<p><b>SafetyVoltageLimits</b>: ({safety[0]}, {safety[1]}) become "
-                     f"<b>({new_safety[0]}, {new_safety[1]})</b>.</p>")
-        elif safety:
-            html += f"<p>The <b>SafetyVoltageLimits</b> stay ({safety[0]}, {safety[1]}).</p>"
-        if not same:
-            html += ("<p>This is a starting point: the paces are the author's pool's. Measure your own "
-                     "with Pace Entry or PingPong, or correct them with Pace correction in PoolWind's menu.</p>")
-        rows = "".join(f"<tr><td>{k + 1}</td><td>{v:.3f}</td><td>{pace_text(p)}</td></tr>"
-                       for k, (p, v) in enumerate(table))
+            html += (f"<p>The table runs from your slowest step to the jet's top ({hi:.3f} V): PoolWind "
+                     "never drives the jet outside it. To set a lower top speed, scan again and press "
+                     "<b>Stop</b>, then <b>Use as top</b>, where you want it.</p>")
+        html += ("<p>The paces follow PoolWind's Pace curve: <b>7:00</b> at your slowest step, "
+                 "<b>1:00</b> at your top step, and an inverse-speed curve in between. A scan always "
+                 "starts over from it: the Paces measured or corrected before are replaced.</p>"
+                 "<p>This is a starting point: measure your own paces with Pace Entry or PingPong, or "
+                 "correct them with Pace correction in PoolWind's menu.</p>")
+        # the fastest on top, as the other tables (Bill, 2026-10-31: "Scan: xx
+        # steps screen's table should be inverted to match the others.")
+        rows = "".join(reversed([f"<tr><td>{k + 1}</td><td>{v:.3f}</td><td>{pace_text(p)}</td></tr>"
+                                 for k, (p, v) in enumerate(table)]))
         html += ("<table border=1 cellpadding=3><tr><th>Zone</th><th>Volts</th><th>Pace</th></tr>"
                  f"{rows}</table>")
         html += (f"<p><b>Save scan</b> writes this to {os.path.basename(self.cal_path)} (the current file is "
-                 "kept as a backup) and opens the rest of the calibration. <b>Return</b> without saving "
-                 f"keeps the current file (the scan is in {os.path.basename(self.session_path)}).</p>")
+                 "kept as a backup in the temp folder) and opens the rest of the calibration. <b>Return</b> without saving "
+                 f"keeps the current file (the scan is in temp/{os.path.basename(self.session_path)}).</p>")
         self._show_state("scan_results", html)
 
     def _save_scan(self):
-        if not self._ask("Save scan", "Write the scan to the calibration file?"):
+        if not self._ask("Save scan", "Write scan to Master calibration file?"):
             return
         s = self.scan
         cal = self._load_for_save()
         cal["pace_voltage"] = s["table"]
-        if s["safety"]:
-            cal["SafetyVoltageLimits"] = s["safety"]
+        cal.pop("SafetyVoltageLimits", None)    # before v15.6; the table's ends are the limits now
         cal["InitialCalFinished"] = True
+        cal["PacesFromFormula"] = s["formula"]
+        cal.pop("PacesFixed", None)             # before 2026-10-28: Pace correction's fixed Paces
+        cal.pop("PacesFixedEarlier", None)
+        cal.pop("PacesPending", None)
+        cal.pop("PingPongBalls", None)          # the steps may have moved: PingPong again
         cal["jetVoltageRange"] = s["range"]
-        cal["jetSteps"] = s["steps"]
-        cal.pop("jetStepVolts", None)
-        cal.setdefault("# zones or auto", "auto")
+        # Every jet step's measured volts, kept when Pace Entry's table ends
+        # lower (Entry complete): the steps above come back in Pace Entry
+        # (Bill, 2026-10-31: "But we lose data if we trim it down. If later
+        # on, Pace Entry ... is run again it will be limited to the trimmed
+        # down table" "Yes, use jetStepVolts."). PoolWind doesn't read it:
+        # pace_voltage is the table it swims. Its length less one replaces
+        # 'jetSteps'.
+        cal["jetStepVolts"] = [round(float(v), 3) for _, v in s["table"]]
+        cal.pop("jetSteps", None)
+        cal.pop("# zones or auto", None)        # gone in v15.7
         note = self._write_cal(cal)
         self.cal = cal
         self._apply_pool_scale()
@@ -9193,33 +11879,39 @@ class CalibrateWindow(QWidget):
         self.hist.append((now, self.v))
         while self.hist and now - self.hist[0][0] > 6.0:
             self.hist.popleft()
-        self.volt_label.setText(f"{self.v:.2f} V")
-        if self.jet.simulated:
-            self.sim_label.setText(f"Simulated Pace Display: {pace_text(self.jet.display_pace())}")
+        held = getattr(self, "_held_v", None)
+        self.volt_label.setText(f"{self.v:.2f} V" if held is None else f"{held:.3f} V")
+        self.pp_volt_label.setText(self.volt_label.text())
         if self.camera:
             self._camera_tick(now)
 
         st = self.state
+        if self.mode == "entry" and st in ("winddown", "drive", "down") and self.points:
+            self._follow_table()
         if st.startswith("scan_"):
             self._scan_tick(now)
         elif st in ("down", "winddown"):
-            if abs(self.v - self._level) > self.jump_v:
-                self._level = self.v
+            vv = self._steady_v(now)
+            if abs(vv - self._level) > self.jump_v:
+                self._level = vv
                 self._level_t = now
             if now - self._level_t > BOTTOM_QUIET_S or now - self._hold_since > DOWN_TIMEOUT_S:
                 self._hold(None)
                 if st == "down":
                     self._begin_settle()
+                elif self.mode == "entry":
+                    self._winddown_done()
                 else:
                     self._show_results()
         elif st == "up":
-            if abs(self.v - self._ref) > self.jump_v:
+            vv = self._steady_v(now)
+            if abs(vv - self._ref) > self.jump_v:
                 self._jump_reads += 1
             else:
                 self._jump_reads = 0
             if self._jump_reads >= JUMP_READS:
                 self._hold(None)            # let go before the remote repeats
-                if self.v < self._ref:
+                if vv < self._ref:
                     print(f"Step went DOWN ({self._ref:.3f} -> {self.v:.3f} V): the remote sent a stale command")
                 self._begin_settle()
             elif now - self._hold_since > NO_STEP_S:
@@ -9235,10 +11927,24 @@ class CalibrateWindow(QWidget):
                 self._end_run("The jet didn't step up any more: it is at its fastest speed.")
         elif st == "settle":
             recent = [v for t, v in self.hist if t >= self._settle_from]
+            # Pace Entry: a voltage that keeps swinging (the bottom) is taken
+            # after SETTLE_MAX_S, its average (Bill, 2026-10-29: "Voltage at
+            # bottom fluctuates so that there is a long wait for the entry
+            # screen to open up.")
+            swinging_too_long = (self.mode == "entry" and
+                                 now - getattr(self, "_settle_began", now) >= SETTLE_MAX_S)
+            if swinging_too_long:
+                self._settle_from = now - SETTLE_S
+                recent = []
             if recent and max(recent) - min(recent) > self.jump_v:
+                if now - getattr(self, "_settle_said", 0.0) >= 5.0:
+                    self._settle_said = now
+                    self._log(f"settle: the voltage moved {1000 * (max(recent) - min(recent)):.0f} mV "
+                              f"({min(recent):.3f}-{max(recent):.3f} V; more than {1000 * self.jump_v:.0f} "
+                              "mV): waiting again")
                 self._settle_from = now     # still moving: wait again
             elif now - self._settle_from >= SETTLE_S:
-                avg = [v for t, v in self.hist if now - t <= AVERAGE_S]
+                avg = [v for t, v in self.hist if now - t <= (SETTLE_S if swinging_too_long else AVERAGE_S)]
                 self._step_v = sum(avg) / len(avg)
                 if self._step_v < self.min_volts:
                     self._hold(None)
@@ -9248,14 +11954,48 @@ class CalibrateWindow(QWidget):
                     return
                 if self.mode == "pingpong":
                     self._pingpong_step()
+                elif (getattr(self, "_fix_row", None) is not None and self._drv_tries < 3
+                      and abs(self._step_v - self._drv_target) > self.step_v / 2):
+                    # settled a step off (overshot, or let go early at a
+                    # swinging bottom): drive again
+                    self._drv_tries += 1
+                    self._drv_phase, self._drv_wait = "wait", now + 0.5
+                    self._show_state("drive", f"<p>To step {self._fix_row + 1}: "
+                                     f"<b>{self._drv_target:.3f} V</b></p>")
+                elif getattr(self, "_fix_row", None) is not None and self._fix_why == "continue":
+                    self._fix_row = None            # Continue Auto scan: on up from the last step typed
+                    self._release_shown()
+                    self._step_up()
+                elif getattr(self, "_fix_row", None) is not None:
+                    self._release_shown()
+                    self._touch()
+                    v, p = self.points[self._fix_row]
+                    self._show_state("refix", f"<p>Step {self._fix_row + 1}: <b>{self._step_v:.3f} V</b>"
+                                     f" (recorded at {v:.3f} V" + (f", {pace_text(p)}" if p else "") + ")</p>")
                 else:
-                    self.pace_label.setText("")
+                    self._release_shown()
                     self._show_state("enter", f"<p>This step: <b>{self._step_v:.3f} V</b></p>")
-        elif st in ("enter", "flow", "balls"):
-            if abs(self.v - self._step_v) > 2 * self.jump_v:
+        elif st == "drive":
+            self._drive_tick(now)
+        elif st == "refix" and self._fix_why == "review" and now - self._idle_t > REVIEW_IDLE_S:
+            self._log(f"no entry for {REVIEW_IDLE_S:.0f} s: winding down")
+            self._fix_row = None
+            self._release_shown()
+            self._go_down("winddown")
+        elif st == "edited" and now - self._idle_t > REVIEW_IDLE_S:
+            self._log(f"nothing typed for {REVIEW_IDLE_S:.0f} s: winding down")
+            self._release_shown()
+            self._go_down("winddown")
+        elif st in ("enter", "flow", "balls", "refix"):
+            # Pace Entry: the voltage over the last second, so a swinging
+            # bottom isn't taken for a move
+            if abs(self._steady_v(now) - self._step_v) > 2 * self.jump_v:
                 # Someone used the pool's remote: measure this step again
+                self._log(f"{st}: the voltage moved from {self._step_v:.3f} to {self.v:.3f} V "
+                          f"(more than {2000 * self.jump_v:.0f} mV): this step is measured again")
                 self._begin_settle()
             elif st == "flow" and now >= self._flow_until:
+                self._pp_note = ""
                 self.timer_balls.reset()
                 self.camera.collect()          # balls seen while waiting don't count
                 self._show_state("balls", f"<p>This step: <b>{self._step_v:.3f} V</b></p>")
@@ -9290,8 +12030,12 @@ class CalibrateWindow(QWidget):
         self.preview.setPixmap(QtGui.QPixmap.fromImage(q).scaled(
             self.preview.width(), self.preview.height(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
+    @staticmethod
+    def _log(text):
+        print(f"Calibration {datetime.now().strftime('%H:%M:%S')}: {text}", flush=True)
+
     def _begin_settle(self):
-        self._settle_from = time.time()
+        self._settle_from = self._settle_began = time.time()
         self._show_state("settle")
 
     # ------------------------------------------------------------------
@@ -9301,17 +12045,30 @@ class CalibrateWindow(QWidget):
         if self.mode == "scan":
             self._start_scan()
             return
+        if self.mode == "entry":
+            self._auto_scan()
+            return
         self.points = []
         self.sources = []
+        self.balls_raw = []
+        self._pp_note = ""
         self.table.setRowCount(0)
-        self.max_volts = self.max_spin.value()
+        # No Highest voltage (Pace Entry and PingPong): the pool's table's
+        # top is the scan's (Bill, 2026-10-30: "The highest setting was
+        # already set in the initial calibration and this section shouldn't
+        # change it.")
+        # ...and on into the scan's steps above the table's top (Bill,
+        # 2026-11-01: "Yes, have PingPong go into the "-----" steps too")
+        self.max_volts = max([float(v) for _, v in self.cal["pace_voltage"]]
+                             + [float(v) for v in self.cal.get("jetStepVolts") or ()])
+        self._beyond = None                     # (PingPong: set with its results)
         self.drops_wanted = self.drops_spin.value()
         self.every = self.every_spin.value()
         stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
         folder = os.path.dirname(self.cal_path)
-        self.session_path = os.path.join(folder, "calibration_session_" + stamp + ".csv")
+        self.session_path = temp_path(folder, "calibration_session_" + stamp + ".csv")
         if self.mode == "pingpong":
-            self.drops_path = os.path.join(folder, "calibration_drops_" + stamp + ".csv")
+            self.drops_path = temp_path(folder, "calibration_drops_" + stamp + ".csv")
             try:
                 with open(self.drops_path, "w", newline="") as f:
                     csv.writer(f).writerow(["time", "step", "volts", "drop", "ball_pace",
@@ -9320,6 +12077,29 @@ class CalibrateWindow(QWidget):
                 print("Couldn't write", self.drops_path, e)
         self._go_down("down")
 
+    def _auto_scan(self):
+        """Pace Entry's Auto scan, over the table from its bottom row; or,
+        stopped part way (Back, Continue), on from the last step typed
+        (Bill, 2026-10-29: "Then the scan will begin at the last entered
+        point.")."""
+        self.screen = "scan"
+        self.max_volts = max(v for v, _ in self.points)     # the top of the pool's table
+        self._fix_queue = []
+        self._scan_topped = False
+        go_on, self._scan_next = self._scan_next, None
+        self._scan_row = go_on or 0
+        self.red = {k for k in self.red if k < self._scan_row}     # the rows above are typed again
+        self._trusted = {k: n for k, n in self._trusted.items() if k < self._scan_row}
+        if not go_on:                           # a new scan: a new table, filled in at Save (_filled)
+            self.points = [(v, None) for v, _ in self.points]
+            self.sources = [None] * len(self.points)
+        for r in range(len(self.points)):
+            self._add_row(r, scroll=False)
+        if go_on:
+            self._drive_to(go_on - 1, "continue")
+        else:
+            self._go_down("down")
+
     def _go_down(self, state):
         self._level = self.v
         self._level_t = time.time()
@@ -9327,6 +12107,9 @@ class CalibrateWindow(QWidget):
         self._show_state(state)
 
     def record(self):
+        if self.mode == "entry":
+            self._record_entry()
+            return
         pace = parse_pace(self.pace_label.text())
         if pace is None:
             QMessageBox.warning(self, "Pace", "Type the pace as minutes and seconds, for example 2:15 or 215.")
@@ -9347,18 +12130,271 @@ class CalibrateWindow(QWidget):
         self._record_point(pace, "display")
         self._step_up()
 
+    # ------------------------------------------------------------------
+    # Pace Entry, v15.7 (Bill, 2026-10-29: "entry correction is awful"):
+    # going up, a Pace that can't be right is only marked red ("The jet is
+    # running and there isn't time for corrections, especially at high
+    # speeds. Then go to next voltage."); at the top the red rows are worked
+    # out again (the fewest that put the column in order) and the jet comes
+    # down stopping at each to ask again ("if number is still wrong, pop up
+    # the error message"); at the bottom a row tapped drives the jet there to
+    # type it again ("If no entry or scrolling for 5 seconds, wind down the
+    # jet"); Finish saves ("wind down, save and finish").
+    # ------------------------------------------------------------------
+    def _typed_pace(self):
+        """The three digits typed as a Pace, or None."""
+        d = "".join(c for c in self.pace_label.text() if c.isdigit())
+        return parse_pace(d) if len(d) == 3 else None
+
+    def _record_entry(self):
+        pace = self._typed_pace()
+        if self.state == "enter":
+            r = self._scan_row
+            good = [p for i, (_, p) in enumerate(self.points[:r]) if p is not None and i not in self.red]
+            bad = pace is None or (good and pace >= good[-1] - 1e-6)
+            self._hold_shown()
+            self._record_point(pace, "display")
+            if bad:
+                self.red.add(r)
+                self._add_row(r)
+            self._step_up()
+            return
+        if self.state != "refix" or self._fix_row is None:
+            return
+        r = self._fix_row
+        if pace is None:                        # not a Pace at all (1:99): type it again
+            self.pace_label.setText("")
+            self._touch()
+            return
+        # Taken as right this time, and the whole table checked again
+        # around it (Bill, 2026-10-29: "when a red row's entry is changed yet
+        # it still has problems with the numbers above it (slower), clear
+        # the red from the current line. I just assume that this time it was
+        # entered correctly. Then go to the red row above it and enter a new
+        # value there. Maybe with each entry the whole table should be
+        # checked and lines marked red if needed.")
+        self.points[r] = (self.points[r][0], round(pace, 4))
+        self._trust_n = getattr(self, "_trust_n", 0) + 1
+        self._trusted[r] = self._trust_n
+        self._mark_red(latest=r)
+        self._write_session()
+        self._hold_shown()
+        self._fix_queue = []
+        # Each step asked at most twice in a row of re-entries: two steps
+        # the Pace Display shows the same (1:00 at the top) would turn each
+        # other red for ever; they stay red, to be tapped
+        self._asked[r] = self._asked.get(r, 0) + 1
+        ask = [k for k in self.red if self._asked.get(k, 0) < 2]
+        above = sorted(k for k in ask if k > r)
+        below = sorted((k for k in ask if k < r), reverse=True)
+        if above or below:
+            self._drive_to((above or below)[0], "descent" if self.screen == "scan" else "review")
+        elif self.screen == "scan":
+            self._fix_row = None
+            self._go_down("winddown")
+        else:                                   # the Edit screen: the jet stays at this step a while
+            self._fix_row = None
+            v = self.points[r][0]
+            self._show_state("edited", f"<p>Step {r + 1}: <b>{pace_text(pace)}</b> at {v:.3f} V</p>")
+
+    def _hold_shown(self):
+        """The entry just recorded and its step's voltage stay on screen
+        until the next row is ready (Bill, 2026-10-29: "As soon as last digit
+        is enterd, entry box is cleared so I can never see the last digit.
+        For display only, hold the entry and the voltage until entry for the
+        next row is ready.")."""
+        self._held_v = self._step_v
+        self.pace_label.setStyleSheet("border: 2px solid #888; background: #e8e8e8; color: #444;")
+
+    def _release_shown(self):
+        self._held_v = None
+        self.pace_label.setText("")
+        self.pace_label.setStyleSheet("border: 2px solid #888; background: white; color: black;")
+
+    def _mark_red(self, latest=None):
+        """Red again: the fewest rows that put the column in order (one
+        wrong Pace doesn't make the right ones after it red), keeping the
+        Paces typed again (_trusted, the latest weighing most)."""
+        rows = [i for i, (_, p) in enumerate(self.points) if p is not None]
+        weight = lambda i: (10 ** 9 if i == latest else          # the Pace just typed: right, whatever
+                            1000 + self._trusted[i] if i in self._trusted else 1)
+        best = {}                                # row -> (weight, previous row) of the heaviest falling run
+        for i in rows:
+            best[i] = (weight(i), None)
+            for j in rows:
+                if j >= i:
+                    break
+                if self.points[j][1] > self.points[i][1] + 1e-6 and best[j][0] + weight(i) > best[i][0]:
+                    best[i] = (best[j][0] + weight(i), j)
+        keep = set()
+        if best:
+            i = max(best, key=lambda k: (best[k][0], -k))
+            while i is not None:
+                keep.add(i)
+                i = best[i][1]
+        self.red = {i for i in range(len(self.points)) if i not in keep and
+                    (self.points[i][1] is not None or self.sources[i] == "display")}   # not typed yet: not red
+        for r in range(len(self.points)):
+            self._add_row(r, scroll=False)
+
+    def _descent(self):
+        """From the top: down, stopping at each red row to ask again."""
+        self._mark_red()
+        self._asked = {}
+        self._fix_queue = sorted(self.red, reverse=True)
+        self._next_fix()
+
+    def _next_fix(self):
+        if self._fix_queue:
+            self._drive_to(self._fix_queue.pop(0), "descent")
+        else:
+            self._fix_row = None
+            self._go_down("winddown")
+
+    def _row_clicked(self, r, _c=0):
+        """The Edit screen: a row tapped, the jet driven there to type it
+        again, whatever the jet is doing."""
+        self._touch()
+        self.setFocus()
+        r = self._trow(r)
+        if self.mode == "entry" and self.screen == "edit" and 0 <= r < len(self.points):
+            self._asked = {}
+            self._drive_to(r, "review")
+
+    def _steady_v(self, now):
+        """Pace Entry: the voltage over the last STEADY_S, so a swinging
+        bottom isn't taken for a step or for the jet still moving (Bill,
+        2026-10-29: "Voltage at bottom fluctuates"); the other modes: the
+        reading."""
+        if self.mode != "entry":
+            return self.v
+        last = [v for t, v in self.hist if now - t <= STEADY_S]
+        return sum(last) / len(last) if last else self.v
+
+    def _follow_table(self):
+        """The row nearest the voltage, chosen and in sight (Bill,
+        2026-10-29: "When the jet is being slowed down keep the table
+        aligned with the voltage.")."""
+        r = min(range(len(self.points)), key=lambda k: abs(self.points[k][0] - self.v))
+        before = getattr(self, "_followed", None)
+        if r != before:
+            # marked with ▶ and bold, not the selection, which hid the red
+            # (Bill, 2026-10-29: "the bad row loses its red mark"); in the
+            # middle of the view ("so I can actually see the table move down
+            # to the red row")
+            self._followed = r
+            if before is not None and before < len(self.points):
+                self._add_row(before, scroll=False)
+            self._add_row(r, scroll=False)
+            self.table.scrollToItem(self.table.item(self._trow(r), 0), QtWidgets.QAbstractItemView.PositionAtCenter)
+
+    def _touch(self, *_):
+        self._idle_t = time.time()
+
+    def _drive_to(self, r, why):
+        """Step the jet up or down to row r's voltage, then settle and ask."""
+        self._fix_row, self._fix_why = r, why
+        self._drv_target = self.points[r][0]
+        self._drv_phase, self._drv_wait, self._drv_tries = "wait", 0.0, 0
+        self._show_state("drive", f"<p>To step {r + 1}: <b>{self._drv_target:.3f} V</b></p>")
+
+    def _drive_tick(self, now):
+        """UP or DN held through the steps, let go when the reading reaches
+        the sought step; only that step settles (Bill, 2026-10-29: "The drive
+        up and drive down times are very slow. Could it be there is a
+        settling time between each step? Only the step being sought should
+        have a settling time.")."""
+        target, band = self._drv_target, self.step_v / 2
+        if self._drv_phase == "wait":
+            if now < self._drv_wait:
+                return
+            vv = self._steady_v(now)
+            if abs(vv - target) <= band:
+                self._begin_settle()
+                return
+            self._drv_dir = "UP" if vv < target else "DN"
+            self._drv_from, self._drv_moved_t = vv, now
+            self._hold(self._drv_dir)
+            self._drv_phase = "hold"
+            return
+        v = self.v
+        if abs(self._steady_v(now) - self._drv_from) > self.jump_v:
+            self._drv_from, self._drv_moved_t = self._steady_v(now), now
+        there = (v >= target - band) if self._drv_dir == "UP" else (v <= target + band)
+        if there:
+            self._hold(None)
+            self._begin_settle()
+        elif now - self._drv_moved_t > NO_STEP_S or now - self._hold_since > DOWN_TIMEOUT_S:
+            self._hold(None)
+            print(f"Pace Entry: the jet didn't step toward {target:.3f} V; typed again here")
+            self._drv_target = self._steady_v(now)
+            self._begin_settle()
+
+    def _winddown_done(self):
+        """Pace Entry, the jet at its slowest: the screen it went down for."""
+        self._release_shown()
+        self._show_state({"scan": "scan_end", "finish": "results"}.get(self.screen, "ready"))
+
+    def _kept(self):
+        """Pace Entry and PingPong: how many rows make the table, the rows
+        above the table's top only as far as the last one with a Pace (the
+        rest "-----", left out); every row otherwise."""
+        n = len(self.points)
+        beyond = getattr(self, "_beyond", None)
+        if self.mode not in ("entry", "pingpong") or beyond is None:
+            return n
+        typed = [i for i in range(beyond, n) if self.points[i][1] is not None]
+        return max(typed) + 1 if typed else min(beyond, n)
+
+    def _filled(self):
+        """Pace Entry's table as saved, and the steps filled in: a step
+        without a Pace takes the speed between its neighbours', on to 7:00
+        at the slowest step and 1:00 at the fastest when they weren't typed
+        (Bill, 2026-10-30: "The user can decide to stop making entries at the
+        high speed and that's OK. When Pace data is saved, the program
+        should interpolate and extend to the ends, 1.00 at the highest speed
+        and 7.00 at the lowest.")."""
+        pts = list(self.points)[:self._kept()]
+        blank = {i for i, (_, p) in enumerate(pts) if p is None}
+        if not pts or not blank:
+            return pts, blank
+        if pts[0][1] is None:
+            pts[0] = (pts[0][0], 7.0)
+        if pts[-1][1] is None:
+            pts[-1] = (pts[-1][0], 1.0)
+        red = getattr(self, "red", ()) if self.mode == "entry" else ()   # (a red step isn't filled in from)
+        good = sorted((v, p) for i, (v, p) in enumerate(pts) if p is not None and
+                      (i not in red or i in (0, len(pts) - 1)))
+        gv = [v for v, _ in good]
+        gs = [1.0 / p for _, p in good]
+        pts = [(v, p if p is not None else round(1.0 / interp(v, gv, gs), 4)) for v, p in pts]
+        return pts, blank
+
     def _record_point(self, pace, source):
-        self.points.append((round(self._step_v, 3), None if pace is None else round(pace, 4)))
-        self.sources.append(source)
-        self._add_row(len(self.points) - 1)
+        point = (round(self._step_v, 3), None if pace is None else round(pace, 4))
+        r = len(self.points)
+        if self.mode == "entry":                # Auto scan: over the table's rows, from the bottom
+            r = self._scan_row
+            self._scan_row += 1
+            self._trusted.pop(r, None)
+        if r < len(self.points):
+            self.points[r] = point
+            self.sources[r] = source
+        else:
+            self.points.append(point)
+            self.sources.append(source)
+        self._add_row(r)
         self._write_session()
 
     def _at_top(self):
         return self._step_v >= self.max_volts - self.jump_v
 
     def _step_up(self):
+        if self.mode == "entry" and self._scan_row >= len(self.points):
+            self._end_run("The jet has reached the top of the pool's table.")
+            return
         if self._at_top():
-            self._end_run(f"The jet has reached the highest voltage you chose ({self.max_volts:.2f} V).")
+            self._end_run(f"The jet has reached the top of the pool's table ({self.max_volts:.2f} V).")
             return
         self._ref = self._step_v
         self._jump_reads = 0
@@ -9368,12 +12404,22 @@ class CalibrateWindow(QWidget):
     # ------------------------------------------------------------------
     # PingPong steps
     # ------------------------------------------------------------------
+    def _ball_step(self, step):
+        """Balls are dropped at FIRST_BALL_STEP and every 'every'th step after."""
+        return step >= FIRST_BALL_STEP and (step - FIRST_BALL_STEP) % self.every == 0
+
     def _pingpong_step(self):
-        """A settled step: drop balls at every 'every'th step (and the last
-        one), otherwise note its voltage and step on; its pace is filled in
-        from the ball steps on either side."""
+        """A settled step: the bottom one is 7:00 (FIRST_BALL_STEP); drop
+        balls at the ball steps (and the last one), otherwise note its
+        voltage and step on; its pace is filled in from the steps on either
+        side."""
         n = len(self.points)
-        if n % self.every == 0 or self._at_top() or getattr(self, "_balls_here", False):
+        if n == 0 and not self._at_top():
+            self._record_point(PACE_CURVE_ENDS[0], "bottom")
+            self._pp_note = (f"<p>Step 1 is {pace_text(PACE_CURVE_ENDS[0])}, the slowest Pace; the first "
+                             f"balls go in at step {FIRST_BALL_STEP}.</p>")
+            self._step_up()
+        elif self._ball_step(n + 1) or self._at_top() or getattr(self, "_balls_here", False):
             self._balls_here = False
             self.drops = []
             self._flow_until = time.time() + FLOW_SETTLE_S
@@ -9401,8 +12447,15 @@ class CalibrateWindow(QWidget):
         med = paces[len(paces) // 2] if len(paces) % 2 else sum(paces[len(paces) // 2 - 1:len(paces) // 2 + 1]) / 2
         return [(b, p) for b, p in self.drops if abs(p - med) / med <= DROP_AGREE]
 
+    def _expected_steps(self):
+        """The run's steps while balls are dropped: the jet's steps up to the
+        top of the pool's table (the results use all the table's steps)."""
+        return max(2, len(self.points) + 1,
+                   int(round((self.max_volts - self._pool_range()[0]) / self.step_v)) + 1)
+
     def _add_drop(self, ball_pace):
-        f = ball_factor(ball_pace)
+        f = drag_factor(len(self.points) + 1, self._expected_steps(),
+                        self.body_spin.value(), self.delta_spin.value())
         self.drops.append((ball_pace, ball_pace * f))
         try:
             with open(self.drops_path, "a", newline="") as fh:
@@ -9419,10 +12472,24 @@ class CalibrateWindow(QWidget):
     def use_drops(self):
         good = self._good_drops()
         if len(good) < MIN_GOOD_DROPS:
-            QMessageBox.information(self, "Use drops", f"At least {MIN_GOOD_DROPS} drops that agree are "
+            QMessageBox.information(self, "Use dropped", f"At least {MIN_GOOD_DROPS} drops that agree are "
                                     "needed. Drop another ball.")
             return
+        ball = sum(b for b, _ in good) / len(good)
         pace = sum(p for _, p in good) / len(good)
+        # Say so, with every drop listed: the step was taken on the last
+        # drop without showing it, and the screen looked stuck (Bill at the
+        # pool, 2026-10-26: "drop 5th ball never appeared")
+        self._show_drops()
+        step = len(self.points) + 1
+        nxt = step + 1
+        while not self._ball_step(nxt):
+            nxt += 1
+        self.ball_label.setText(f"Step {step} done: {pace_text(pace)}")
+        self._pp_note = (f"<p><b>Step {step} done: {pace_text(pace)}</b>, from {len(good)} drops that "
+                         f"agree. The jet now steps up to step {nxt} for the next balls; wait for "
+                         "<b>Drop the balls</b>.</p>")
+        self.balls_raw.append((step, round(self._step_v, 3), round(ball, 4), len(good)))
         self._record_point(pace, "balls")
         self._fill_in()
         self._step_up()
@@ -9433,9 +12500,10 @@ class CalibrateWindow(QWidget):
         self._show_drops()
 
     def _fill_in(self):
-        """Paces for the steps between the last two ball steps: speed
-        (1 / pace) along a straight line in voltage between them."""
-        measured = [i for i, s in enumerate(self.sources) if s == "balls"]
+        """Paces for the steps between the last two ball steps (or the 7:00
+        bottom and the first): speed (1 / pace) along a straight line in
+        voltage between them."""
+        measured = [i for i, s in enumerate(self.sources) if s in ("balls", "bottom")]
         if len(measured) < 2:
             return
         a, b = measured[-2], measured[-1]
@@ -9493,10 +12561,107 @@ class CalibrateWindow(QWidget):
         if self.mode == "scan":
             self._scan_top(time.time(), "stopped")
             return
+        if self.mode == "entry":
+            # The Finish screen, the jet taken down meanwhile
+            self._fix_row, self._fix_queue = None, []
+            self._release_shown()
+            self.screen = "finish"
+            self._go_down("winddown")
+            return
         self._end_run("")
+
+    def back(self):
+        """Pace Entry's Scan screen: back to the Edit screen, asking first
+        while the scan is running (Bill, 2026-10-29: "'Scan hasn't
+        finished. You can go back to the the scan or continue to the Edit
+        screen. Data already entered will be saved,'"). The buttons are let
+        go and the loop waits while it asks."""
+        if self.state == "scan_end":
+            self.screen = "edit"
+            self._show_state("ready")
+            return
+        held = self.relay
+        self.timer.stop()
+        self._hold(None)
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Question)
+        box.setWindowTitle("Auto scan")
+        box.setText("Scan hasn't finished. You can go back to the scan or continue to the Edit "
+                    "screen. Data already entered will be saved.")
+        box.addButton("Back", QMessageBox.RejectRole)
+        cont = box.addButton("Continue", QMessageBox.AcceptRole)
+        box.exec()
+        now = time.time()
+        self._last_tick = now
+        if box.clickedButton() is not cont:
+            for name in ("_level_t", "_settle_from", "_settle_began", "_drv_moved_t", "_idle_t"):
+                if hasattr(self, name):
+                    setattr(self, name, now)        # the time asking isn't waiting
+            self._jump_reads = 0
+            if held:
+                self._hold(held)
+            self.timer.start(TICK_MS)
+            return
+        self.timer.start(TICK_MS)
+        self._scan_next = self._scan_row if self._scan_row and not self._scan_topped else None
+        self._fix_row, self._fix_queue = None, []
+        self._release_shown()
+        self.screen = "edit"
+        self._mark_red()
+        self._write_session()
+        self._go_down("winddown")
+
+    def entry_complete(self):
+        """Pace Entry's Auto scan: the last step typed becomes the table's
+        top row (the jet's limit), the steps above it dropped, and on to the
+        Finish screen, the jet taken down; nothing saved until Save Table
+        (Bill, 2026-10-31: the scan had gone past his last top, so the table
+        had more steps than his Pace list: "There should have been something
+        like a 'Last Entry" button so I could stop" ... "Yes, Last entry end
+        the table at that step as described. But rename the button to
+        "Entry complete".")."""
+        n = self._scan_row
+        if n < 2:
+            return
+        self._hold(None)
+        # The steps above: kept, "-----" (Bill, 2026-10-31: "the pace_table
+        # should not be trimmed down")
+        for k in range(n, len(self.points)):
+            self.points[k] = (self.points[k][0], None)
+            self.sources[k] = None
+        self._beyond = n
+        self.red = {k for k in self.red if k < n}
+        self._trusted = {k: t for k, t in self._trusted.items() if k < n}
+        for k in range(len(self.points)):
+            self._add_row(k, scroll=False)
+        self.max_volts = self.points[n - 1][0]
+        self._scan_topped = True
+        self._scan_next = None
+        self._mark_red()
+        self._write_session()
+        self.finish()
+
+    def edit_table(self):
+        """The Finish screen: back to the Edit screen."""
+        self.screen = "edit"
+        self._show_state("winddown" if self.state == "winddown" else "ready")
+
+    def quit(self):
+        if self.state == "choose" and self._pool_changes():
+            if self._ask("Quit", "Save the pool settings you changed?"):
+                self.save_pool_settings()
+        if self.mode == "entry" and getattr(self, "screen", "") == "finish":
+            if not self._ask("Quit", "Are you sure? All edited data will be lost."):
+                return
+            self._leaving = True                # (asked: closeEvent doesn't ask again)
+        self.close()
 
     def _end_run(self, why):
         self._why = why
+        if self.mode == "entry" and self.points:
+            self._scan_topped = True
+            self._descent()
+            return
         self._go_down("winddown")
 
     def pump_toggle(self):
@@ -9504,7 +12669,7 @@ class CalibrateWindow(QWidget):
             return
         if not self._ask("Pump On/Off", "Are you sure? This will turn the pool's pump on or off."):
             return
-        if self.state in ("enter", "flow", "balls"):
+        if self.state in ("flow", "balls"):
             self.stop()
         self._pump_busy = True
         self._hold(None)
@@ -9514,6 +12679,25 @@ class CalibrateWindow(QWidget):
     def _pump_release(self):
         self.jet.pump(False)
         self._pump_busy = False
+
+    def _ask_replace_scan(self):
+        rng = self.cal.get("jetVoltageRange")
+        n = self.cal.get("jetSteps") or max(0, len(self.cal.get("jetStepVolts") or ()) - 1)
+        found = (f" It found {rng[0]:.3f} to {rng[1]:.3f} V in {n} steps."
+                 if rng and n else "")
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Warning)
+        box.setWindowTitle("Initial voltage scan")
+        box.setText("The initial voltage scan has already been run." + found)
+        box.setInformativeText("Run it again if the pool, its controller or the Pace cable has "
+                               "changed. Its results replace the voltage range "
+                               "and the Pace table when you press Save scan (the current file is "
+                               "kept as a backup in the temp folder); Return leaves them as they are.")
+        replace = box.addButton("Replace", QMessageBox.AcceptRole)
+        cancel = box.addButton("Cancel", QMessageBox.RejectRole)
+        box.setDefaultButton(cancel)
+        box.exec()
+        return box.clickedButton() is replace
 
     def _ask(self, title, text):
         box = QMessageBox(self)
@@ -9527,18 +12711,82 @@ class CalibrateWindow(QWidget):
     # ------------------------------------------------------------------
     # Table, results, saving
     # ------------------------------------------------------------------
-    def _add_row(self, r):
+    def _trow(self, r):
+        """Pace Entry's table has the fastest step on top, as in Pace
+        correction (Bill, 2026-10-30: "the table should be inverted with the
+        max speed on the top"): step r's row there, and back."""
+        return len(self.points) - 1 - r if self.mode == "entry" else r
+
+    def _add_row(self, r, scroll=True):
         if self.table.rowCount() <= r:
             self.table.setRowCount(r + 1)
         v, p = self.points[r]
+        tr = self._trow(r)
         src = self.sources[r] if r < len(self.sources) else None
         shown = "..." if p is None else ("~" + pace_text(p) if src == "filled" else pace_text(p))
-        for c, text in enumerate((str(r + 1), f"{v:.3f}", shown)):
+        red = r in getattr(self, "red", ())
+        here = self.mode == "entry" and r == getattr(self, "_followed", None)   # the jet's row (_follow_table)
+        beyond = getattr(self, "_beyond", None)
+        if p is None and self.mode == "entry":
+            shown = ("?" if src == "display" else       # typed but no Pace / not typed yet
+                     "-----" if beyond is not None and r >= beyond else "")
+        elif p is None and self.mode == "pingpong" and beyond is not None and r >= beyond:
+            shown = "-----"
+        for c, text in enumerate((("▶ " if here else "") + str(r + 1), f"{v:.3f}", shown)):
             item = QTableWidgetItem(text)
             item.setTextAlignment(Qt.AlignCenter)
-            self.table.setItem(r, c, item)
-        self.table.scrollToItem(self.table.item(r, 0))
-        self.step_label.setText(f"Steps recorded: {len(self.points)}")
+            if red and here:
+                item.setBackground(QColor(225, 150, 165))       # the jet's row, red too
+            elif red:
+                item.setBackground(QColor(255, 190, 190))
+            elif here:
+                item.setBackground(QColor(215, 215, 215))       # the jet's row (Bill, 2026-10-29: "just grey")
+            if here:
+                f = item.font()
+                f.setBold(True)
+                item.setFont(f)
+            self.table.setItem(tr, c, item)
+        if self.mode == "entry":
+            self._show_reverts(r)
+        if scroll:
+            self.table.scrollToItem(self.table.item(tr, 0))
+        if self.mode != "entry":
+            self.step_label.setText(f"Steps recorded: {self._kept()}")   # (not the "-----" rows)
+        self._show_warning()
+
+    def _show_reverts(self, only=None):
+        """↺ beside each step changed on the Edit screen, as in Pace
+        correction (Bill, 2026-10-30: "You dropped the revert buttons to the
+        table again")."""
+        if self.mode != "entry":
+            return
+        for r in (range(len(self.points)) if only is None else (only,)):
+            b = self.table.cellWidget(self._trow(r), 3)
+            if b is None:
+                b = QPushButton("↺")
+                b.setFixedSize(32, 26)
+                b.setFocusPolicy(Qt.NoFocus)
+                b.setToolTip("Put this step back")
+                b.clicked.connect(lambda _=False, r=r: self._revert(r))
+                self.table.setCellWidget(self._trow(r), 3, b)
+            b.setVisible(self.points[r] != self._orig[r] and getattr(self, "screen", "") == "edit")
+
+    def _revert(self, r):
+        if self.screen != "edit":
+            return
+        self._touch()
+        self.points[r] = self._orig[r]
+        self.sources[r] = "table"
+        self._trusted.pop(r, None)
+        self._mark_red()
+        self._write_session()
+
+    def _show_warning(self):
+        """Pace Entry: a red row in the table (Bill, 2026-10-29: "Should be a
+        red 'There are warnings in table below'")."""
+        self.warn_label.setVisible(self.mode == "entry" and bool(getattr(self, "red", ()))
+                                   and getattr(self, "state", "") != "choose"
+                                   and getattr(self, "screen", "") != "finish")
 
     def _write_session(self):
         """Every reading, as it is taken: a record even if the program is
@@ -9554,113 +12802,216 @@ class CalibrateWindow(QWidget):
             print("Couldn't write", self.session_path, e)
 
     def _show_results(self):
-        # PingPong: steps after the last ball step have no pace; leave them out
-        while self.points and self.points[-1][1] is None:
-            self.points.pop()
-            self.sources.pop()
+        # PingPong finished before the top: the pool's steps above the jet's
+        # are kept (the jet's limit and the zones stay the scan's), their
+        # Paces filled in at Save on to 1:00, as in Pace Entry (Bill,
+        # 2026-10-30: "The user can enter as many sets of balls as he wants
+        # and then can quit with possible less than the highest number of
+        # zones, like in the Pace entry routine.")
+        if self.mode == "pingpong" and self.points:
+            last = self.points[-1][0]
+            table = sorted(float(v) for _, v in self.cal["pace_voltage"])
+            for v in table:
+                if v > last + self.step_v / 2:
+                    self.points.append((round(v, 3), None))
+                    self.sources.append(None)
+            # the scan's steps above the table's top (and above the last
+            # ball step): "-----", left out at Save, as in Pace Entry
+            self._beyond = len(self.points)
+            top = max(table[-1], last)
+            for v in sorted(float(x) for x in self.cal.get("jetStepVolts") or ()):
+                if v > top + self.step_v / 2:
+                    self.points.append((round(v, 3), None))
+                    self.sources.append(None)
         self.table.setRowCount(len(self.points))
-        self._show_state("results")
-        why = getattr(self, "_why", "")
         if self.mode == "pingpong":
-            why += ("<p>PingPong paces are the balls' paces corrected for the surface current, "
-                    "with a factor measured on the author's pool (1.5 at slow speeds to 1.7 at "
-                    "fast). Rows marked ~ are filled in between ball steps.</p>")
-        if len(self.points) < 2:
+            for r in range(len(self.points)):   # ("..." filled in at Save, "-----" left out)
+                if self.points[r][1] is None:
+                    self._add_row(r, scroll=False)
+        if self.mode == "entry":
+            self._release_shown()               # the live voltage again
+        self._show_state("results")
+        if self.mode == "pingpong" and len(self.points) >= 2:
+            self._apply_drag()
+        self._results_info()
+
+    def _apply_drag(self):
+        """The ball steps' Paces again from their ball paces, with the two
+        numbers on the screen and the steps actually taken, and the steps
+        between filled in (ball_table)."""
+        volts = [v for v, _ in self.points[:self._kept()]]     # (not the "-----" rows)
+        paces = ball_table(volts, self.balls_raw, self.body_spin.value(), self.delta_spin.value())
+        for i, p in enumerate(paces):
+            if p is not None and self.sources[i] != "display":
+                self.points[i] = (volts[i], p)
+                self._add_row(i)
+        self._write_session()
+
+    def _drag_changed(self):
+        if self.mode == "pingpong" and self.state == "results" and len(self.points) >= 2:
+            self._apply_drag()
+            self._results_info()
+
+    def _results_info(self):
+        why = getattr(self, "_why", "") if self.mode != "entry" else ""
+        entry = self.mode == "entry"
+        pts, filled = self._filled()
+        if self.mode == "pingpong":             # ~: every step not measured with balls
+            filled = {i for i, src in enumerate(self.sources) if src not in ("balls", "bottom")}
+        if self.mode == "pingpong":
+            why += ("<p>PingPong Paces are the balls' paces times a factor for the swimmer's body, "
+                    "lower in the water than the ball: <b>bodyDrag</b> at the jet's fastest speed, "
+                    "plus <b>deltaBodyDrag</b> more at its slowest (legs down, at the back of the "
+                    "pool). Change them below and the table follows. Rows "
+                    "marked ~ are filled in between ball steps, and on to 1:00 at the top "
+                    "of the pool's table when the run was finished before it.</p>")
+        if len(pts) < 2:
             self.info.setHtml(f"<h3>Not enough steps</h3><p>{why}</p><p>At least two steps are "
                               "needed for a table. Nothing was saved.</p>")
             self.save_btn.setVisible(False)
             return
         old = self.cal.get("pace_voltage", [])
-        rows = ""
+        rows = []
         worst = 0.0
+        # The steps not faster than the one below, red as in the Edit
+        # screen's table (Bill, 2026-10-31: "knows all about an error but
+        # the lines are not marked in red.")
+        bad = {i + 1 for i in range(len(pts) - 1) if pts[i + 1][1] >= pts[i][1]}
+        if entry:
+            bad |= {i for i in getattr(self, "red", ()) if i < len(pts)}
+        tr = lambda k: "<tr bgcolor='#ffbebe'>" if k - 1 in bad else "<tr>"
         if len(old) >= 2:
             ov = [v for _, v in old]
             op = [p for p, _ in old]
             order = sorted(range(len(ov)), key=lambda i: ov[i])
             ov = [ov[i] for i in order]
             op = [op[i] for i in order]
-            for v, p in self.points:
-                if ov[0] <= v <= ov[-1]:
-                    q = interp(v, ov, op)
+            for k, (v, p) in enumerate(pts, 1):
+                new = ("~" if k - 1 in filled else "") + pace_text(p)
+                # (a step a hair outside the current table's ends, as the
+                # bottom 1.229 V against 1.230 V, is its end step; it showed
+                # "-" (Bill, 2026-10-31: "Table doesn't show first Pace
+                # entry, only a "-"."))
+                if ov[0] - END_SLACK_V <= v <= ov[-1] + END_SLACK_V:
+                    q = interp(min(max(v, ov[0]), ov[-1]), ov, op)
                     d = round((p - q) / q * 100.0)
                     worst = max(worst, abs(d))
-                    rows += f"<tr><td>{v:.3f}</td><td>{pace_text(p)}</td><td>{pace_text(q)}</td><td>{d:+d}%</td></tr>"
+                    rows.append(f"{tr(k)}<td>{k}</td><td>{v:.3f}</td><td>{new}</td><td>{pace_text(q)}</td>"
+                                f"<td>{d:+d}%</td></tr>")
                 else:
-                    rows += f"<tr><td>{v:.3f}</td><td>{pace_text(p)}</td><td>-</td><td></td></tr>"
-        lo, hi = self.cal.get("SafetyVoltageLimits", (None, None))
+                    rows.append(f"{tr(k)}<td>{k}</td><td>{v:.3f}</td><td>{new}</td><td>-</td><td></td></tr>")
+        rows = "".join(reversed(rows) if entry else rows)      # Pace Entry: the fastest on top
         verdict = ""
         if rows:
             verdict = ("<p>The new table is within 3% of the current one: your pool matches it.</p>"
                        if worst <= 3.0 else
                        f"<p>The new table differs from the current one by up to {worst:.0f}%.</p>")
-        limits = ""
-        if hi is not None:
-            limits = (f"<p>The <b>SafetyVoltageLimits</b> stay as they are ({lo}, {hi}). With the "
-                      f"new table, the jet's fastest allowed pace is about "
-                      f"<b>{pace_text(interp(hi, [v for v, _ in self.points], [p for _, p in self.points]))}</b>"
-                      f" and its slowest about "
-                      f"<b>{pace_text(interp(lo, [v for v, _ in self.points], [p for _, p in self.points]))}</b>. "
-                      "Change them in the calibration file if you want (setup guide 5.3).</p>")
+        slower = [str(i + 2) for i in range(len(pts) - 1) if pts[i + 1][1] >= pts[i][1]]
+        if slower:
+            verdict += (f"<p style='color:#b00000'><b>Not faster than the step below: step"
+                        f"{'s' if len(slower) > 1 else ''} {', '.join(slower)}.</b> "
+                        + ("<b>Edit table</b> to type them again, or save and set them in Pace correction.</p>"
+                           if self.mode == "entry" else
+                           "Save and set them in Pace correction, or run PingPong again.</p>"))
+        (lo, slow), (hi, fast) = min(pts), max(pts)
+        limits = (f"<p>PoolWind never drives the jet outside this table: {lo:.3f} V "
+                  f"(<b>{pace_text(slow)}</b>) to {hi:.3f} V (<b>{pace_text(fast)}</b>).</p>")
+        if self.mode == "entry":
+            self.info.setHtml(
+                f"<h3>Finish: the new table, {len(pts)} steps</h3>{verdict}"
+                "<p>Each step's new Pace beside the current table's, and how far apart they are"
+                + (" (~: not typed, filled in between the steps typed, on to 1:00 at the top and "
+                   "7:00 at the bottom)" if filled else "") + ".</p>"
+                f"<table border=1 cellpadding=3><tr><th>Step</th><th>Volts</th><th>New</th><th>Current</th>"
+                f"<th></th></tr>{rows}</table>{limits}"
+                "<p><b>Save Table</b> replaces the pool's Master Pace table with the new one (the current "
+                "file is kept as a backup in the temp folder; it asks first if a step is still red) and goes back to PoolWind. <b>Edit table</b> goes back to the "
+                "Edit screen. <b>Quit</b> leaves without saving (the readings are kept in "
+                f"temp/{os.path.basename(self.session_path)}).</p>")
+            return
         self.info.setHtml(
             f"<h3>Results: {len(self.points)} steps</h3><p>{why}</p>{verdict}"
-            f"<table border=1 cellpadding=3><tr><th>Volts</th><th>New</th><th>Current</th><th></th></tr>{rows}</table>"
-            f"{limits}<p><b>Save table</b> writes the new table to {os.path.basename(self.cal_path)}; "
-            "the current file is kept as a backup. <b>Quit</b> without saving keeps the current table "
-            f"(the readings are in {os.path.basename(self.session_path)}).</p>")
+            f"<table border=1 cellpadding=3><tr><th>Step</th><th>Volts</th><th>New</th><th>Current</th><th></th></tr>"
+            f"{rows}</table>"
+            f"{limits}"
+            + f"<p><b>Save table</b> writes the new table to {os.path.basename(self.cal_path)}; "
+            + "the current file is kept as a backup in the temp folder. <b>Quit</b> without saving keeps the current table "
+            f"(the readings are in temp/{os.path.basename(self.session_path)}).</p>")
 
-    def save(self):
+    def save(self, confirm=True):
         if self.mode == "scan":
             self._save_scan()
             return
-        if not self._ask("Save table", "Replace the pace table in the calibration file with the new one?"):
+        if self.mode == "entry" and self.red:
+            box = QMessageBox(self)
+            box.setIcon(QMessageBox.Warning)
+            box.setWindowTitle("Save Table")
+            box.setText(f"Step{'s' if len(self.red) > 1 else ''} "
+                        f"{', '.join(str(r + 1) for r in sorted(self.red))} still red.")
+            on = box.addButton("Save anyway", QMessageBox.AcceptRole)
+            box.addButton("Go back", QMessageBox.RejectRole)
+            box.exec()
+            if box.clickedButton() is not on:
+                return
+        filled_pts = self._filled()[0]         # (PingPong's own points stay as measured: Drag still works on them)
+        all_volts = sorted({round(float(v), 3) for v, _ in self.points})    # (the "-----" steps too)
+        if self.mode == "entry":
+            self.points = filled_pts
+        if confirm and not self._ask("Save table", "Replace the pool's Master Pace table with the new one?\n\n"
+                                     "This is the basic calibration: any Pace corrections made to the "
+                                     "Master table before are replaced too. Swimmers' own tables on their "
+                                     "sticks are not changed; Pace correction's Copy Master values gives them the new one."):
             return
         cal = self._load_for_save()
-        pts = sorted(self.points)
+        pts = sorted(filled_pts)
         cal["pace_voltage"] = [(float(p), float(v)) for v, p in pts]   # plain numbers: PoolWind reads the file with ast
+        cal["PacesFromFormula"] = False         # measured (a scan starts over from the curve)
+        cal.pop("PacesFixed", None)             # before 2026-10-28: Pace correction's fixed Paces
+        cal.pop("PacesFixedEarlier", None)
+        cal.pop("PacesPending", None)           # Pace correction's: the table is new
+        if self.mode == "pingpong":
+            cal["bodyDrag"] = round(self.body_spin.value(), 2)
+            cal["deltaBodyDrag"] = round(self.delta_spin.value(), 2)
+            cal["PingPongBalls"] = list(self.balls_raw)     # Pace correction works the table out again from these
+        else:
+            cal.pop("PingPongBalls", None)      # Pace Entry's table: the balls don't belong to it
+        if not cal.get("jetStepVolts"):         # (a file from before it: the steps as they were, all of them)
+            cal["jetStepVolts"] = all_volts
         note = self._write_cal(cal)
-        if not self.jet.simulated or self.write_cal:
-            self.cal = cal
+        self.cal = cal
         self.save_btn.setVisible(False)
         QMessageBox.information(self, "Saved", note)
-
-    def _simulated_path(self):
-        base, ext = os.path.splitext(self.cal_path)
-        return f"{base}_simulated{ext}"
+        if self.mode == "entry":                # back to PoolWind (Bill, 2026-10-29)
+            self._leaving = True
+            self.close()
 
     def _load_for_save(self):
-        """The calibration file as it is now on disk (a desk test: its
-        simulated copy, once there is one)."""
-        sim = self._simulated_path()
-        if self.jet.simulated and not self.write_cal and os.path.isfile(sim):
-            return load_calibration(sim)
+        """The calibration file as it is now on disk."""
         return load_calibration(self.cal_path)
 
     def _write_cal(self, cal):
-        """Writes cal, with a dated backup of the file it replaces; a desk
-        test never touches the real calibration file. Returns the note to
-        show."""
-        if self.jet.simulated and not self.write_cal:
-            target = self._simulated_path()
-            save_calibration(target, cal)
-            return f"Simulated: saved to {os.path.basename(target)}, not to the calibration file."
+        """Writes cal, with a dated backup of the file it replaces. Returns
+        the note to show."""
         stamp = datetime.now().strftime("%Y-%m-%d_%H%M")
         base, ext = os.path.splitext(self.cal_path)
-        backup = f"{base}_before_{stamp}{ext}"
+        backup = temp_path(os.path.dirname(base), f"{os.path.basename(base)}_before_{stamp}{ext}")
         with open(self.cal_path, "r") as f:
             text = f.read()
         with open(backup, "w") as f:
             f.write(text)
         save_calibration(self.cal_path, cal)
-        return (f"Saved. The previous file is kept as {os.path.basename(backup)}.\n\n"
+        return (f"Saved. The previous file is kept in the temp folder as {os.path.basename(backup)}.\n\n"
                 "From PoolWind's menu, it is used as soon as this window closes; "
                 "otherwise the next time PoolWind starts.")
 
     # ------------------------------------------------------------------
     def closeEvent(self, event):
         running = self.state in ("down", "settle", "enter", "flow", "balls", "up", "winddown", "paused",
-                                 "scan_down", "scan_up", "scan_winddown", "scan_paused")
-        if running and not self.jet.simulated:
-            if not self._ask("Quit", "Take the jet down to its slowest speed and quit?"):
+                                 "drive", "refix", "edited", "scan_down", "scan_up", "scan_winddown",
+                                 "scan_paused")
+        if running:
+            if not getattr(self, "_leaving", False) and not self._ask(
+                    "Quit", "Take the jet down to its slowest speed and quit?"):
                 event.ignore()
                 return
             self._winddown_blocking()
@@ -9668,6 +13019,12 @@ class CalibrateWindow(QWidget):
         self.watchdog.stop()
         if self.camera:
             self.camera.stop()
+        if self._pump_busy:
+            # Closed during Pump On/Off's 2 s press: let go of the button now,
+            # or it stays pressed (Bill, 2026-10-26: the pump came on when
+            # PoolWind was started again)
+            self.jet.pump(False)
+            self._pump_busy = False
         self.jet.off()
         self.jet.close()
         event.accept()
@@ -9688,41 +13045,43 @@ class CalibrateWindow(QWidget):
 def calibration_main():
     ap = argparse.ArgumentParser(description="PoolWind calibration")
     ap.add_argument("--calibrate", action="store_true", help="(selects the calibration)")
-    ap.add_argument("--simulate", action="store_true", help="simulated jet and Pace Display")
     ap.add_argument("--cal", help="the calibration file (default: named after this program, "
                                   "poolwind_calibrate.py -> poolwind_calibration.txt)")
     ap.add_argument("--window", action="store_true", help="a window instead of full screen")
-    ap.add_argument("--write-cal", action="store_true",
-                    help="with --simulate: save into the calibration file itself (test folder only)")
     args = ap.parse_args()
 
     base = os.path.splitext(os.path.abspath(__file__))[0]
     cal_path = os.path.abspath(args.cal) if args.cal else base + "_calibration.txt"
 
     app = QApplication(sys.argv)
-    # Demo (defaults file, built in True): the simulated jet only
+    # Demo (defaults file, built in True): nothing at the pool moves, so no
+    # calibration (its simulated jet is gone, v15.7)
     try:
         with open(base + "_defaults.txt") as f:
             text = f.read()
         demo = ast.literal_eval(text[text.index("{"):]).get("Demo", True) is not False
     except Exception:
         demo = True
-    if demo and not args.simulate:
-        print("Demo ('Demo' isn't False in the defaults file): the calibration uses a simulated jet")
-        args.simulate = True
+    if demo:
+        QMessageBox.critical(None, "PoolWind calibration",
+                             "PoolWind is set up as a demo ('Demo' isn't False in the defaults file), "
+                             "and the calibration drives the real pool.\n\n"
+                             "Set 'Demo' to False once PoolWind is built and installed (setup guide).")
+        return 1
     if not os.path.isfile(cal_path):
         QMessageBox.critical(None, "PoolWind calibration",
                              f"No calibration file at {cal_path}.\n\nInstall PoolWind first (setup guide, section 3).")
         return 1
     try:
-        jet = SimulatedJet() if args.simulate else RealJet()
+        jet = RealJet()
     except Exception as e:
         QMessageBox.critical(None, "PoolWind calibration",
                              "Couldn't reach the relays or the voltage sensor.\n\n"
-                             "Is PoolWind still running? Close it first: both use the same relays.\n\n"
+                             "Is PoolWind still running? Close it first: both use the same relays. "
+                             "(The calibration runs only on the Raspberry Pi at the pool.)\n\n"
                              f"({e})")
         return 1
-    w = CalibrateWindow(jet, cal_path, args.window, write_cal=args.simulate and args.write_cal)
+    w = CalibrateWindow(jet, cal_path, args.window)
     try:
         return app.exec()
     finally:
@@ -9743,8 +13102,8 @@ if __name__ == "__main__":
     except Exception:
         pass
 
-    # --calibrate: only the calibration (a first install, a calibration file
-    # PoolWind can't start with, or a desk test with --simulate)
+    # --calibrate: only the calibration (a first install, or a calibration
+    # file PoolWind can't start with)
     if "--calibrate" in sys.argv:
         sys.exit(calibration_main())
 

@@ -437,14 +437,15 @@ The swimmer settings use **the same names** in the defaults file and on
 the USB sticks. A stick's value wins while it's inserted. See the
 [user manual](USER_MANUAL.md#8-your-settings) for the list.
 
-**The defaults file as shipped** uses a moderate top pace, 3:00 per 100
-yards, and an average height. If you raise the top pace for yourself,
-remember it applies to anyone who swims without their own stick.
+**The defaults file as shipped** uses a moderate range of zones, `(6, 12)`
+(about 4:34 to 3:07 per 100 yards on the shipped Pace table), and an
+average height. If you raise the fastest zone for yourself, remember it
+applies to anyone who swims without their own stick.
 
 **Zones on the sticks.** A swimmer's stick holds their slowest and fastest
-**zone** (`'zoneMin, Max'`), set with Swimmer limits. The defaults file may
-use zones too, or, as shipped, a pace range (`'paceMin, Max'`), which
-PoolWind turns into zones through the Pace table. Zone numbers belong to
+**zone** (`'zoneMin, Max'`), set with Swimmer limits. The defaults file uses
+zones too. An older pace range (`'paceMin, Max'`) still works: PoolWind
+turns it into zones through the Pace table. Zone numbers belong to
 the Pace table they were set on: after a new scan, set the swimmers'
 limits again.
 
@@ -476,7 +477,7 @@ The files are written like this:
 {
 'swimmersHeight': 66
 
-,'paceMin, Max': ('5:00', '3:00')
+,'zoneMin, Max': (6, 12)
 }
 ```
 

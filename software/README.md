@@ -10,7 +10,7 @@ Required Notice: Copyright (c) William A. Gorlitz. U.S. Copyright Registration T
 |---|---|
 | `poolwind.py` | The program, with the calibration built in (menu **Calibrate pool...**, or `python3 poolwind.py --calibrate`) |
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick |
-| `poolwind_calibration.txt` | Your pool's calibration: the Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, number of zones. **The one here is the author's pool**: the calibration's scan fits it to yours (setup guide, section 5) |
+| `poolwind_calibration.txt` | Your pool's calibration: the Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane. **The one here is the author's pool**: the calibration's scan fits it to yours (setup guide, section 5) |
 | `toggle_monitor.sh` | The Monitor Toggle: turns the pool monitor between portrait and landscape (setup guide, section 9) |
 
 The settings files must sit next to the program and start with its name.
@@ -34,5 +34,5 @@ the calibration, the jet's limits) and explains every setting.
 ## Where your swims are saved
 
 Swim logs (CSV) and training video are saved on the swimmer's USB stick if
-one is inserted when PoolWind starts, or otherwise in a `CSV Vault` folder
+one is in (plugged in before or while PoolWind runs), or otherwise in a `CSV Vault` folder
 next to the program.

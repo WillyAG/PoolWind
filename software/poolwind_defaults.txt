@@ -3,9 +3,12 @@
 # it's inserted. See the user manual, "Your settings", and the setup guide,
 # section 6.
 #
-# 'paceMin, Max': slowest and fastest pace PoolWind may drive the jet to,
-# in minutes:seconds per 100 yards. Shipped with a moderate top pace of
-# 3:00: if you raise it, remember it applies to everyone without a stick.
+# 'zoneMin, Max': the slowest and fastest zone PoolWind may drive the jet
+# to (zone 1 is the jet's slowest step; set them with Swimmer limits in
+# PoolWind's menu). Shipped as (6, 12), a moderate range: about 4:34 to
+# 3:07 per 100 yards on the shipped Pace table. If you raise the fastest,
+# remember it applies to everyone without a stick. After a new voltage
+# scan, set them again.
 #
 # To change a built-in setting, copy its line here (setup guide, section 7).
 # PoolWind never rewrites this file, so your comments stay.
@@ -18,12 +21,10 @@
 
 ,'swimmersHeight': 66
 
-,'paceMin, Max': ('5:00', '3:00')
+,'zoneMin, Max': (6, 12)
 
 ,'recordTrainingVideo': True
 
 ,'logRate': 5
-
-,'ejectStickOnClose': True
 
 }

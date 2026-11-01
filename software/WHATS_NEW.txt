@@ -1,21 +1,32 @@
 What's new in PoolWind v15.7 (since v15.5)
 
 For swimmers (user manual):
-- Your own Pace table on your USB stick. A welcome screen greets you
-  and says which table you swim with; when the pool is calibrated
-  again, it asks Old (yours) or New (the pool's).
+- Your own Pace table on your USB stick, made from the pool's the first
+  time the stick is used. Pace correction changes yours; other swimmers
+  aren't affected.
+- Pace correction redone: correct your Paces while you swim. Changes stay
+  pending until you press Make permanent. "Copy Master values" tries the
+  pool's own Paces.
 - A USB stick plugged in or pulled out while PoolWind runs is picked up.
-- Pace correction redone: correct your Paces while you swim. Changes
-  stay pending until you make them permanent.
-- Swim Plot and the calendar show old swims in today's Paces. The
+  The stick is always ejected when PoolWind closes.
+- Swim Plot and the calendar show old swims in the Paces in use now. The
   first start after this update adds the jet's voltage to your old swim
   logs, once for each USB stick (a few seconds). Days that can't be
   converted show grey.
+- Swim Plot: "Use: Swimmer dataset / Master dataset (coach)" on the date
+  screen, so a coach can compare swimmers on the pool's table; a "Please
+  wait" box while swims are read, and what's been read is kept;
+  goto MPH / goto Pace, PACE or MPH beside the date, a coordinate box with
+  its legend; Compress Gaps keeps the cursor and the values shown.
 
 For the builder (setup guide, section 5):
 - The voltage scan can be run again any time; its Paces are a first
-  estimate (7:00 at the slowest speed, 1:00 at the top).
-- Pace Entry has Edit, Scan and Finish screens; PingPong has bodyDrag
-  and deltaBodyDrag.
+  estimate (7:00 at the slowest step, 1:00 at the top). It checks that
+  the pool's voltage changes in steps: a pool whose voltage rises
+  continuously needs changes (see the setup guide and Claude).
+- Pace Entry has Edit, Auto scan and Finish screens; PingPong has bodyDrag
+  and deltaBodyDrag. Both can go on into the steps above the table's top.
 - The jet's limits are now the Pace table's first and last rows. An old
   'SafetyVoltageLimits' line in the calibration file is ignored.
+- The shipped settings use zones, 'zoneMin, Max': (6, 12), in place of a
+  Pace range.

@@ -16,6 +16,16 @@ set -u
 
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOFTWARE="$SRC_DIR/software"
+# The GitHub repository this copy was cloned from (its Release holds the
+# sample video): a copy of the project, or a private test repository,
+# downloads from itself. Not a clone: the author's.
+REPO_URL="$(git -C "$SRC_DIR" remote get-url origin 2>/dev/null)"
+REPO_URL="${REPO_URL%.git}"
+case "$REPO_URL" in
+    https://github.com/*/*) ;;
+    git@github.com:*) REPO_URL="https://github.com/${REPO_URL#git@github.com:}" ;;
+    *) REPO_URL="https://github.com/WillyAG/PoolWind" ;;
+esac
 PW_DIR="$HOME/PoolWind"
 LOG="$PW_DIR/install.log"
 
@@ -167,7 +177,12 @@ copy_if_missing "$SOFTWARE/poolwind_calibration.txt" "$PW_DIR/poolwind_calibrati
 if [ -f "$PW_DIR/PoolWind_demo.mp4" ]; then
     say "   kept PoolWind_demo.mp4"
 elif curl -L -f -o "$PW_DIR/PoolWind_demo.mp4" \
-        "https://github.com/WillyAG/PoolWind/releases/latest/download/PoolWind_demo.mp4" >> "$LOG" 2>&1; then
+        "$REPO_URL/releases/latest/download/PoolWind_demo.mp4" >> "$LOG" 2>&1; then
+    say "   installed PoolWind_demo.mp4 (the demo's recorded swim)"
+elif command -v gh >/dev/null 2>&1 && \
+        gh release download --repo "${REPO_URL#https://github.com/}" --pattern PoolWind_demo.mp4 \
+           --dir "$PW_DIR" --clobber >> "$LOG" 2>&1; then
+    # (a private repository: only with GitHub's gh tool, signed in)
     say "   installed PoolWind_demo.mp4 (the demo's recorded swim)"
 else
     rm -f "$PW_DIR/PoolWind_demo.mp4"
