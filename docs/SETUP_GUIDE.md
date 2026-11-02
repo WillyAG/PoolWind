@@ -141,7 +141,9 @@ starting:
   appears. If it doesn't, double-click **Monitor Toggle**. 
 
 Double-click the **PoolWind** icon. The pool screen appears, showing the
-camera's view from above.
+camera's view from above, and a box winds the jet down to its lowest step.
+If a box says the voltage sensor isn't found, check the interface board
+(build guide, section 9).
 
 Check that:
 
@@ -400,7 +402,8 @@ There is no separate limits setting: the **Pace table's first and last
 rows** are the jet's limits.
 
 - The **first** row's voltage is the jet's lowest. PoolWind winds the jet
-  down to it when **OnOff** is pressed, before it switches the pump.
+  down to it when it starts and closes, when **OnOff** is pressed (before
+  it switches the pump), and when Set Swim Area or the calibration opens.
 - The **last** row's voltage is the highest PoolWind ever drives the jet
   to, whatever any swimmer's setting says.
 
@@ -438,10 +441,10 @@ starting with the program's name:
 
 | File | Holds | Who changes it |
 |---|---|---|
-| `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick | The owner |
+| `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick | The builder, and Swimmer limits with no stick in |
 | `poolwind_calibration.txt` | The Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, swim zone width, the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetStepVolts`: every jet step the scan found, so Pace Entry and PingPong can show steps above the table's top again, `PacesFromFormula`: the Paces are still the scan's estimate), PingPong's numbers (`bodyDrag`, `deltaBodyDrag`, `PingPongBalls`), Pace correction's pending changes for swimmers without a stick (`PacesPending`), and the update's `logsTable` / `rulerAdded` (section 10) | The calibration, Pace correction and the builder |
 | `poolwind_calibration_camera.png` | The camera picture the swim area was set on (the camera check, 5.2) | PoolWind, when the swim area is saved |
-| `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | That swimmer |
+| `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | Swimmer limits, and a new stick's setup |
 | `poolwind_ind_calibration.txt` (on each USB stick) | One swimmer's own Pace table, their Pace correction's pending changes and drag numbers. Made from the pool's table the first time the stick is used | Pace correction |
 | `temp` folder (next to the program, and on each USB stick) | Files PoolWind never needs to run: the backups made before a table is replaced (`..._before_<date>.txt`), the calibration's records (`calibration_scan_`, `calibration_session_`, `calibration_drops_`, `calibration_correction_<date>.csv`) and developer traces. Delete it any time; PoolWind makes it again when needed | PoolWind |
 
@@ -476,8 +479,9 @@ limits again.
 
 **Recording rate (`'logRate'`).** How many swim log records, and training
 video frames, PoolWind saves per second: 1 to 15, read when PoolWind
-starts. Set it in the defaults file for everyone (a coach's choice, for
-example) or on a swimmer's stick for that swimmer.
+starts. Swimmers set it (5 to 15) with Swimmer limits, on their stick or,
+with no stick in, in the defaults file for everyone (a coach's choice, for
+example).
 
 | `'logRate'` | Video | Storage | A 32 GB stick holds |
 |---|---|---|---|
