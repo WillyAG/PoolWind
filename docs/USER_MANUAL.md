@@ -31,7 +31,8 @@ pool are covered in the build guide and the setup and calibration guide.
 - **Know how to take manual control:** press **OnOff** to wind the jet down
   and stop the pump, or close PoolWind (see
   [Finishing a swim](#5-finishing-a-swim)) and use the pool's own remote.
-  Closing PoolWind doesn't slow the jet. While PoolWind runs, it fights
+  Closing PoolWind winds the jet down to its slowest setting. While
+  PoolWind runs, it fights
   against any change the pool's own remote makes.
 - **Take any pool cover off before starting PoolWind,** and close PoolWind
   before putting it back on. A cover changes what the camera sees: PoolWind
@@ -368,8 +369,8 @@ about 923 yd at Paces 8% slower. The log file itself never changes.
 Press **OnOff** to turn the pump off: the jet winds down first. Then press
 **X** at the top right of the screen to close PoolWind. It then:
 
-1. releases its control of the pool's remote (closing doesn't slow the
-   jet: if the pump is still running, the jet stays at its speed),
+1. winds the jet down to its slowest setting and releases its control of
+   the pool's remote (the pump stays as it is),
 2. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
 3. **ejects your USB stick**, so it's safe to remove.
 

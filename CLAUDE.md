@@ -56,13 +56,15 @@ faster than they can handle.
   table, never from a swimmer's table on a USB stick.
 - **The pump relay (GPIO 27) turns the pool's pump on and off.** Don't
   pulse it in tests.
-- **PoolWind winds the jet down when OnOff is pressed**, before it pulses
-  the pump relay (`OnOff_btn_press`, `initial_voltage_winddown`), and when
-  leaving the pool screen. The wind-down message's **On/Off now** button
-  stops it so the pump switches at once, for emergencies. Any change you
-  make must keep both, along with the relay watchdog (`RELAY_WATCHDOG_S`):
-  if the loop stalls, it lets go of UP and DN. Closing PoolWind does
-  **not** wind the jet down; it only lets go of the relays.
+- **PoolWind winds the jet down** (`initial_voltage_winddown`, a box with
+  the voltage) to the lowest step at start and close (`App.shutdown`),
+  when OnOff is pressed, before it pulses the pump relay
+  (`OnOff_btn_press`), and when leaving the pool screen for Set Swim Area
+  or the calibration; for Swim Plot only to the swimmer's slowest zone
+  (`to_swimmer`). It never drives up. The OnOff box's **On/Off now**
+  button stops it so the pump switches at once, for emergencies. Any
+  change you make must keep these, along with the relay watchdog
+  (`RELAY_WATCHDOG_S`): if the loop stalls, it lets go of UP and DN.
 - Changes that affect jet speed (zones, zone limits, the pace table, relay
   timing) must be tested with the pool empty, watching the jet, before
   anyone swims. Say so to the user.

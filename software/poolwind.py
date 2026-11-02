@@ -2850,9 +2850,17 @@ class App:
             pass
 
         # ------------------------------------------------------------
-        # 1. (No wind-down: it's done when OnOff is pressed.)
+        # 1. Wind the jet down to its lowest (Bill, 2026-11-02: at start
+        #    and close, to save the equipment), then
         # 2. TURN OFF ALL RELAYS
         # ------------------------------------------------------------
+        try:
+            if getattr(self, "GPIO", None) is not None:
+                self.GPIO.reclaim(self.PIN_UP)      # if a submenu had let them go
+                self.GPIO.reclaim(self.PIN_DN)
+            self.initial_voltage_winddown("Closing PoolWind")
+        except Exception as e:
+            print("Wind-down at close:", e)
         try:
             self.relay_off()
         except Exception:
@@ -3246,11 +3254,15 @@ class App:
         self._apply_individual_defaults(ind_defaults)
         print("USB stick settings reloaded.")
 
-    def initial_voltage_winddown(self, title="Starting Up", now_button=False):
+    def initial_voltage_winddown(self, title="Starting Up", now_button=False, to_swimmer=False):
         """
-        Force the valve DOWN until voltage < minV: when OnOff is pressed
-        (before the pump is switched), and when leaving or returning to the
-        main screen.
+        Force the valve DOWN until voltage < minV: at start and close, when
+        OnOff is pressed (before the pump is switched), and when leaving or
+        returning to the main screen (Bill, 2026-11-02: "drive the voltage
+        down while displaying the Winddown box on both opening and closing
+        the program ... an equipment saving feature"). To the jet's lowest
+        step, or with to_swimmer to the swimmer's slowest zone (Swim Plot:
+        "Lowest Swimmer setting for 'Swim Plot'"); never up.
         Shows a small modal window with live voltage updates. With
         now_button (OnOff), it has an "On/Off now" button that stops the
         wind-down at once, so the pump can be switched immediately.
@@ -3283,6 +3295,10 @@ class App:
         # own volts (v15.6)
         V = self.plateau_voltages
         minV = (V[1] + V[2]) / 2 if len(V) > 2 else self.SafetyVoltageLimits[0] + 0.02
+        if to_swimmer:
+            slow = self.zone_limits()[0]
+            if 1 <= slow < len(V) - 1:
+                minV = max(minV, (V[slow] + V[slow + 1]) / 2)
 
         # --- Read initial voltage ---
         volts = self.takeReading()
@@ -3349,9 +3365,9 @@ class App:
     def toggle_zone_highlight(self):
         self._zone_highlight = not self.zone_highlight_on()
 
-    def leave_main_screen(self):
+    def leave_main_screen(self, to_swimmer=False):
         self.hold_mode = False                  # no held speed to come back to
-        self.initial_voltage_winddown("Leaving the pool screen")
+        self.initial_voltage_winddown("Leaving the pool screen", to_swimmer=to_swimmer)
         self.relay_off()
         self.GPIO.release(self.PIN_UP)
         self.GPIO.release(self.PIN_DN)
@@ -3360,7 +3376,7 @@ class App:
         self.GPIO.reclaim(self.PIN_UP)
         self.GPIO.reclaim(self.PIN_DN)
         self.relay_off()
-        self.initial_voltage_winddown("Back to the pool screen")
+        self.initial_voltage_winddown("Back to the pool screen", to_swimmer=True)
         # Start the jet target from slow, as at startup: the swimmer has to
         # be found again before the jet speeds up, and nothing from before
         # the menu (position, grace window) carries over.
@@ -5141,7 +5157,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
     def openSwimPlot(self):
         self.app.pause_update_loop = True
-        self.app.leave_main_screen()
+        self.app.leave_main_screen(to_swimmer=True)    # the swimmer's slowest zone, not the bottom
         self._enter_submenu()
 
         # qt_update_loop only stops RESCHEDULING itself once pause_update_loop
@@ -13238,6 +13254,8 @@ if __name__ == "__main__":
     app.window = window       # allow App.shutdown() to close the window
     window.show()
     app.start_relay_watchdog()
+    # The jet down to its lowest before swimming (Bill, 2026-11-02)
+    app.initial_voltage_winddown("Starting PoolWind")
 
     # 5. Ensure shutdown runs when Qt exits normally
     qt_app.aboutToQuit.connect(app.shutdown)

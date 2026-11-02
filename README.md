@@ -91,7 +91,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Jet speed limits: the jet never goes faster than the top the builder chose during calibration
 
-- Jet flow winds down to its lowest level before PoolWind turns the pump on or off
+- Jet flow winds down to its lowest level when PoolWind starts and closes, and before it turns the pump on or off, to save wear on the equipment
 
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
 
