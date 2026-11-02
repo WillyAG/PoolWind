@@ -172,7 +172,8 @@ sensor and the two RJ45 connectors.
 ### Ordering the board
 
 Upload [`hardware/gerbers/PoolWind_PCB_gerbers.zip`](../hardware/gerbers/PoolWind_PCB_gerbers.zip)
-to any PCB maker. It's a standard two-layer board, 117 × 88 mm (4.59 × 3.46 in);
+to any PCB maker, for example [JLCPCB](https://jlcpcb.com), [PCBWay](https://www.pcbway.com),
+[OSH Park](https://oshpark.com) or [Aisler](https://aisler.net). It's a standard two-layer board, 117 × 88 mm (4.59 × 3.46 in);
 the maker's default settings are fine. The ZIP holds everything the maker
 needs, including the **drill file** (`_drill.txt`, every hole's position and
 size), so there's nothing to send separately. Check the maker's preview

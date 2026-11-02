@@ -14,7 +14,9 @@ How to build it: see the [build guide](../docs/BUILD_GUIDE.md).
   `PoolWind_interface_board_pcb_bottom.png` are pictures of the wiring
   (breadboard view) and the board layout from above and below (PCB view).
 - `gerbers/` — the interface board's manufacturing files.
-  **`PoolWind_PCB_gerbers.zip`** is ready to upload to any PCB maker:
+  **`PoolWind_PCB_gerbers.zip`** is ready to upload to any PCB maker (for example
+  [JLCPCB](https://jlcpcb.com), [PCBWay](https://www.pcbway.com),
+  [OSH Park](https://oshpark.com) or [Aisler](https://aisler.net)):
   two-layer board, 117 × 88 mm (4.59 × 3.46 in). The same files are also
   there unzipped, with a pick-and-place list (`_pnp.xy`).
 - `PoolWind_PCB_preview.png` — a picture of the board drawn from the Gerber
