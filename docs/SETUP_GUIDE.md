@@ -486,9 +486,11 @@ The files are written like this:
 - Text goes in quotes. `True` and `False` have capital letters.
 - Lines starting with `#` are comments, ignored by PoolWind.
 
-If the defaults or calibration file can't be read when PoolWind starts, it
-says why in the terminal and doesn't start. If you make a mistake while it's
-running, it says so and keeps the last good settings.
+If the defaults or calibration file can't be read when PoolWind starts, or
+the defaults file has a misspelled setting name or a wrong word (such as
+`'poolx'`), PoolWind doesn't start: a box shows the file, the line and the
+problem. Fix it, save, and start PoolWind again. If you make a mistake while
+it's running, it says so in the terminal and keeps the last good settings.
 
 PoolWind only ever changes single lines in the defaults file (Swimmer
 limits without a stick, Set Swim Area in video mode), so your comments
