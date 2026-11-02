@@ -35,6 +35,9 @@ For the builder (setup guide, section 5):
 - The jet winds down to its lowest when PoolWind starts and closes, and
   when Set Swim Area or the calibration opens; for Swim Plot to the
   swimmer's slowest zone. It saves wear on the equipment.
+- A settings or calibration file PoolWind can't start with, a misspelled
+  setting name or a wrong word: a box shows the file, the line and the
+  problem. No voltage sensor: a box says what to check.
 - A new install on the Pi is no longer a demo: PoolWind controls the pool
   from its first start (the demo is on a Windows PC). An updated
   installation keeps its 'Demo' line as it is.

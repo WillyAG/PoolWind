@@ -30,8 +30,9 @@ meant to be set up.
 PoolWind drives a real swimming current. A mistake can put someone in a jet
 faster than they can handle.
 
-- **Never run anything that drives the relays** (PoolWind with
-  `'Demo': False` and a real valve, or any script using GPIO 17, 18 or 27)
+- **Never run anything that drives the relays** (PoolWind on the Pi
+  without a `'Demo': True` line, with a real valve, or any script using
+  GPIO 17, 18 or 27)
   without the user's go-ahead, and only when they confirm **nobody is in
   the pool**. For code and screen problems, use the demo (`'Demo': True`)
   or desk testing (setup guide, section 8): simulated valve, recorded video.
@@ -201,6 +202,14 @@ faster than they can handle.
 
 ## Finding out what's wrong
 
+- **A box at start ("PoolWind can't start")** names the problem: a
+  settings or calibration file it can't read (file, line, plain-words
+  problem; `settings_file_error`), a misspelled setting name or a wrong word
+  for a choice setting (`CHOICE_SETTINGS`; `RETIRED_SETTINGS` are still
+  ignored), no voltage sensor, or as a last resort "Unknown problem while
+  starting" with the error. Swimmers' settings (zones, height, training
+  video, logRate 5-15) are set in Swimmer limits (`save_swimmer_settings`),
+  so they rarely need a file edited.
 - **Run PoolWind from a terminal** to see its messages; the desktop icon
   hides them: `cd ~/PoolWind && python3 poolwind.py`. On Windows, in
   PowerShell: `cd $HOME\PoolWind` then `py -X utf8 poolwind.py`.
