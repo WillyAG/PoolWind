@@ -67,6 +67,11 @@ cd PoolWind-download
 bash install.sh
 ```
 
+**Easier than typing:** open this guide in the Pi's web browser, click the
+copy button (⧉) at the top right of the box above, then right-click in the
+terminal and choose **Paste** (or press Ctrl+Shift+V; plain Ctrl+V doesn't
+work in a terminal). Press Enter if the last line hasn't run.
+
 The first line downloads PoolWind into a `PoolWind-download` folder in your
 home folder (where a new terminal starts). The second goes into that
 folder, and the third runs the install script. Capitals and the `-` matter.
@@ -641,7 +646,8 @@ git pull
 bash install.sh
 ```
 
-(In a new terminal, which starts in your home folder.) If you no longer
+(In a new terminal, which starts in your home folder; copy and paste the
+lines the same way as in section 3.) If you no longer
 have the `PoolWind-download` folder, follow section 3 again: it's the same
 script.
 
