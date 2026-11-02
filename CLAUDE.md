@@ -60,7 +60,7 @@ faster than they can handle.
   make must keep both, along with the relay watchdog (`RELAY_WATCHDOG_S`):
   if the loop stalls, it lets go of UP and DN. Closing PoolWind does
   **not** wind the jet down; it only lets go of the relays.
-- Changes that affect jet speed (zones, pace limits, the pace table, relay
+- Changes that affect jet speed (zones, zone limits, the pace table, relay
   timing) must be tested with the pool empty, watching the jet, before
   anyone swims. Say so to the user.
 - `SAFETY.md` covers the electrical side (GFCI, certified supplies, the
@@ -76,7 +76,8 @@ faster than they can handle.
 - `install.sh`: sets up a fresh Raspberry Pi OS and copies the program to
   `~/PoolWind/` (`poolwind.py`, `poolwind_defaults.txt`,
   `poolwind_calibration.txt`, `install.log`), and downloads the demo's
-  `PoolWind_demo.mp4` from the latest GitHub Release (a failed download
+  `PoolWind_demo.mp4` from the latest GitHub Release of the repository it
+  was cloned from (with `gh` for a private one; a failed download
   doesn't stop the install). Desktop icons: **PoolWind**, **Monitor
   Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: offers to
   install Claude Code the first time, then opens it in this download folder,
@@ -159,20 +160,20 @@ faster than they can handle.
 - `SwimController`: `_zone_steps` divides the pool into equal zones, **one per
   jet step**: the pace table's rows (rows within 0.01 V count once) that lie
   inside the swimmer's zone limits (`'zoneMin, Max'`, 1-based step numbers)
-  and the table's ends. The calibration's `'# zones or auto'` can ask for
-  fewer zones, spread evenly by voltage. `_index_for_CoM` maps the position
+  and the table's ends (the calibration's old `'# zones or auto'` line is
+  gone since v15.7 and ignored). `_index_for_CoM` maps the position
   to a zone, and so to a target jet step. The pool is controlled by jet
   steps; Pace is for display and the swim log only. In a demo, and while
   Swimmer limits runs, the zones open to the whole table
   (`App.zone_limits`).
 - Swim pace estimate: water speed from the voltage (through the pace table),
-  plus the swimmer's drift, weighted by `DRIFT_SCALE` (1.5).
+  plus the swimmer's drift, weighted by `DRIFT_SCALE` (1.67).
 - Pace tables (v15.7): the pool's **Master** table is `pace_voltage` in the
   calibration file. With a swimmer's stick in, the Paces come from their
   own `poolwind_ind_calibration.txt` on the stick (`App._load_swimmer`,
   made from the pool's the first time; read onto the pool's jet steps if a
   scan moved them), only the Paces, never the voltages. No welcome screen
-  (dropped 2026-10-30): Pace correction's Copy Pool values puts the pool's
+  (dropped 2026-10-30): Pace correction's Copy Master values puts the pool's
   table into the swimmer's pending one. `App.watch_stick` switches swimmer when a
   stick is plugged in or pulled while running (`switch_swimmer`).
   Pace correction's pending changes (`PacesPending`) live in whichever file
@@ -206,7 +207,7 @@ faster than they can handle.
   - `'paceTrace': True` in the defaults file writes `pace_trace_*.csv` in the
     `temp` folder next to the program, one row per loop: voltage, paces, position, swimmer found,
     target step, relay. It's switched live and grows about 15 MB an hour.
-  - `recordRawVideo` (calibration file, works only with `'developerMode':
+  - `recordRawVideo` (defaults file, works only with `'developerMode':
     True`) records the camera's uncorrected video for replaying a problem.
 - **The camera:** `v4l2-ctl -d /dev/video0 --list-formats-ext` lists the
   sizes and frame rates it offers; `v4l2-ctl -d /dev/video0 --list-ctrls`
@@ -230,7 +231,7 @@ faster than they can handle.
 - **Swimmer not found / jet not following.** Usually the swim area (setup
   guide 5.2: corners on the water surface, redo it if the camera moved),
   lighting (outdoor sun, glare and sharp shadows are untested), or the
-  center lane (`middleSwimZone %`). The zone highlight and the
+  swim zone width (`middleSwimZone %`). The zone highlight and the
   developer readouts show what PoolWind sees.
 - **DEMO on the screen, the jet doesn't respond.** `'Demo'` isn't
   `False` in `poolwind_defaults.txt` (setup guide, section 4).
