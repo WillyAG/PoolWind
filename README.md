@@ -87,7 +87,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Automatic detection if the swimmer leaves the center swim zone, pausing data collection and lowering the jet flow to its lowest setting
 
-- Per-swimmer USB sticks: personal settings (height, zone limits, video recording switch), the swimmer's own Pace table, and swim data. A stick can be swapped while PoolWind runs. Months of data can be collected depending on the size of the USB stick (about 70 hours on a 32 GB stick, at the shipped logRate).
+- Per-swimmer USB sticks: personal settings (zone limits, height, training video and its frames per second, all set in Swimmer limits), the swimmer's own Pace table, and swim data. A stick can be swapped while PoolWind runs. Months of data can be collected depending on the size of the USB stick (about 70 hours on a 32 GB stick, at the shipped 5 frames per second).
 
 - Jet speed limits: the jet never goes faster than the top the builder chose during calibration
 
@@ -134,7 +134,7 @@ The install scripts fetch the libraries PoolWind uses, each under its own licens
 
 - No support is provided: you're welcome to share builds, questions and answers with other users in [Discussions](../../discussions) in which the author may participate.
 
-- An AI assistant such as Claude Code, run in the downloaded PoolWind folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background. See [Getting help](docs/SETUP_GUIDE.md#12-getting-help) in the setup guide.
+- An AI assistant such as Claude Code, run in the downloaded `PoolWind-download` folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background. See [Getting help](docs/SETUP_GUIDE.md#12-getting-help) in the setup guide.
 
 
 ## Acknowledgments
