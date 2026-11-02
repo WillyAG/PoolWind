@@ -451,9 +451,10 @@ When PoolWind starts with a blank or unrecognized USB stick inserted, it
 offers to set it up as a new swimmer's stick. You enter:
 
 - the swimmer's **name** (it becomes the stick's name),
-- their **height**, and
+- their **height**,
 - their **slowest and fastest zone** (the Pace is shown beside each). Set
-  them better later by swimming, with [Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone).
+  them better later by swimming, with [Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone), and
+- whether to record **training video**, and its **frames per second**.
 
 **Setting up a stick erases everything on it.** PoolWind asks you to tick a
 box confirming this before it continues.
@@ -466,8 +467,9 @@ example one at about 3:00 per 100 yards.
 Your USB stick holds your **slowest** and **fastest zone**: the jet never
 goes slower or faster than these. Open the menu (**≡**, top left) and
 choose **Swimmer limits...**. A small box opens over the pool screen; drag
-it out of the way if you want to see the swimmer. It shows both zones,
-with the Pace beside each.
+it out of the way if you want to see the swimmer. Its upper section,
+**Limits - Auto or Manual Settings**, shows both zones, with the Pace beside
+each.
 
 **By hand (a coach can do this without the swimmer swimming):** tap
 Slowest or Fastest, then press **+** or **-** (or the + and - keys on the
@@ -486,9 +488,15 @@ keyboard). Press **Save**.
    coach presses **High limit reached**.
 4. Press **Save**.
 
-Save writes them to your USB stick. With no stick in, it saves them in the
-main settings file, for everyone who swims without a stick. **Cancel**
-closes the box without changing anything.
+**Manual Settings**, the lower section: your **height**, whether to
+**record training video**, and its **frames per second** (5 to 15: more
+gives smoother video but fills your stick faster, see
+[logRate](#lograte-how-often-poolwind-records)). Training video and frames
+per second take effect at the next start.
+
+Save writes both sections to your USB stick. With no stick in, it saves
+them in the main settings file, for everyone who swims without a stick.
+**Cancel** closes the box without changing anything.
 
 ## 7. Reviewing your swims: Swim Plot
 
@@ -562,6 +570,8 @@ The same user settings live in two places:
   stick is in. A setting missing from the stick comes from the main
   settings file. Next to it, `poolwind_ind_calibration.txt` is your Pace
   table: leave that file to Pace correction.
+- **Swimmer limits** in the menu sets the zones, height, training video
+  and frames per second for you, so you rarely need to edit a file.
 - To edit either file, find it with the File Manager and double-click it.
   After PoolWind has closed, your stick is ejected and doesn't show in the
   File Manager: pull it out and plug it back in first. Keep the quote marks, commas and brackets exactly as they
@@ -596,8 +606,9 @@ your technique closely: each arm pull and kick shows in three times as many
 frames. Go back to `5` for everyday swims, so your stick doesn't fill three
 times as fast. Lower than 5 saves more space but makes the video jumpy.
 
-**How to change it.** Add or change this line in your stick's
-`poolwind_ind_defaults.txt`:
+**How to change it.** In **Swimmer limits** (menu), under Manual Settings,
+set **Frames per second** and press **Save**. Or add or change this line in
+your stick's `poolwind_ind_defaults.txt`:
 
 ```
 ,'logRate': 15

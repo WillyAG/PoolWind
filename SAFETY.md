@@ -48,11 +48,12 @@ for the full disclaimer.
   this either. The pool also can't receive two remotes at the same time.
   When PoolWind is closed, it releases all its relays and the pool works
   exactly as manufactured with its own remote. 
-- **Closing and opening PoolWind drives the jet to its slowest setting.**  
-- **PoolWind winds the jet down** to its lowest setting when its **OnOff** button is pressed, before it
-  turns the pump on or off, and when **Set Swim Area** or **Calibrate pool**
-  opens. **Swim Plot** winds it down to the swimmer's slowest zone.
-- **In an emergency, press OnOff, then On/Off now** in its message: the
+- **The jet winds down to its slowest setting** when:
+  - PoolWind opens or closes
+  - **OnOff** is pressed
+  - Calibration routines are opened, including Swim Area
+  - **Swim Plot** is opened (except the jet winds down to the slowest swimmer setting)
+- **In an emergency, press OnOff, then On/Off now** and the jet motor 
   pump switches at once, without waiting for the jet to wind down.
 - **Close PoolWind before putting on a pool cover:** it can take the cover
   for a swimmer and move the jet.
@@ -63,10 +64,9 @@ for the full disclaimer.
   program before you get in, and make sure it goes to the lowest flow.
 - **Set sensible limits** for each swimmer's ability: their slowest and
   fastest zone on their USB stick (Swimmer limits), and the zone limits in
-  the defaults file for anyone without a stick. The **jet's limits** are the
-  first and last rows of the pool's Pace table, set by the calibration's
-  scan (setup guide, section 5.8). The program will not command speeds
-  outside them. The calibration file is for the builder's changes only.
+  the defaults file for anyone without a stick. Swimmers set their limits
+  and settings with **Swimmer limits** in the menu. Leave the defaults and
+  calibration files to the builder. 
 - **The calibration moves the jet to fast speeds.** Nobody in the pool
   while it runs. During the scan, when the pool sounds too fast or
   strained, press **Stop**, then **Use as top**: PoolWind then never drives

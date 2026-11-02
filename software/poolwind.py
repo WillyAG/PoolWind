@@ -1666,14 +1666,17 @@ class App:
         lo, hi = self.controller._zone_steps()[0], self.controller._zone_steps()[-1]
         dlg = USBDriveSetupDialog(mount_path, size_bytes, zones=(lo + 1, hi + 1),
                                   n_steps=len(self.plateau_voltages),
-                                  zone_pace=lambda z: Utils.DecimalToTime(self.zone_pace(z - 1)))
+                                  zone_pace=lambda z: Utils.DecimalToTime(self.zone_pace(z - 1)),
+                                  record=bool(self.REPdefaults[self.KEY_RECORD]),
+                                  rate=self.REPdefaults[self.KEY_LOGRATE])
         if dlg.exec() != QDialog.Accepted:
             return
 
-        name, height, zone_min, zone_max = dlg.get_values()
-        self._format_and_setup_usb_drive(mount_path, name, height, zone_min, zone_max)
+        name, height, zone_min, zone_max, record, rate = dlg.get_values()
+        self._format_and_setup_usb_drive(mount_path, name, height, zone_min, zone_max, record, rate)
 
-    def _format_and_setup_usb_drive(self, mount_path, name, height, zone_min, zone_max):
+    def _format_and_setup_usb_drive(self, mount_path, name, height, zone_min, zone_max,
+                                    record=None, rate=None):
         """
         Quick-formats the drive at mount_path as exFAT, labels it from
         `name`, and writes a fresh poolwind_ind_defaults.txt -- then
@@ -1717,9 +1720,9 @@ class App:
             ind_defaults = {
                 self.KEY_HEIGHT: height,
                 self.KEY_ZONES: (zone_min, zone_max),
-                self.KEY_RECORD: self.REPdefaults[self.KEY_RECORD],
+                self.KEY_RECORD: self.REPdefaults[self.KEY_RECORD] if record is None else record,
                 # (no algorithm line: a developer choice since 2026-10-17)
-                self.KEY_LOGRATE: self.REPdefaults[self.KEY_LOGRATE],
+                self.KEY_LOGRATE: self.REPdefaults[self.KEY_LOGRATE] if rate is None else rate,
             }
             ind_path = os.path.join(new_mount_path, "poolwind_ind_defaults.txt")
             self._write_stick_file(ind_path, ind_defaults)
@@ -1760,27 +1763,35 @@ class App:
         os.replace(tmp, path)
 
     def save_zone_limits(self, zone_min, zone_max):
-        """Swimmer limits' Save: 'zoneMin, Max' onto the swimmer's stick
-        (replacing an older 'paceMin, Max'), or with no stick into the main
-        defaults file, changing only that line (its comments are kept).
-        Both are hot-reloaded, so the new zones apply within a second.
-        Returns where it was written."""
-        value = (int(zone_min), int(zone_max))
+        """Swimmer limits' zones (save_swimmer_settings)."""
+        return self.save_swimmer_settings({self.KEY_ZONES: (int(zone_min), int(zone_max))})
+
+    def save_swimmer_settings(self, values):
+        """Swimmer limits' Save (Bill, 2026-11-02: also height, training
+        video and logRate, "Manual Settings"): onto the swimmer's stick
+        ('zoneMin, Max' replacing an older 'paceMin, Max'), or with no
+        stick into the main defaults file, changing only those lines (its
+        comments are kept). Both are hot-reloaded: the zones and height
+        apply within a second; training video and logRate are read at the
+        next start. Returns where it was written."""
         if self._ind_path is not None and os.path.isfile(self._ind_path):
             with open(self._ind_path, "r") as f:
                 ind = ast.literal_eval(f.read())
             ind = self._rename_old_settings(ind)
-            ind.pop(self.KEY_PACE, None)
-            ind[self.KEY_ZONES] = value
+            if self.KEY_ZONES in values:
+                ind.pop(self.KEY_PACE, None)
+            ind.update(values)
             self._write_stick_file(self._ind_path, ind)
             return "the swimmer's USB stick"
         with open(self.defaults_path, "r") as f:
-            text = f.read()
-        line = re.compile(r"^(\s*,?\s*)'(?:zoneMin, Max|paceMin, Max)'\s*:.*$", re.M)
-        new_text, n = line.subn(lambda m: f"{m.group(1)}'{self.KEY_ZONES}': {value!r}", text, count=1)
-        if n == 0:
-            end = new_text.rstrip().rfind("}")
-            new_text = new_text[:end] + f",'{self.KEY_ZONES}': {value!r}\n" + new_text[end:]
+            new_text = f.read()
+        for key, value in values.items():
+            names = "zoneMin, Max|paceMin, Max" if key == self.KEY_ZONES else re.escape(key)
+            line = re.compile(r"^(\s*,?\s*)'(?:" + names + r")'\s*:.*$", re.M)
+            new_text, n = line.subn(lambda m: f"{m.group(1)}'{key}': {value!r}", new_text, count=1)
+            if n == 0:
+                end = new_text.rstrip().rfind("}")
+                new_text = new_text[:end] + f",'{key}': {value!r}\n" + new_text[end:]
         tmp = self.defaults_path + ".tmp"
         with open(tmp, "w") as f:
             f.write(new_text)
@@ -6971,6 +6982,36 @@ class EmbeddedCamera:
         pass
 
 
+LOG_RATE_CHOICES = (5, 15)       # the frames/sec offered in the boxes (Bill, 2026-11-02: "5 to 15")
+
+
+def video_rate_widgets(record, rate):
+    """Record training video (a check box) and its frames per second (5 to
+    15): Swimmer limits' Manual Settings and a new stick's box."""
+    check = QCheckBox("On")
+    check.setChecked(bool(record))
+    spin = QtWidgets.QSpinBox()
+    try:
+        rate = int(round(float(rate)))
+    except (TypeError, ValueError):
+        rate = BUILT_IN_DEFAULTS["logRate"]
+    lo, hi = LOG_RATE_CHOICES
+    spin.setRange(min(lo, rate), max(hi, rate))     # an older file's 1-4 still shows
+    spin.setValue(rate)
+    spin.setSuffix(" frames/sec")
+    spin.setEnabled(check.isChecked())
+    check.toggled.connect(spin.setEnabled)
+    return check, spin
+
+
+def video_rate_note():
+    note = QLabel("Higher frames/sec gives better quality but takes more storage space. "
+                  "Training video and frames/sec take effect at the next start.")
+    note.setWordWrap(True)
+    note.setStyleSheet("color: #555; font-size: 12px;")
+    return note
+
+
 class OverlayPanel(QFrame):
     """
     A small box over the pool screen while the pool keeps running under it
@@ -7047,7 +7088,8 @@ class SwimmerLimitsPanel(OverlayPanel):
     TEXT = {
         None: ("Slowest and fastest zones for this swimmer. Change them with + and - "
                "(or the keyboard), or press Start to find them by swimming. Save writes "
-               "them to the swimmer's USB stick. Drag this box to move it."),
+               "both sections to the swimmer's USB stick (no stick: the main settings "
+               "file). Drag this box to move it."),
         "low": ("Swim near the back of the pool: the jet slows as you drift back. When it "
                 "is as slow as you want (almost treading water), leave the swim area, or "
                 "the coach presses Low limit reached."),
@@ -7066,6 +7108,21 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.active = 0                    # the limit the keyboard changes: 0 slowest, 1 fastest
 
         lay = self._setup_frame(parent, "Swimmer limits")
+        self.setStyleSheet(self.styleSheet() + " QSpinBox, QCheckBox { font-size: 15px; }"
+                           " QGroupBox { font-size: 15px; font-weight: bold;"
+                           " border: 1px solid #888; border-radius: 4px; margin-top: 18px;"
+                           " padding-top: 6px; }"
+                           " QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left;"
+                           " left: 8px; top: 0px; padding: 0 4px; }")
+
+        # Upper box: the zones, by hand or by swimming (Start); lower box:
+        # height, training video and its rate (Bill, 2026-11-02: "The upper
+        # section could be boxed with the title "Limits - Auto or Manual
+        # Settings" ... The lower section could be boxed with the title
+        # "Manual Settings"")
+        limits_box = QtWidgets.QGroupBox("Limits - Auto or Manual Settings")
+        outer, lay = lay, QVBoxLayout(limits_box)
+        outer.addWidget(limits_box)
 
         self.rows = []
         for which, name in ((0, "Slowest"), (1, "Fastest")):
@@ -7084,20 +7141,51 @@ class SwimmerLimitsPanel(OverlayPanel):
             lay.addLayout(row)
             self.rows.append((name, pick, minus, plus))
 
+        self.go_btn = QPushButton("Start")
+        self.go_btn.clicked.connect(self._go)
+        self.go_btn.setMinimumHeight(48)
+        lay.addWidget(self.go_btn)
+
+        app_d = app.REPdefaults
+        manual_box = QtWidgets.QGroupBox("Manual Settings")
+        form = QtWidgets.QFormLayout(manual_box)
+        self.height_spin = QtWidgets.QSpinBox()
+        self.height_spin.setRange(30, 100)
+        self.height_spin.setSuffix(" in")
+        try:
+            self.height_spin.setValue(int(round(float(app_d[app.KEY_HEIGHT]))))
+        except (KeyError, TypeError, ValueError):
+            self.height_spin.setValue(66)
+        form.addRow("Swimmer's height:", self.height_spin)
+        self.record_check, self.rate_spin = video_rate_widgets(app_d[app.KEY_RECORD],
+                                                              app_d[app.KEY_LOGRATE])
+        form.addRow("Record training video:", self.record_check)
+        form.addRow("Frames per second:", self.rate_spin)
+        form.addRow(video_rate_note())
+        outer.addWidget(manual_box)
+        self.manual_saved = self._manual()
+        for w in (self.height_spin, self.rate_spin):
+            w.valueChanged.connect(lambda _=0: self._show())
+        self.record_check.toggled.connect(lambda _=False: self._show())
+
         row = QHBoxLayout()
         self.cancel_btn = QPushButton("Cancel")
         self.cancel_btn.clicked.connect(self.close_panel)
-        self.go_btn = QPushButton("Start")
-        self.go_btn.clicked.connect(self._go)
         self.save_btn = QPushButton("Save")
         self.save_btn.clicked.connect(self._save)
-        for b in (self.cancel_btn, self.go_btn, self.save_btn):
+        for b in (self.cancel_btn, self.save_btn):
             b.setMinimumHeight(48)
             row.addWidget(b)
-        lay.addLayout(row)
+        outer.addLayout(row)
 
         self._show()
         self._place()
+
+    def _manual(self):
+        """The Manual Settings as they'd be saved."""
+        return {self.app.KEY_HEIGHT: self.height_spin.value(),
+                self.app.KEY_RECORD: self.record_check.isChecked(),
+                self.app.KEY_LOGRATE: self.rate_spin.value()}
 
     PANEL_ATTR = "limits_panel"
 
@@ -7149,7 +7237,9 @@ class SwimmerLimitsPanel(OverlayPanel):
             plus.setEnabled(idle)
         self.go_btn.setText({None: "Start", "low": "Low limit reached",
                              "high": "High limit reached"}[self.stage])
-        self.save_btn.setEnabled(idle and self.values != self.saved)
+        manual = getattr(self, "manual_saved", None)
+        changed = self.values != self.saved or (manual is not None and self._manual() != manual)
+        self.save_btn.setEnabled(idle and changed)
 
     def _go(self):
         app = self.app
@@ -7176,13 +7266,17 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.adjustSize()
 
     def _save(self):
+        values = {self.app.KEY_ZONES: (int(self.values[0]), int(self.values[1]))}
+        manual = self._manual()
+        values.update({k: v for k, v in manual.items() if v != self.manual_saved.get(k)})
         try:
-            where = self.app.save_zone_limits(*self.values)
+            where = self.app.save_swimmer_settings(values)
         except Exception as e:
-            QMessageBox.warning(self, "Swimmer limits", f"Couldn't save the limits:\n{e}")
+            QMessageBox.warning(self, "Swimmer limits", f"Couldn't save the settings:\n{e}")
             return
-        print(f"Swimmer limits: zones {self.values[0]}-{self.values[1]} saved to {where}")
+        print(f"Swimmer limits: {values} saved to {where}")
         self.saved = list(self.values)
+        self.manual_saved = manual
         self.close_panel()
 
     def close_panel(self):
@@ -8550,7 +8644,8 @@ class USBDriveSetupDialog(QDialog):
     checkbox before OK can be pressed -- App only formats the drive after
     this dialog is accepted.
     """
-    def __init__(self, mount_path, size_bytes, parent=None, zones=(1, 2), n_steps=2, zone_pace=None):
+    def __init__(self, mount_path, size_bytes, parent=None, zones=(1, 2), n_steps=2, zone_pace=None,
+                 record=True, rate=5):
         super().__init__(parent)
         self.setWindowTitle("New USB Drive Detected")
         self._result = None
@@ -8594,6 +8689,13 @@ class USBDriveSetupDialog(QDialog):
             form.addRow(label, spin)
             self.zone_edits.append(spin)
 
+        # Training video and its rate, as in Swimmer limits' Manual
+        # Settings (Bill, 2026-11-02)
+        self.record_check, self.rate_spin = video_rate_widgets(record, rate)
+        form.addRow("Record training video:", self.record_check)
+        form.addRow("Frames per second:", self.rate_spin)
+        form.addRow("", video_rate_note())
+
         layout.addLayout(form)
 
         self.confirm_check = QCheckBox("I understand this will erase all data on the drive")
@@ -8624,7 +8726,8 @@ class USBDriveSetupDialog(QDialog):
             QMessageBox.warning(self, "Zones", "The fastest zone must be above the slowest zone.")
             return
 
-        self._result = (name, height, zone_min, zone_max)
+        self._result = (name, height, zone_min, zone_max,
+                        self.record_check.isChecked(), self.rate_spin.value())
         self.accept()
 
     def get_values(self):
