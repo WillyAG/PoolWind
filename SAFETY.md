@@ -59,13 +59,13 @@ for the full disclaimer.
   down and stop the jet after PoolWind is closed.
 - **Never swim alone** while testing a new build or new settings.
 - **Test with the pool empty of swimmers first.** Watch the jet respond to the
-  program before you get in, make sure it goes to the lowest flow.
+  program before you get in, and make sure it goes to the lowest flow.
 - **Set sensible limits** for each swimmer's ability: their slowest and
-  fastest zone on their USB stick (Swimmer limits), and the pace limits in
-  the defaults file for anyone without a stick. The **safety voltage
-  limits** in the calibration file are fitted to your pool by the
-  calibration's scan. The program will not command speeds outside them.
-  The calibration file is for technician changes only.
+  fastest zone on their USB stick (Swimmer limits), and the zone limits in
+  the defaults file for anyone without a stick. The **jet's limits** are the
+  first and last rows of the pool's Pace table, set by the calibration's
+  scan (setup guide, section 5.8). The program will not command speeds
+  outside them. The calibration file is for the builder's changes only.
 - **The calibration moves the jet to fast speeds.** Nobody in the pool
   while it runs. During the scan, when the pool sounds too fast or
   strained, press **Stop**, then **Use as top**: PoolWind then never drives
@@ -78,15 +78,16 @@ for the full disclaimer.
 - **Children and weak swimmers:** use a low fastest zone on their stick, and do
   not let PoolWind control the current for anyone who couldn't handle the
   jet at the fastest pace their stick allows. Supervise them.
-- **Without a USB stick, the defaults file's pace limits apply.** The shipped
-  defaults file uses a moderate top pace (3:00 per 100 yards) as a safe
-  starting point. If you raise it for yourself, remember it then applies to
+- **Without a USB stick, the defaults file's zone limits apply.** The shipped
+  defaults file uses a moderate fastest zone (zone 12, about 3:07 per 100
+  yards on the shipped Pace table) as a safe starting point. If you raise it for yourself, remember it then applies to
   anyone who swims without their own stick.
 
 ## The remote
 
-- Soldering to a remote will probably **void that remote's warranty**. Buy a
-  spare remote to modify and keep your original untouched.
+- Soldering to a remote will probably **void that remote's warranty**. Two
+  come with the pool: modify one and keep the other untouched (or buy a
+  spare to modify).
 - The modified remote (used by PoolWind) and the pool's normal remote both
   work, but **not at the same time**: the pool can only receive one remote
   at a time. Close PoolWind before using the normal remote.
