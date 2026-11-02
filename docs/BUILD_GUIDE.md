@@ -180,7 +180,9 @@ size), so there's nothing to send separately. Check the maker's preview
 before ordering: if the board shows no holes, the maker didn't recognize
 the drill file. Rename it to end in `.drl` (for example
 `PoolWind_interface_board_drill.drl`), zip the files again and
-upload. The design itself is in
+upload. Some makers, JLCPCB for one, may show no preview: then check that
+the size it read is about 117 × 88 mm; their engineers review the files
+before making the board. The design itself is in
 [`hardware/schematics/PoolWind_interface_board.fzz`](../hardware/schematics/PoolWind_interface_board.fzz);
 open it in the free [Fritzing](https://fritzing.org) program to see the
 layout.
@@ -223,8 +225,8 @@ There's no special soldering order: the only delicate part, the INA260
 sensor, plugs in afterward.
 
 1. **Resistors R3 and R6: leave them out.** They form a voltage divider
-   for detecting whether the pool is on, from the Pace Display port's
-   38 V power line, which PoolWind doesn't use. If you ever fit them,
+   for detecting whether the pool's pump is running, from the Pace Display
+   port's 38 V power line, which PoolWind doesn't use. If you ever fit them,
    use **R6 = 100 kΩ and R3 = 7.5 kΩ** (about 2.7 V at GPIO 23). Lower
    values would destroy the Raspberry Pi's GPIO pin.
 2. **Headers:**
@@ -520,7 +522,7 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
 - **Not enough height?** For the author's 8 x 15 ft pool, the 120 degree camera
   centered over the pool needs to be 5½ to 6 ft away from the surface of the water. That distance may not be available. The author placed the camera about 3 ft from the center point along the lengthwise axis toward the front of the pool. The swimmer does not appear distorted when corrected.
    
-  You could bring the camera to the side, still centered on the length (15 ft). For four feet of available space, the camera would need to be brought out from the side by about 3ft. Although the program will run fine, the side image of the swimmer may hide some movements when reviewing the video. See [user manual, section 7: Reviewing your swims](USER_MANUAL.md#7-reviewing-your-swims-swim-plot).
+  You could bring the camera to the side, still centered on the length (15 ft). For four feet of available space, the camera would need to be brought out from the side by about 3 ft. Although the program will run fine, the side image of the swimmer may hide some movements when reviewing the video. See [user manual, section 7: Reviewing your swims](USER_MANUAL.md#7-reviewing-your-swims-swim-plot).
   
   **Mounting on a post to the side?** Same reasoning as above, you can go off to the pool side by 3 ft and get the 8 x 15 ft from a height of 4 ft from the surface of the water. Closer to the center of the pool is always better.
 
