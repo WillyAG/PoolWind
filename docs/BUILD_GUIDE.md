@@ -116,7 +116,7 @@ board alone. A kit includes the pieces that are easy to get wrong:
   busy, and at the poolside it's usually shut inside the station's closed
   box, so it needs one (see also the heat notes in
   [section 8](#8-the-poolside-station)).
-- **A case** for the Pi itself: designed for air flow and ribbon cable pass through.
+- **A case** for the Pi itself: designed for air flow and ribbon cable pass-through.
 - **A micro-HDMI to HDMI cable.** The Pi 5's video ports are the small
   micro-HDMI size; the monitor takes ordinary HDMI.
 - **A microSD card**, often with Raspberry Pi OS already on it.
@@ -283,9 +283,7 @@ current Gerber files print "Pace Volt In" and "UP-DN"). Below: the two relay mod
 On/Off on the second) wired to the board's headers, and the Raspberry Pi
 header on the left.*
 
-*This is the author's own board, from an early batch that was corrected
-and updated by hand. The photo shows an earlier version of the board.
-Boards made from the current Gerber files need no changes.*
+*Boards made from the current Gerber files need no changes.*
 
 ![The board's bottom copper, seen from below](../hardware/schematics/PoolWind_interface_board_pcb_bottom.png)
 
@@ -300,7 +298,7 @@ onto all 40 of the Raspberry Pi's GPIO pins.
 **Mind the orientation:** pin 1 on the board must meet pin 1 on the Pi.
 A cable plugged on the wrong way round can damage the Pi.
 
-**Hint:** Looking at the Raspberry board with the GPIO header strip (close
+**Hint:** Looking at the Raspberry Pi board with the GPIO header strip (close
 to the edge of the board) toward you, Pin 1 is on the right side top. You
 may see small text directly next to it: J8. If you place the Interface
 board edge to edge where the two GPIO sets are closest to each other,
@@ -520,9 +518,9 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
   Also it is not essential that the camera is mounted exactly in the center point of the pool, still the closer the better. PoolWind has perspective correction which visually moves the camera to the center but distorts the objects it sees.
 
 - **Not enough height?** For the author's 8 x 15 ft pool, the 120 degree camera
-  centered over the pool needs to be 5½ to 6ft away from the surface of the water. That distance may not be available. The author placed the camera about 3 ft from the center point along the lengthwise axis toward the front of the pool. The swimmer does not appear distorted when corrected.
+  centered over the pool needs to be 5½ to 6 ft away from the surface of the water. That distance may not be available. The author placed the camera about 3 ft from the center point along the lengthwise axis toward the front of the pool. The swimmer does not appear distorted when corrected.
    
-  You could bring the camera to the side, still centered on the length (15ft). For four feet of available space, the camera would need to be brought out from the side by about 3ft. Although the program will run fine, the side image of the swimmer may hide some movements when reviewing the video. See [user manual, section 7: The plot and video](USER_MANUAL.md#the-plot-and-video).
+  You could bring the camera to the side, still centered on the length (15 ft). For four feet of available space, the camera would need to be brought out from the side by about 3ft. Although the program will run fine, the side image of the swimmer may hide some movements when reviewing the video. See [user manual, section 7: Reviewing your swims](USER_MANUAL.md#7-reviewing-your-swims-swim-plot).
   
   **Mounting on a post to the side?** Same reasoning as above, you can go off to the pool side by 3 ft and get the 8 x 15 ft from a height of 4 ft from the surface of the water. Closer to the center of the pool is always better.
 
@@ -545,6 +543,7 @@ The camera selected for this is wide angle with a 120 degree view, chosen so it 
 The Raspberry Pi, the control interface board, and the monitor sit together in a waterproof case with a clear door, beside the pool. The case used worked perfectly although the clear door came with an injection-molding spot right in the middle that was not polished down. Polishing with a Dremel tool worked but was tedious and the plastic tried to melt. 
 
 Build as you see fit. For instance, the Raspberry Pi could sit further away from the pool and the monitor and mouse could be at the pool's edge. Whatever you choose, keep everything **waterproof**. Or find a waterproof touchscreen: that would be ideal if there is such a thing. You could use two monitors and set up a work station further away from the pool (the Raspberry Pi has two HDMI ports).
+
 The keyboard is rarely used and is not needed at the pool edge. It is used for changing default settings, setting up the USB stick, for moving or deleting files, and general computer stuff. 
 
 - **Monitor:** the 10-inch Eyoyo only just fits the case, partially within the clear door. Its control buttons had to be removed. Mount it in **portrait** mode (taller than wide).
