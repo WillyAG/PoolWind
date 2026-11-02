@@ -105,7 +105,8 @@ The install script:
   password;
 - copies PoolWind into a **`PoolWind` folder** in your home folder. This is
   where the program, its settings files and the `CSV Vault` live;
-- downloads the **sample video**, a recorded swim for the demo;
+- downloads the **sample video**, a recorded swim for testing at a desk
+  (section 8);
 - adds three icons to the desktop: **PoolWind**, **Monitor Toggle** for
   [working from home](#9-working-from-home), and **Claude**
   ([getting help](#12-getting-help));
@@ -121,17 +122,16 @@ as `poolwind.py.previous`.
 
 When it finishes, **restart the Pi.**
 
-When the screen comes back, there will be a "PoolWind" icon. When you double-click it, PoolWind comes up in demo mode
-([the demo tour](USER_MANUAL.md#9-the-demo-tour) explains what it shows).
+When the screen comes back, there will be a "PoolWind" icon. **PoolWind
+controls the pool from its first start:** don't start it until the
+hardware is connected and checked (build guide, section 9), and then as
+section 4 describes. To see PoolWind without a pool, try the demo on a
+Windows PC (section 13).
 
 ## 4. First start
 
-**Turn the demo off first.** PoolWind is installed as a demo: a recorded
-swim and a simulated jet, so nothing at the pool moves. To control the
-pool, open `poolwind_defaults.txt` in the `PoolWind` folder (double-click
-it), change `'Demo': True` to `'Demo': False`, and save it.
-
-Suggested before starting:
+PoolWind controls the pool from its first start. Suggested before
+starting:
 
 - Nobody in the pool
 - The pool switched off at first; you'll turn it on for the jet check
@@ -520,7 +520,7 @@ PoolWind to be closed and started again.
 
 | Setting | Built-in value | What it does |
 |---|---|---|
-| `'Demo'` | `True` | Runs the program in demo mode. Does not need further hardware including pool. Most routines are functional.|
+| `'Demo'` | `False` on the Pi, `True` on a PC | Developer: `True` runs the demo, the sample video with a simulated jet: nothing at the pool moves (**restart**) |
 | `'Sensitivity'` | `5000` | Minimum size, in pixels, of something the camera counts as a swimmer |
 | `'CoM filter Alpha'` | `0.05` | Smoothing of the swimmer's position. Smaller is smoother but slower to react |
 | `'inactivity wind down time (sec)'` | `3` | How long the swimmer may be out of the lane before the jet winds down (**restart**) |
@@ -556,10 +556,9 @@ v15.7 are given these two columns once after the update
 ## 8. Testing at a desk
 
 These developer settings let you run PoolWind without the pool. They only
-work with `'developerMode': True` and `'Demo': False` in
-`poolwind_defaults.txt`: a demo always plays the sample video with a
-simulated jet, and with `developerMode` off PoolWind always runs the real
-pool setup, whatever the file says. Add them to `poolwind_defaults.txt`;
+work with `'developerMode': True` in `poolwind_defaults.txt` (and no
+`'Demo': True` line): with `developerMode` off PoolWind always runs the
+real pool setup, whatever the file says. Add them to `poolwind_defaults.txt`;
 they all need a **restart**.
 
 | Setting | Normal | Meaning |

@@ -54,10 +54,6 @@ pool are covered in the build guide and the setup and calibration guide.
 **Resume** (in red) instead of Begin. Your swim continues where it left off:
 today's distance and average Pace carry on from your earlier session.
 
-**DEMO on the screen?** PoolWind is set up as a demo and doesn't control
-the jet. Ask whoever set it up. To follow the recorded swim, see
-[The demo tour](#9-the-demo-tour).
-
 **A blank or new USB stick?** PoolWind offers to set it up as a new
 swimmer's stick (see [Setting up a new stick](#setting-up-a-new-stick)).
 
@@ -642,5 +638,5 @@ Between these points the swimmer is simply swimming: watch how the jet speed cha
 (see [Reviewing your swims](#7-reviewing-your-swims-swim-plot)).
 
 A demo keeps its swims in a `Demo Vault` folder in the `PoolWind` folder,
-not on a USB stick. On a PC, closing PoolWind deletes the whole
-`PoolWind` folder, Demo Vault and all; a new demo starts again at 0.000.
+not on a USB stick. Closing PoolWind deletes the whole `PoolWind` folder,
+Demo Vault and all; a new demo starts again at 0.000.

@@ -95,7 +95,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
 
-- Demo mode: try PoolWind with a recorded swim and a simulated jet, on the Pi or a Windows PC
+- Demo: try PoolWind on a Windows PC, with a recorded swim and a simulated jet
 
 
 *PoolWind is an independent project. It is not affiliated with or endorsed by Endless Pools. "Endless Pools" is used only to describe compatibility.*

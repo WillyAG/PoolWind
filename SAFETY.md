@@ -38,10 +38,10 @@ for the full disclaimer.
 
 ## Using the pool
 
-- **PoolWind starts as a demo,** with a recorded swim and a simulated jet:
-  nothing at the pool moves. Set `'Demo': False` only once the build is
-  checked (setup guide, section 4). On a PC, PoolWind can never control a
-  pool.
+- **PoolWind controls the pool from its first start on the Raspberry Pi.**
+  Start it only after the build guide's first power-up checks (section 9),
+  with nobody in the pool. On a PC, PoolWind runs only as a demo and can
+  never control a pool.
 - **To control the pool by hand, close PoolWind.** While PoolWind is running
   it keeps setting the jet speed itself: if you change the speed with the
   pool's own remote, PoolWind changes it back. Hold and Suspend don't stop

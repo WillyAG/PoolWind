@@ -1,7 +1,7 @@
 # CLAUDE.md: notes for an AI assistant helping a PoolWind builder
 
 You are probably helping someone who built PoolWind and has a problem, or
-someone trying the demo (on the Pi, or on a Windows PC) before building. These
+someone trying the demo (on a Windows PC) before building. These
 notes give you the background the author's own development sessions built
 up, so you don't have to rediscover it. Read the relevant guide in `docs/`
 too; it is written for the builder and is the authority on how things are
@@ -35,13 +35,16 @@ faster than they can handle.
   without the user's go-ahead, and only when they confirm **nobody is in
   the pool**. For code and screen problems, use the demo (`'Demo': True`)
   or desk testing (setup guide, section 8): simulated valve, recorded video.
-- **Demo is the fail-safe default.** `'Demo'` is built in as `True`, and
-  anything but `False` (a missing or misspelled line) means a demo: the
-  sample video, the pool screen and a simulated jet, no relay connected,
-  whatever else the files say (`App._read_defaults_file`). Only the main
-  defaults file can set it, not a USB stick. Keep all of that. Don't change
-  the user's `'Demo'` to `False` for them unless they ask and confirm the
-  build has been checked (setup guide, section 4).
+- **Demo.** `'Demo'` is built in as `True` only on a computer without the
+  Pi's relay and sensor libraries (`lgpio is None`: the Windows demo), and
+  `False` on the Pi: since 2026-11-02 a Pi install controls the pool from
+  its first start, and the shipped defaults file has no `'Demo'` line. A
+  demo is the sample video, the pool screen and a simulated jet, no relay
+  connected, whatever else the files say (`App._read_defaults_file`);
+  `'Demo': True` in the main defaults file (not a USB stick) is a
+  developer option on the Pi, and anything but `False` there means a demo.
+  Keep the PC side a demo always. Without the voltage sensor, the Pi
+  stops at start with a box (check the board, `i2cdetect -y 1`).
 - **Never energize UP and DN at the same time.** The program always turns
   one off before turning the other on; keep it that way.
 - **The calibration file is safety-critical.** The Pace table's first and
@@ -233,8 +236,8 @@ faster than they can handle.
   lighting (outdoor sun, glare and sharp shadows are untested), or the
   swim zone width (`middleSwimZone %`). The zone highlight and the
   developer readouts show what PoolWind sees.
-- **DEMO on the screen, the jet doesn't respond.** `'Demo'` isn't
-  `False` in `poolwind_defaults.txt` (setup guide, section 4).
+- **DEMO on the screen, the jet doesn't respond.** A `'Demo'` line other
+  than `False` in `poolwind_defaults.txt` (a developer option): remove it.
 - **"Video file not found".** The sample video didn't download (it's a
   GitHub Release file, `PoolWind_demo.mp4`), or a
   `'video file, start (sec), corners'` line names a missing file.
@@ -243,7 +246,7 @@ faster than they can handle.
 - **Windows: "Windows protected your PC" or a browser warning** for
   `install_windows.bat`: expected for an unsigned script (setup guide,
   section 13): **More info → Run anyway**.
-- **Jet doesn't move.** Check that the demo is off, that the voltage is read at all (a reading near 0 V
+- **Jet doesn't move.** Check that there's no `'Demo': True` line, that the voltage is read at all (a reading near 0 V
   means the Pace cable is unplugged, or, on some pools, the pump is off), that the remote
   works by hand, and the relay wiring (build guide, section 9, first
   power-up checks).

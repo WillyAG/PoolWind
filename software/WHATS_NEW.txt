@@ -30,3 +30,6 @@ For the builder (setup guide, section 5):
   'SafetyVoltageLimits' line in the calibration file is ignored.
 - The shipped settings use zones, 'zoneMin, Max': (6, 12), in place of a
   Pace range.
+- A new install on the Pi is no longer a demo: PoolWind controls the pool
+  from its first start (the demo is on a Windows PC). An updated
+  installation keeps its 'Demo' line as it is.

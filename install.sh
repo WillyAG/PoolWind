@@ -172,7 +172,7 @@ run cp "$SOFTWARE/poolwind.py" "$PW_DIR/poolwind.py"
 say "   installed poolwind.py"
 copy_if_missing "$SOFTWARE/poolwind_defaults.txt"    "$PW_DIR/poolwind_defaults.txt"
 copy_if_missing "$SOFTWARE/poolwind_calibration.txt" "$PW_DIR/poolwind_calibration.txt"
-# The demo's recorded swim ('Demo': True), from the latest GitHub Release.
+# The sample swim (desk tests, and a 'Demo': True developer run), from the latest GitHub Release.
 # Not needed at the pool, so a failed download doesn't stop the install.
 if [ -f "$PW_DIR/PoolWind_demo.mp4" ]; then
     say "   kept PoolWind_demo.mp4"
@@ -186,7 +186,7 @@ elif command -v gh >/dev/null 2>&1 && \
     say "   installed PoolWind_demo.mp4 (the demo's recorded swim)"
 else
     rm -f "$PW_DIR/PoolWind_demo.mp4"
-    say "   the sample video couldn't be downloaded: the demo will say so"
+    say "   the sample video couldn't be downloaded: PoolWind says so if it's needed"
 fi
 run mkdir -p "$HOME/.local/bin"
 # The Monitor Toggle script: always the new version, but keeping the monitor

@@ -568,9 +568,13 @@ BUILT_IN_DEFAULTS = {
     # True: PoolWind runs as a demo -- the sample video, the pool screen,
     # and a simulated jet; no relay is ever connected (not even the pump),
     # whatever else the files say. False: the real pool setup. Main
-    # defaults file only (a USB stick can't set it). Built in as True, so a
-    # missing or misspelled line can never drive a pool.
-    'Demo': True,
+    # defaults file only (a USB stick can't set it). Built in: True on a
+    # computer without the Raspberry Pi's relay and sensor libraries (the
+    # PC demo), False on the Pi, which controls the pool from its first
+    # start (Bill, 2026-11-02: "We can make the program default ... set to
+    # False. In the default file, we can remove it but keep it as a
+    # developer option"). The shipped defaults file has no 'Demo' line.
+    'Demo': lgpio is None,
 
     # --- developer tools ---
     # False for users: always camera / pool display / real valve, no
@@ -656,6 +660,70 @@ BUILT_IN_DEFAULTS = {
 }
 
 
+class SettingValueError(ValueError):
+    """A setting whose value PoolWind can't use; names the setting so the
+    box can show its line."""
+    def __init__(self, key, problem):
+        super().__init__(f"{key}: {problem}")
+        self.key, self.problem = key, problem
+
+
+def settings_file_error(path, error=None, problem=None):
+    """A settings or calibration file PoolWind can't start with: a box
+    saying which file, which line and what's wrong, until Close is pressed;
+    then PoolWind exits. Before, the message only went to the terminal and
+    the desktop icon seemed to do nothing (Bill, 2026-11-02: "rather that
+    just hanging up if the defaults file read is bad, we just put up an
+    errpr message saying where the problem is")."""
+    import re
+    line_no = None
+    if problem is None:
+        if isinstance(error, SettingValueError):
+            problem = error.problem
+            try:
+                with open(path, "r") as f:
+                    for n, text in enumerate(f, 1):
+                        if f"'{error.key}'" in text and not text.lstrip().startswith("#"):
+                            line_no = n
+            except Exception:
+                pass
+        elif isinstance(error, SyntaxError):
+            line_no, problem = error.lineno, error.msg
+            for words, plain in (("expression expected", "no value after the colon"),
+                                 ("never closed", "a bracket or quote is opened but not closed"),
+                                 ("does not match", "a closing bracket doesn't match its opening one"),
+                                 ("unterminated string", "a quote mark is missing"),
+                                 ("forgot a comma", "a comma is missing (every setting after the first starts with one)")):
+                if words in problem:
+                    if words == "forgot a comma" and error.end_lineno:
+                        line_no = error.end_lineno     # the setting that lacks its comma
+                    problem = plain
+                    break
+        else:
+            problem = str(error)
+            m = re.search(r"line (\d+)", problem)
+            if m:
+                line_no = int(m.group(1))
+                problem = ("a value PoolWind can't read: numbers, text in quotes, "
+                           "True or False, and brackets only")
+    where = ""
+    if line_no:
+        try:
+            with open(path, "r") as f:
+                line = f.read().splitlines()[line_no - 1].strip()
+            where = f"Line {line_no}:   {line}\n\n"
+        except Exception:
+            where = f"Line {line_no}\n\n"
+    print("Can't start:", path, "--", f"line {line_no}:" if line_no else "", problem)
+    QMessageBox.critical(
+        None, "PoolWind can't start",
+        f"{os.path.basename(path)} can't be read.\n\n{where}Problem: {problem}\n\n"
+        f"Fix it in a text editor, save, and start PoolWind again.\n\n"
+        f"File: {path}",
+        QMessageBox.Close)
+    sys.exit(1)
+
+
 class App:
     def __init__(self):
 
@@ -711,8 +779,7 @@ class App:
             self.REPdefaults = self._derive_internal_defaults(self.REPdefaults)
 
         except Exception as e:
-            print("Error loading defaults file:", e)
-            sys.exit()
+            settings_file_error(self.defaults_path, e)
 
         # ---------------------------------------------------------
         # Per-swimmer USB overlay: if a drive with poolwind_ind_defaults.txt
@@ -963,8 +1030,22 @@ class App:
         # ctrl-o, Enter, ctrl-x, reboot
         # ---------------------------------------------------------
         if self.valveOption == "real":
-            i2c = board.I2C()
-            self.ina260 = adafruit_ina260.INA260(i2c)
+            # Since 2026-11-02 the Pi isn't a demo at first start, so this
+            # can be the first thing a builder meets before the board is in.
+            try:
+                i2c = board.I2C()
+                self.ina260 = adafruit_ina260.INA260(i2c)
+            except Exception as e:
+                print("No voltage sensor:", e)
+                QMessageBox.critical(
+                    None, "PoolWind can't start",
+                    "The voltage sensor (INA260, I2C address 0x40) isn't found.\n\n"
+                    "Check the interface board, the ribbon cable and the INA260 "
+                    "(build guide, section 9: i2cdetect -y 1 should show 40). "
+                    "If I2C was just turned on, restart the Pi.\n\n"
+                    f"({e})",
+                    QMessageBox.Close)
+                sys.exit(1)
         else:
             self.ina260 = None
 
@@ -1930,8 +2011,7 @@ class App:
                 with open(self.calibration_path, "r") as f:
                     cal = ast.literal_eval(f.read())
             except Exception as e:
-                print("Error loading calibration file:", self.calibration_path, e)
-                sys.exit()
+                settings_file_error(self.calibration_path, e)
             changed = self._convert_old_swim_area(cal)
             changed = self._rename_old_cal_keys(cal) or changed
             for key in self.DROPPED_CAL_KEYS:
@@ -1962,9 +2042,9 @@ class App:
                 print("Calibration file created from the defaults file:", self.calibration_path)
         missing = [k for k in self.CAL_REQUIRED if k not in cal]
         if missing:
-            print("Calibration file", self.calibration_path, "is missing", ", ".join(missing),
-                  "-- the jet can't be driven safely without it. Exiting.")
-            sys.exit()
+            settings_file_error(self.calibration_path,
+                                problem="it has no " + " or ".join(missing)
+                                + ", and the jet can't be driven safely without it")
         return cal
 
     def _defaults_file_value(self, key, fallback):
@@ -2050,6 +2130,15 @@ class App:
     DEVELOPER_KEYS = ("workplace (home or pool or default)", "capture_device (camera or video)",
                       "display_device (work or pool)", "Valve (real or simulate)")
 
+    CHOICE_SETTINGS = {"workplace (home or pool or default)": ("home", "pool", "default"),
+                       "capture_device (camera or video)":    ("camera", "video"),
+                       "display_device (work or pool)":       ("work", "pool"),
+                       "Valve (real or simulate)":            ("real", "simulate"),
+                       "algorithm (basic or swimmerPace)":    ("basic", "swimmerPace")}
+    # ('Demo' isn't checked: anything but False is a demo, the safe side.)
+    # Settings gone in a published version: a line left in a file is ignored.
+    RETIRED_SETTINGS = ("ejectStickOnClose", "SafetyVoltageLimits")
+
     def _read_defaults_file(self):
         """
         Reads the defaults file (older setting names changed to the current
@@ -2058,6 +2147,24 @@ class App:
         """
         with open(self.defaults_path, 'r') as f:
             file_defaults = self._rename_old_settings(ast.literal_eval(f.read()))
+        # Settings with a fixed set of words: a mistyped one (Bill, 2026-11-02:
+        # 'poolx') once turned the monitor and restarted PoolWind endlessly.
+        # Every name must be one PoolWind knows: a misspelled one would
+        # otherwise be skipped quietly and the built-in value used (Bill,
+        # 2026-11-02: "the defaults file should be read and verified line
+        # by line"). Comments (#) aren't settings, so they never count.
+        known = (set(BUILT_IN_DEFAULTS) | set(self.CAL_KEYS) | set(self.OLD_CAL_KEYS)
+                 | set(self.OLD_CAL_NAMES) | set(self.DROPPED_CAL_KEYS)
+                 | {v for k, v in vars(App).items() if k.startswith("KEY_")}
+                 | set(self.RETIRED_SETTINGS))
+        for key in file_defaults:
+            if key not in known:
+                raise SettingValueError(key, f"'{key}' isn't a PoolWind setting (misspelled?)")
+        for key, allowed in self.CHOICE_SETTINGS.items():
+            if key in file_defaults and file_defaults[key] not in allowed:
+                raise SettingValueError(
+                    key, f"'{file_defaults[key]}' isn't one of: "
+                         + ", ".join(f"'{a}'" for a in allowed))
         defaults = dict(BUILT_IN_DEFAULTS)
         defaults.update(file_defaults)
         stale = [k for k in self.CAL_KEYS + self.OLD_CAL_KEYS if k in file_defaults]
@@ -13054,19 +13161,21 @@ def calibration_main():
     cal_path = os.path.abspath(args.cal) if args.cal else base + "_calibration.txt"
 
     app = QApplication(sys.argv)
-    # Demo (defaults file, built in True): nothing at the pool moves, so no
-    # calibration (its simulated jet is gone, v15.7)
+    # Demo (defaults file, else the built-in: True on a PC, False on the
+    # Pi): nothing at the pool moves, so no calibration (its simulated jet
+    # is gone, v15.7)
     try:
         with open(base + "_defaults.txt") as f:
             text = f.read()
-        demo = ast.literal_eval(text[text.index("{"):]).get("Demo", True) is not False
+        demo = ast.literal_eval(text[text.index("{"):]).get("Demo", BUILT_IN_DEFAULTS["Demo"]) is not False
     except Exception:
         demo = True
     if demo:
         QMessageBox.critical(None, "PoolWind calibration",
-                             "PoolWind is set up as a demo ('Demo' isn't False in the defaults file), "
-                             "and the calibration drives the real pool.\n\n"
-                             "Set 'Demo' to False once PoolWind is built and installed (setup guide).")
+                             "PoolWind is set up as a demo ('Demo': True in the defaults file, "
+                             "or a computer without the Raspberry Pi's relays), and the calibration "
+                             "drives the real pool.\n\n"
+                             "On the Pi, take the 'Demo' line out of the defaults file.")
         return 1
     if not os.path.isfile(cal_path):
         QMessageBox.critical(None, "PoolWind calibration",
@@ -13110,11 +13219,22 @@ if __name__ == "__main__":
     # 1. Create QApplication FIRST
     qt_app = QApplication(sys.argv)
 
-    # 2. Create App (logic only, NO Qt widgets)
-    app = App()
-
-    # 4. Create QtMainWindow AFTER App is ready
-    window = QtMainWindow(app)
+    # 2. Create App (logic only, NO Qt widgets), 4. then QtMainWindow.
+    # Anything not caught on the way gets a box too, as a last resort,
+    # instead of PoolWind seeming to do nothing (Bill, 2026-11-02).
+    try:
+        app = App()
+        window = QtMainWindow(app)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        _defaults = os.path.splitext(os.path.abspath(__file__))[0] + "_defaults.txt"
+        QMessageBox.critical(
+            None, "PoolWind can't start",
+            f"Unknown problem while starting:\n{type(e).__name__}: {e}\n\n"
+            f"If you just changed the defaults file, check that change first:\n{_defaults}",
+            QMessageBox.Close)
+        sys.exit(1)
     app.window = window       # allow App.shutdown() to close the window
     window.show()
     app.start_relay_watchdog()

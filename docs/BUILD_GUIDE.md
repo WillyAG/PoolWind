@@ -585,8 +585,8 @@ Before connecting anything to the pool:
 1. **Check the wiring** against the board, especially the ribbon cable's
    orientation.
 2. **Power up the Raspberry Pi** and install the software (setup guide,
-   section 3). PoolWind starts as a demo. Before steps 5 and 6, turn the
-   demo off ([setup guide, section 4](SETUP_GUIDE.md#4-first-start)).
+   section 3). PoolWind controls the pool from its first start: don't
+   start it before step 5.
 3. <a id="set-up-the-camera"></a>**Set up the camera**   
    To see what the camera sees, use the Raspberry Pi VLC Media Player and select 'Open Capture Device' -> 'Video Device Name' -> '/dev/video0' -> 'Play'. The camera must display the pool with the **pool front to the left**. Physically move the camera to the correct orientation and adjust so that at a minimum all of the water area is showing but, if possible, some of the decking as well.
 4. **Check that the INA260 is found:** in a terminal, `i2cdetect -y 1`
