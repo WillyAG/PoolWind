@@ -49,7 +49,7 @@ The program will probably need modifications. You do not need to be a programmer
 1. **Read [SAFETY.md](SAFETY.md).**
 2. **Check first:** [three checks to make before buying anything](docs/BUILD_GUIDE.md#before-you-buy-anything-three-checks): your remote, your pool's Pace Display port, and your skills.
    They take a few minutes and tell you whether PoolWind can work with your pool.
-3. **Gather the parts:** the [parts list](hardware/PARTS_LIST.md), about $480 in all.
+3. **Gather the parts:** the [parts list](hardware/PARTS_LIST.md), about $450–550 in all.
 4. **Build it:** the [build guide](docs/BUILD_GUIDE.md).
 5. **Install the software and fit it to your pool:** the [setup and calibration guide](docs/SETUP_GUIDE.md).
 6. **Swim:** the [user manual](docs/USER_MANUAL.md).
