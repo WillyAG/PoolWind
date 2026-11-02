@@ -63,7 +63,7 @@ for the full disclaimer.
 - **Test with the pool empty of swimmers first.** Watch the jet respond to the
   program before you get in, and make sure it goes to the lowest flow.
 - **Set sensible limits** for each swimmer's ability: their slowest and
-  fastest zone on their USB stick (Swimmer limits), and the zone limits in
+  fastest zone on their USB stick, and the zone limits in
   the defaults file for anyone without a stick. Swimmers set their limits
   and settings with **Swimmer limits** in the menu. Leave the defaults and
   calibration files to the builder. 
