@@ -10,12 +10,14 @@ Required Notice: Copyright (c) William A. Gorlitz. U.S. Copyright Registration T
 |---|---|
 | `poolwind.py` | The program, with the calibration built in (menu **Calibrate pool...**, or `python3 poolwind.py --calibrate`) |
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick |
-| `poolwind_calibration.txt` | Your pool's calibration: the Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane. **The one here is the author's pool**: the calibration's scan fits it to yours (setup guide, section 5) |
+| `poolwind_calibration.txt` | Your pool's calibration: the Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, swim zone width. **The one here is the author's pool**: the calibration's scan fits it to yours (setup guide, section 5) |
 | `toggle_monitor.sh` | The Monitor Toggle: turns the pool monitor between portrait and landscape (setup guide, section 9) |
+| `WHATS_NEW.txt` | What's new in this version; the install script shows it after an update (setup guide, section 10) |
 
 The settings files must sit next to the program and start with its name.
 Each swimmer's own settings go on their USB stick, in
-`poolwind_ind_defaults.txt`.
+`poolwind_ind_defaults.txt`, and their own Pace table in
+`poolwind_ind_calibration.txt`.
 
 ## Installing and setting up
 
