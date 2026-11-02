@@ -67,10 +67,17 @@ cd PoolWind-download
 bash install.sh
 ```
 
-**Easier than typing:** open this guide in the Pi's web browser, click the
-copy button (⧉) at the top right of the box above, then right-click in the
-terminal and choose **Paste** (or press Ctrl+Shift+V; plain Ctrl+V doesn't
-work in a terminal). Press Enter if the last line hasn't run.
+**Easier than typing:** copy the lines from this guide on the Pi itself.
+
+1. Click the web browser icon (a globe) on the bar at the top of the
+   desktop, type `github.com/WillyAG/PoolWind` in its address bar at the
+   top, and press Enter.
+2. On that page, click the **docs** folder, then **SETUP_GUIDE.md**, and
+   scroll down to this section, **3. Installing PoolWind**.
+3. Click the copy button (⧉) at the top right of the box of three lines.
+4. In the terminal, right-click and choose **Paste** (or press
+   Ctrl+Shift+V; plain Ctrl+V doesn't work in a terminal). Press Enter if
+   the last line hasn't run.
 
 The first line downloads PoolWind into a `PoolWind-download` folder in your
 home folder (where a new terminal starts). The second goes into that
