@@ -101,7 +101,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
 | **OnOff** (light red) | Turns the pool's pump on or off, at one touch. The jet winds down first (see [OnOff](#onoff-the-pump)) |
-| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the technician), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...**, then **Swim Plot...** |
+| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the builder), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...**, then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
 A button looks pressed in while you touch it.
@@ -144,7 +144,7 @@ matches the jet's speed right now, as a faint band across the screen, with
 thin yellow lines between all the zones. Tap again to turn them off. They
 are turned off when PoolWind starts.
 
-- The band is the **jet's** zone, not yours: It is not a physical zone but it represents the rate the water is moving.  You can think of the band as the readout of a jet speed meter, slowest at the bottom of the screen (the back of the pool), fastest at the top.
+- The band is the **jet's** zone, not yours: it is not a physical zone but it represents the rate the water is moving. You can think of the band as the readout of a jet speed meter, slowest at the bottom of the screen (the back of the pool), fastest at the top.
   For how the zones work, see
   [PoolWind in brief](../README.md#poolwind-in-brief) in README.
 - It stays put while the jet holds a speed, so it's a **stationary
@@ -158,7 +158,7 @@ are turned off when PoolWind starts.
 The same tap works on the video in [Swim Plot](#7-reviewing-your-swims-swim-plot).
 
 ### swimArea definition
-**swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left)  **Set Swim Area...** (see [The swim area](SETUP_GUIDE.md#52-set-swim-area) in the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
+**swimArea** is the swimming area of the pool that does not include the water return benches. Its four corners are marked using the menu item: (**≡**, top left) **Set Swim Area...** (see [The swim area](SETUP_GUIDE.md#52-set-swim-area) in the setup guide). Everything else the camera might pick up is cut out of the swimArea and discarded. The swimArea is what you see on the monitor.
 
 ### swimZone definition
 **swimZone** is a subset of the swimArea and is a lateral zone down the middle of the pool that has a width of 35% (as shipped) of the swimArea. It's a "zone" because PoolWind only responds to swims occurring in the swimZone.
@@ -235,7 +235,7 @@ correct them while you swim:
 
 > On a newly calibrated pool, the Paces start as a rough estimate from the
 > calibration's voltage scan: 7:00 at the slowest jet speed to 1:00 at the
-> fastest (see [Begin initial voltage scan](SETUP_GUIDE.md#53-calibrate-pool---begin-initial-voltage-scan)
+> fastest (see [Begin initial voltage scan](SETUP_GUIDE.md#53-calibrate-pool---begin-initial-voltage-scan---master-dataset)
 > in the setup guide). Pace correction brings them closer to your own.
 
 **Whose Paces.** With your USB stick in, you correct **your own Pace
@@ -310,7 +310,7 @@ asks **Keep pending** or **Make permanent**.
 
 After a **PingPong** calibration, two more numbers are at the top of the
 box, **bodyDrag** and **deltaBodyDrag**: they change the whole table (see
-the [setup guide](SETUP_GUIDE.md#55-calibrate-pool---pingpong)).
+the [setup guide](SETUP_GUIDE.md#55-calibrate-pool---pingpong---master-dataset)).
 **Defaults** puts them back to the author's pool's.
 
 ### What happens to your old swim data if the pool is re-calibrated
@@ -509,7 +509,7 @@ Pulling your USB stick while Swim Plot is open closes it. You can plug it (or an
 **The plot and video**:\
 The swim's training video plays together with a plot of your swim:
 
-<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the zone highlight as a light band across the shoulders, and the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
+<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the zone highlight as a light band across the shoulders, and the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the goto MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
 
 - **Pace** over time (shown first), or **MPH** over distance: switch with
   the **goto MPH** / **goto Pace** button (it names the other plot). 
@@ -521,7 +521,7 @@ The swim's training video plays together with a plot of your swim:
 - The small box at the lower right shows the cursor's **Time** and **Pace** (or **Miles** and **MPH**).
 - **Avg Pace overall** is the whole range's average.
 - **Distance (miles) overall** is the whole range's distance.
-- The **zone highlight** shows the zones and the moving current zone band when it's on: click the video to turn it on or off
+- The **zone highlight** shows the zones and the moving current zone band when it's on: click the video to turn it on or off.
 - The **plot window** can be moved out of the way by click and drag on the top header.
 - Note the **Avg** (average Pace of swim to the moment), **Pace** (the current pace at the moment) and **Dist** (total distance to the moment) are part of the video written at the moment. If pool calibration had changed (or **Master vs Swimmer datasets** had switched, see below) since then, their values may be different than their corresponding values in the plot box. 
 
@@ -600,7 +600,7 @@ frames. Go back to `5` for everyday swims, so your stick doesn't fill three
 times as fast. Lower than 5 saves more space but makes the video jumpy.
 
 **How to change it.** Add or change this line in your stick's
-`poolwind_ind_defaults.txt` 
+`poolwind_ind_defaults.txt`:
 
 ```
 ,'logRate': 15
@@ -638,7 +638,7 @@ click along where the table says.
 | 0.073 | The swimmer leaves the swimZone at fast speed and clicks **Hold**; the jet returns to the exit speed and stays there. | Click **Hold**. |
 | 0.087 | The swimmer keeps swimming against the steady fast jet. The video ends and starts over. | Click **Vary** to return to normal operation. |
 
-Between these points the swimmer is simply swimming, watch how jet speed changes. Each time the video starts over, the same steps repeat and the distance keeps adding up. The swim log keeps growing, and you can view it with **Swim Plot** in the menu
+Between these points the swimmer is simply swimming: watch how the jet speed changes. Each time the video starts over, the same steps repeat and the distance keeps adding up. The swim log keeps growing, and you can view it with **Swim Plot** in the menu
 (see [Reviewing your swims](#7-reviewing-your-swims-swim-plot)).
 
 A demo keeps its swims in a `Demo Vault` folder in the `PoolWind` folder,
