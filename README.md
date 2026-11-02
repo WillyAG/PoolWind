@@ -120,7 +120,7 @@ The program will probably need modifications. You do not need to be a programmer
 - Relay board driven by GPIO 17 (Up), GPIO 18 (Down) and GPIO 27 (pump On/Off)
 - A spare pool remote, with wires soldered to its buttons
 
-Full details are in the [parts list](hardware/PARTS_LIST.md) and the [build guide](docs/BUILD_GUIDE.md); the interface board's files are in the [hardware folder](hardware/).
+Full details are in the [parts list](hardware/PARTS_LIST.md) and the [build guide](docs/BUILD_GUIDE.md); the interface board's files are in the [hardware folder](hardware/). **Everything can be read or downloaded right here on GitHub, on any computer, before you buy the Pi:** open a file and use its download button.
 
 ## License
 
@@ -128,7 +128,7 @@ PoolWind is a shared hobby project, free for personal, hobby and other noncommer
 
 Copyright © William A. Gorlitz. U.S. Copyright Registration TXu 2-304-621.
 
-PoolWind doesn't include other people's software. The install scripts fetch the libraries PoolWind uses, each under its own license: for example PySide6 (Qt for Python) under the LGPL v3, and OpenCV under the Apache 2.0 license.
+The install scripts fetch the libraries PoolWind uses, each under its own license: for example PySide6 (Qt for Python) under the LGPL v3, and OpenCV under the Apache 2.0 license.
 
 
 ## Support
