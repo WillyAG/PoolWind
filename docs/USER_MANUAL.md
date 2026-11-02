@@ -298,7 +298,7 @@ it. While the box is open PoolWind doesn't suspend the swim by itself.
 | **Swim with 'stored' values** / **'pending' values** | Swims your stored Paces, to compare. PoolWind starts with pending every time |
 | **Copy Master values to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
 | **Clear** | Drops the pending changes, after "Are you sure?": your pending Paces are your stored ones again |
-| **Details…** | A typical session, and how it all works |
+| **Details…** (a link at the end of the instructions) | A typical session, and how it all works |
 
 **Pending changes** are kept on your stick (or with the Master table) even
 if PoolWind is closed or the power goes off; **"Pending Paces"** shows on the

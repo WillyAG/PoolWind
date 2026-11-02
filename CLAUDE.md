@@ -81,8 +81,8 @@ faster than they can handle.
   shipped one is the author's pool, an example only).
 - `install.sh`: sets up a fresh Raspberry Pi OS and copies the program to
   `~/PoolWind/` (`poolwind.py`, `poolwind_defaults.txt`,
-  `poolwind_calibration.txt`, `install.log`), and downloads the demo's
-  `PoolWind_demo.mp4` from the latest GitHub Release of the repository it
+  `poolwind_calibration.txt`, `install.log`), and downloads the sample video
+  `PoolWind_demo.mp4` (desk tests; a `'Demo': True` run) from the latest GitHub Release of the repository it
   was cloned from (with `gh` for a private one; a failed download
   doesn't stop the install). Desktop icons: **PoolWind**, **Monitor
   Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: offers to
