@@ -123,7 +123,7 @@ Suggested before starting:
 
 - Nobody in the pool
 - The pool switched off at first; you'll turn it on for the jet check
-- the pool's own remote at hand
+- The pool's own remote at hand
 - **The monitor is in portrait mode** (taller than wide). The install script
   sets this up, so it happens by itself a few seconds after the desktop
   appears. If it doesn't, double-click **Monitor Toggle**. 
@@ -133,7 +133,7 @@ camera's view from above.
 
 Check that:
 
-- the display shows most of the pool from above (will set the correct view later)
+- the display shows most of the pool from above (you'll set the exact view in 5.2)
 - **the jet answers.** With nobody in the pool, press **Hold**, then
   **UP** a few times and **DN** a few times (one jet step per press, see
   the [user manual](USER_MANUAL.md)), and watch the jet change.
@@ -178,7 +178,7 @@ This is a good time to talk about what these terms mean.
    - If not plugged in, the builder is allowed to create or edit the 'Master'
      dataset. See (1.) above.\
      **Pace correction** will edit the Master dataset, not the Swimmer dataset.
-     The builder is also the 'swimmer' and their swim data will be stored in the Master dataset on the SD card. Any other swimmer without a USB stick, will simply add to the builder's swim data but they cannot edit the Master dataset without knowing the password.
+     The builder is also the 'swimmer' and their swim data will be stored in the Master dataset on the SD card. Any other swimmer without a USB stick will simply add to the builder's swim data but they cannot edit the Master dataset without knowing the password.
      The builder should not plug in a USB stick unless they want to be just a
      normal swimmer and keep their own data.  
    - If plugged in, while the Master dataset still controls the pool, the 
@@ -255,13 +255,13 @@ The Pace-volt table's first and last rows become the jet's limits. This procedur
    its number of steps and the Pace table: **one row for each jet
    step**. These rows are PoolWind's **zones**.
 4. Press **Save scan** (it asks "Write scan to Master calibration file?"). Here is where Pace values are written into the table. The shape of the author's Pace-volt table, built into PoolWind, is stretched to the low and high range and its values are entered into the newly created Pace-volt table. This gives reasonable Pace values that can be used in a swim.
-The table is written into the calibration defaults file: `poolwind_calibration.txt`
+The table is written into the calibration file: `poolwind_calibration.txt`.
 If re-initializing, the old Pace-volt table is kept in `temp/poolwind_calibration_before_<date>.txt`.  The scan data is also kept as `temp/calibration_scan_<date>.csv`.
 
 **The scan's Paces are a first estimate.** The scan measures only your
 pool's voltages, not its speeds, so the associated Paces it writes are estimated:
 **7:00** at your pool's slowest step, **1:00** at its top (where you
-pressed Stop, or the jet's fastest speed), and in between an inverse-speed curve. That's realistic enough for PoolWind to run and to start swimming with. **Pace Entry** and **PingPong** replace the estimates with
+pressed Stop, or the jet's fastest speed), and in between, the shape of the author's table. That's realistic enough for PoolWind to run and to start swimming with. **Pace Entry** and **PingPong** replace the estimates with
 Paces measured on your pool, and **Pace correction** in PoolWind's menu
 adjusts them to what feels right from your own swimming experience.
 
@@ -309,7 +309,7 @@ Rows showing **-----** are jet steps the initial scan found above the table's to
   to 1:00 at the fastest step and 7:00 at the slowest. A step that isn't faster than the step below is marked red.
   While the jet is still going down, **Save Table** and **Quit** are greyed out ("Taking the jet down...").
 
-  **Save Table** replaces the Master table (it asks first, and warns if a step is still red) and  goes back to PoolWind. **Edit table** goes back to the Edit screen.
+  **Save Table** replaces the Master table (it asks first, and warns if a step is still red) and goes back to PoolWind. **Edit table** goes back to the Edit screen.
 
   **Quit** leaves without saving, after "Are you sure?".
 
@@ -337,15 +337,15 @@ You need five **orange** ping-pong balls (bright or fluorescent; white ones don'
 There is a starting line and a finish line drawn on the pool live video. 
 When prompted, set one ball gently on the water right at the jet, in the middle. The measurement will begin when the ball crosses the starting line and end when the ball reaches the finish line. The distance is known from the pool calibration default of 'usableSwimLength'. When 3 drops agree, it moves on to the next set while you are collecting the balls.
 
-If you think enough balls had been dropped (in one set), you can press 'Use dropped'. 
+If you think enough balls have been dropped (in one set), you can press 'Use dropped'. 
 If you think the measurement was bad, you can press 'Clear dropped'.
 
 The ball rides on the surface which is the fastest level that the jet pushes. Lower levels move slower and the bottom is practically still. A swimmer typically occupies the top 10 inches, not counting hands and legs, and so would move slower than the pingpong balls.
 So the ball's pace is turned into a swimming Pace with two numbers: **bodyDrag**, the factor at the jet's fastest speed (1.50), and **deltaBodyDrag**, how much more it is at the
-slowest (0.18). Between the two Pace changes evenly, step by step. These are defaults that work in the author's pool, an educated guess. The results screen shows both: change them and the table follows. They're kept in the calibration file with the ball measurements, so they can be changed again later in Pace correction.
+slowest (0.18). Between the two, Pace changes evenly, step by step. These are defaults that work in the author's pool, an educated guess. The results screen shows both: change them and the table follows. They're kept in the calibration file with the ball measurements, so they can be changed again later in Pace correction.
 
 During measurements:
-- **Stop** If the builder thinks the pool is going too fast or that there have been enough entries made. Values already measured will keep and the remainder of the curve will be interpolated.
+- **Stop**: if the builder thinks the pool is going too fast or that there have been enough entries made. Values already measured will keep and the remainder of the curve will be interpolated.
 
 When stopped either manually or at the jet's top (the top the initial scan found; PingPong also goes on into the **-----** steps above the table's top, see 5.4):
 - **Resume** goes back to scan
@@ -367,7 +367,7 @@ Briefly:
 3. Use PingPong if you have no Pace Display. PingPong (5.5) will accurately measure the surface speed of each of your pool's 'zones' using the pingpong balls. But the actual Pace needs a drag factor and change of drag factor to multiply the pingpong measurements. Those factors are just guessed at. The routine gives a dynamic plot of how these factors affect Pace as well as being able to edit points. So with a little experience you may arrive at a pretty good table. 
 
 
-### 5.7 **Pace correction** - Master dataset(no USB stick) or Swimmer dataset(with USB stick) 
+### 5.7 **Pace correction** - Master dataset (no USB stick) or Swimmer dataset (with USB stick) 
 
 'Pace correction' offers a dynamic way to edit the Pace values that you feel are off and replace them with values based on your swimming experience. Even a single entry, say based on your fastest measured time in a real pool, will help and the surrounding Pace values will be interpolated. More entries, say based on other styles, will improve the Pace values even better yet.
 
@@ -377,7 +377,7 @@ Briefly:
 
 **Earlier swims change too.** 
 A change in the Pace-volt table will change the Pace values when the swim is viewed in the **Swim Plot...** routine.\
-See [Your earlier swims change too](USER_MANUAL.md#pace-correction-when-the-paces-dont-feel-right) in the user manual's Pace correction section
+See [Your earlier swims change too](USER_MANUAL.md#pace-correction-when-the-paces-dont-feel-right) in the user manual's Pace correction section.
 
 See the [user manual](USER_MANUAL.md#pace-correction-when-the-paces-dont-feel-right) for more details on this routine.
 
@@ -427,7 +427,7 @@ starting with the program's name:
 | File | Holds | Who changes it |
 |---|---|---|
 | `poolwind_defaults.txt` | The swimmer settings for anyone without a USB stick | The owner |
-| `poolwind_calibration.txt` | The Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetStepVolts`: every jet step the scan found, so Pace Entry and PingPong can show steps above the table's top again, `PacesFromFormula`: the Paces are still the scan's estimate), PingPong's numbers (`bodyDrag`, `deltaBodyDrag`, `PingPongBalls`), Pace correction's pending changes for swimmers without a stick (`PacesPending`), and the update's `logsTable` / `rulerAdded` (section 10) | The calibration, Pace correction and the technician |
+| `poolwind_calibration.txt` | The Master Pace table (the zones; its first and last rows are the jet's limits), swim area, swim length, center lane, the scan's results (`InitialCalFinished`, `jetVoltageRange`, `jetStepVolts`: every jet step the scan found, so Pace Entry and PingPong can show steps above the table's top again, `PacesFromFormula`: the Paces are still the scan's estimate), PingPong's numbers (`bodyDrag`, `deltaBodyDrag`, `PingPongBalls`), Pace correction's pending changes for swimmers without a stick (`PacesPending`), and the update's `logsTable` / `rulerAdded` (section 10) | The calibration, Pace correction and the builder |
 | `poolwind_calibration_camera.png` | The camera picture the swim area was set on (the camera check, 5.2) | PoolWind, when the swim area is saved |
 | `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | That swimmer |
 | `poolwind_ind_calibration.txt` (on each USB stick) | One swimmer's own Pace table, their Pace correction's pending changes and drag numbers. Made from the pool's table the first time the stick is used | Pace correction |
@@ -536,7 +536,8 @@ tick (`CoM_w`, `-1` = none), and since the zone highlight, the jet's zone
 replay without the highlight. Since v15.7 two more: the jet's voltage and
 the Pace the table in use gave there, so Swim Plot can show any swim in
 today's table (user manual, Swim Plot). Logs from before
-v15.7 show as they were swum.
+v15.7 are given these two columns once after the update
+([section 10](#10-updating-poolwind)).
 
 ## 8. Testing at a desk
 
