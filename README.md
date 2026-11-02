@@ -12,9 +12,9 @@
 
 PoolWind monitors your swim with an overhead camera and adjusts the pool's jet flow so that you will not run into the front or the rear of the pool as you swim faster or slower. The pool is divided into "zones", each representing an increasing jet speed toward the front. As you move forward through these zones the jet flow will increase until you settle into a zone where your swim is balanced with the jet flow. Forward movement stops. Swim harder and you move into the next zone where the jet flow increases further. The program is set to your specifications and the last zone should be just beyond your most powerful stroke. When you decide to rest a bit, the jet will move you backwards to a zone where your swim is once again balanced as the jet flow relaxes. You can change stroke styles without running into walls.
 
-That is the main crux of PoolWind but since it involves a camera and computer, it opens up other helpful possibilities.  It also estimates your actual swimming pace which is displayed on a monitor in letters large enough to see anywhere in the pool, along with the distance swum and the average pace at the current point in time. A big possibility that opened up is swim training, described below.
+That is the main crux of PoolWind but since it involves a camera and computer, it opens up other helpful possibilities. It also estimates your actual swimming pace which is displayed on a monitor in letters large enough to see anywhere in the pool, along with the distance swum and the average pace at the current point in time. A big possibility that opened up is swim training, described below.
 
-The PoolWind system is designed for swim training. Each swimmer can plug in their own USB stick and log in their swim session daily over multiple sessions. The camera records the swim and the USB stick stores the data and video. One menu of the program is "Swim Plot" that if selected not only shows the video but also shows a plot of Pace/time or MPH/distance with the cursor synchronized to the exact frame of the video at the moment. The video can be paused, sped up, and slowed down. Moving the cursor also moves the video forward or backward.  A calendar allows you to pick a range of dates to be displayed. Reviewing the logs can point out good and bad swimming habits and with average daily Pace being shown on each day of the calendar, progress can be seen at a glance.
+The PoolWind system is designed for swim training. Each swimmer can plug in their own USB stick and log in their swim session daily over multiple sessions. The camera records the swim and the USB stick stores the data and video. One menu of the program is "Swim Plot" that if selected not only shows the video but also shows a plot of Pace/time or MPH/distance with the cursor synchronized to the exact frame of the video at the moment. The video can be paused, sped up, and slowed down. Moving the cursor also moves the video forward or backward. A calendar allows you to pick a range of dates to be displayed. Reviewing the logs can point out good and bad swimming habits and with average daily Pace being shown on each day of the calendar, progress can be seen at a glance.
 
 The author's own experience: his kick used to be fairly random. By watching
 his movements and seeing their effect on the pace plot, swim after swim, he
@@ -29,14 +29,14 @@ pattern and his speed improved noticeably as a result.
 
 ## Compatibility
 
-- Tested on:  Endless Pools, Standard Endless Pool (purchased February 2012). The controller board was later replaced after a lightning strike, and PoolWind works with the replacement.
+- Tested on: Endless Pools, Standard Endless Pool (purchased February 2012). The controller board was later replaced after a lightning strike, and PoolWind works with the replacement.
 
 - Other makes/models: Untested. Other remotes may have similar buttons which can be used. But a feedback voltage is essential and a relationship between voltage and Pace must be measured in the form of data points (the built-in calibration does this).
 The program will probably need modifications. You do not need to be a programmer, AI can help. You will need a paid Claude subscription for Claude Code, which you can cancel once PoolWind is set up and running great. See [section 12 of the setup guide](docs/SETUP_GUIDE.md#12-getting-help).
 
 - Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
 
-- Outdoor use:  Untested, especially in direct sun. Surface glare, moving light patterns on the pool floor, and sharp shadows (including the swimmer's own) can confuse the camera's swimmer detection. Shade over the pool and a polarizing filter on the camera should help; full outdoor support may need further development.
+- Outdoor use: Untested, especially in direct sun. Surface glare, moving light patterns on the pool floor, and sharp shadows (including the swimmer's own) can confuse the camera's swimmer detection. Shade over the pool and a polarizing filter on the camera should help; full outdoor support may need further development.
 
 
 
@@ -59,7 +59,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - PoolWind is an **add-on**. It does not modify the pool in any way:
 
-- Control: wires are soldered to a spare copy of the pool's own handheld remote, and relays driven by a Raspberry Pi "press" its speed Up,  Down, and On/Off buttons.
+- Control: wires are soldered to a spare copy of the pool's own handheld remote, and relays driven by a Raspberry Pi "press" its speed Up, Down, and On/Off buttons.
 
 - Feedback: the jet speed is read back as a voltage through the port that the manufacturer already provides for its optional Pace Display.
 
@@ -77,7 +77,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - "Swim Plot" for reviewing a day or a date range, synchronized with recorded video
 
-- Hold mode: freeze the current speed, vary it with Up and Dn screen buttons
+- Hold mode: freeze the current speed, vary it with the UP and DN screen buttons
 
 - Built-in calibration: a voltage scan fits PoolWind to your pool, then Pace Entry (read from a Pace Display) or PingPong (ping-pong balls timed by the camera); Pace correction while swimming, for each swimmer's own Paces; old swims shown in today's Paces
 
@@ -85,12 +85,11 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Camera check at each start: if the camera has moved, PoolWind offers to move the swim area with it
 
-- Automatic detection if swimmer leaves the center swim zone, pausing data collection and lowering the jet flow to its lowest setting
+- Automatic detection if the swimmer leaves the center swim zone, pausing data collection and lowering the jet flow to its lowest setting
 
-- Per-swimmer USB sticks: personal settings (height, zone limits, video recording switch), the swimmer's own Pace table, and swim data. A stick can be swapped while PoolWind runs. Months of data can be collected depending on the size of the USB stick
-(Approx 70 hours on a 32 GB stick) 
+- Per-swimmer USB sticks: personal settings (height, zone limits, video recording switch), the swimmer's own Pace table, and swim data. A stick can be swapped while PoolWind runs. Months of data can be collected depending on the size of the USB stick (about 70 hours on a 32 GB stick, at the shipped logRate).
 
-- Safety voltage limits
+- Jet speed limits: the jet never goes faster than the top the builder chose during calibration
 
 - Jet flow winds down to its lowest level before PoolWind turns the pump on or off
 
@@ -133,13 +132,13 @@ The install scripts fetch the libraries PoolWind uses, each under its own licens
 
 ## Support
 
-- No support is provided:  You're welcome to share builds, questions and answers with other users in [Discussions](../../discussions) in which the author may participate.
+- No support is provided: you're welcome to share builds, questions and answers with other users in [Discussions](../../discussions) in which the author may participate.
 
 - An AI assistant such as Claude Code, run in the downloaded PoolWind folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background. See [Getting help](docs/SETUP_GUIDE.md#12-getting-help) in the setup guide.
 
 
 ## Acknowledgments
 
-- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI  (Grok, Copilot, finishing with Anthropic's Claude Code). Claude Code is an absolutely unbelievable code editor/writer. It is responsible for writing the author's newer ideas into code, transforming the program into something that can be shared, and for writing most of the guides.
+- PoolWind relies on OpenCV, NumPy, SciPy, PySide6 (Qt for Python) and matplotlib, and on the many people who share their knowledge online. Special thanks to Murtaza's Workshop for perspective adjustment and color filtering techniques. Program was conceived and prototype written by the author and further developed with the help of AI (Grok, Copilot, finishing with Anthropic's Claude Code). Claude Code is an absolutely unbelievable code editor/writer. It is responsible for writing the author's newer ideas into code, transforming the program into something that can be shared, and for writing most of the guides.
 
 
