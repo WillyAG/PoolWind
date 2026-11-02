@@ -10482,7 +10482,7 @@ DEFAULT_DROPS = 5            # balls per measured step (a pack holds 5)
 MIN_GOOD_DROPS = 3           # drops within DROP_AGREE of their median needed
 DROP_AGREE = 0.10
 DEFAULT_EVERY = 3            # drop balls at every 3rd step, fill in the rest
-REVIEW_IDLE_S = 300.0        # Pace Entry at the bottom: a row driven to, nothing typed: wind down
+REVIEW_IDLE_S = 5.0          # Pace Entry at the bottom: a row driven to, nothing typed: wind down
                              # (5 s planned; 5 minutes "until the bugs are worked out", Bill, 2026-10-29)
 SETTLE_MAX_S = 8.0           # Pace Entry: a voltage still swinging after this long is taken (its average)
 STEADY_S = 0.7               # Pace Entry: steps and stillness judged on the voltage over this long
