@@ -42,7 +42,7 @@ pool are covered in the build guide and the setup and calibration guide.
 ## 2. Starting PoolWind
 
 1. Insert your USB stick.
-   - If no USB stick is found, all data will be recorded on the SD card as the 'master' swimmer. Pool calibrations are defined by the 'master' data.
+   - If no USB stick is found, all data will be recorded on the SD card as the 'Master' swimmer. Pool calibrations are defined by the 'Master' data.
    - A USB stick may be left connected between sessions.
 2. Start PoolWind with its **desktop icon**. 
 3. The pool screen appears, with the PoolWind version at the very top.
@@ -98,7 +98,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
 | **OnOff** (light red) | Turns the pool's pump on or off, at one touch. The jet winds down first (see [OnOff](#onoff-the-pump)) |
-| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the builder), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...**, then **Swim Plot...** |
+| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the builder), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...** (your zones, height and video settings), then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
 A button looks pressed in while you touch it.
@@ -500,7 +500,8 @@ them in the main settings file, for everyone who swims without a stick.
 
 ## 7. Reviewing your swims: Swim Plot
 
-Open the menu (**≡**, top left) and choose **Swim Plot...**.
+Open the menu (**≡**, top left) and choose **Swim Plot...**. When Swim
+Plot opens, the jet winds down to your slowest zone.
 
 **Selecting dates to review:**\
 The "Select Swim Date(s)" screen shows up with "Use .. dataset" selector (see **Master vs Swimmer datasets** below) and a "From" calendar and a "To" calendar. After a short "Please wait" popup, the current month shows in both calendars and each day having a swimming session shows up in green font with the daily average Pace underneath. 
@@ -595,8 +596,8 @@ times as fast.
 PoolWind starts.
 
 **Other settings** (the pool's calibration, the jet's limits and advanced tuning)
-are covered in the setup and calibration guide. They're for technicians
-and builders, not for day-to-day swimming.
+are covered in the setup and calibration guide. They're for the builder,
+not for day-to-day swimming.
 
 ---
 
