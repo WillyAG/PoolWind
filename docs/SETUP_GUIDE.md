@@ -446,8 +446,21 @@ starting with the program's name:
 | `temp` folder (next to the program, and on each USB stick) | Files PoolWind never needs to run: the backups made before a table is replaced (`..._before_<date>.txt`), the calibration's records (`calibration_scan_`, `calibration_session_`, `calibration_drops_`, `calibration_correction_<date>.csv`) and developer traces. Delete it any time; PoolWind makes it again when needed | PoolWind |
 
 The swimmer settings use **the same names** in the defaults file and on
-the USB sticks. A stick's value wins while it's inserted. See the
-[user manual](USER_MANUAL.md#8-your-settings) for the list.
+the USB sticks. A stick's value wins while it's inserted. Swimmers set
+them with **Swimmer limits** in PoolWind's menu
+([user manual, section 8](USER_MANUAL.md#8-your-settings)):
+
+| Setting | Example | Meaning |
+|---|---|---|
+| `'zoneMin, Max'` | `(8, 22)` | Slowest and fastest zone (zone 1 is the jet's slowest step) |
+| `'swimmersHeight'` | `66` | Height in inches |
+| `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot |
+| `'logRate'` | `5` | Frames per second, swim log rows and video frames: 1 to 15 in the file, 5 to 15 in Swimmer limits (**restart**) |
+| `'paceMin, Max'` | `('5:00', '3:00')` | Older files only: a Pace range in place of zones, turned into zones by PoolWind. `'zoneMin, Max'` wins if both are there; Swimmer limits replaces it |
+
+On a stick they're in `poolwind_ind_defaults.txt`, and the swimmer's own
+Pace table in `poolwind_ind_calibration.txt`, which only Pace correction
+should change.
 
 **The defaults file as shipped** uses a moderate range of zones, `(6, 12)`
 (about 4:34 to 3:07 per 100 yards on the shipped Pace table), and an

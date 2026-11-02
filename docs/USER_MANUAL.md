@@ -390,7 +390,7 @@ can hold the last part of your swim in memory for up to half a minute.
 Pulling a stick that hasn't been ejected can lose the end of your swim,
 or leave the stick needing repair.
 
-**To look at your stick's files** (or for a coach to edit a stick): unplug
+**To look at your stick's files**: unplug
 it and plug it back in while PoolWind is closed. It then shows in the File
 Manager.
 
@@ -400,8 +400,8 @@ Once PoolWind is closed, the pool works normally with its own remote.
 
 Each swimmer has their own USB stick. It holds:
 
-- **your settings**: height, zone limits, logRate (optional) and whether to record training video (see [Your settings](#8-your-settings));
-- **your Pace table** (`poolwind_ind_calibration.txt`): made from the
+- **your settings**: zone limits, height, training video and frames per second (see [Your settings](#8-your-settings));
+- **your Pace table**: made from the
   pool's table the first time your stick is used, then corrected by you
   with [Pace correction](#pace-correction-when-the-paces-dont-feel-right).
   The jet's speeds and limits are always the pool's;
@@ -428,13 +428,13 @@ Pace correction and Swimmer limits close, and PoolWind starts again with
 that swimmer's settings, swims, today's totals and Pace table, or with
 the Master data when the stick was pulled.
 
-### How much it holds depends on **logRate**
+### How much it holds depends on **frames per second**
 
-**logRate** is how many snapshots of your swim PoolWind records each second.
-See [logRate: how often PoolWind records](#lograte-how-often-poolwind-records)
+**Frames per second** is how many snapshots of your swim PoolWind records
+each second. See [Frames per second: how often PoolWind records](#frames-per-second-how-often-poolwind-records)
 for what it is, and why and how to change it.
 
-A 32 GB USB stick, at the shipped logRate of 5, holds roughly 70 hours of swim data and video. At logRate of 15, the stick holds about 25 hours. It's a tradeoff of video smoothness vs data size.
+A 32 GB USB stick, at the shipped 5 frames per second, holds roughly 70 hours of swim data and video. At 15, the stick holds about 25 hours. It's a tradeoff of video smoothness vs data size.
 
 If your stick is nearly full when PoolWind starts, it asks what to do:
 
@@ -491,7 +491,7 @@ keyboard). Press **Save**.
 **Manual Settings**, the lower section: your **height**, whether to
 **record training video**, and its **frames per second** (5 to 15: more
 gives smoother video but fills your stick faster, see
-[logRate](#lograte-how-often-poolwind-records)). Training video and frames
+[Frames per second](#frames-per-second-how-often-poolwind-records)). Training video and frames
 per second take effect at the next start.
 
 Save writes both sections to your USB stick. With no stick in, it saves
@@ -560,59 +560,39 @@ In between macro and micro views, the plots can tell you if those movements comb
 
 ## 8. Your settings
 
-The same user settings live in two places:
+You set your settings with **Swimmer limits** in the menu (see
+[Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone)):
 
-- **The main settings file** (`/home/<username>/PoolWind/poolwind_defaults.txt`,
-  where `<username>` is the one you chose in Raspberry Pi Imager): the
-  starting settings for everyone, based on an average adult swimmer.
-- **Your USB stick** (`/media/<username>/<stick name>/poolwind_ind_defaults.txt`):
-  your personal settings. They replace the main settings file's while the
-  stick is in. A setting missing from the stick comes from the main
-  settings file. Next to it, `poolwind_ind_calibration.txt` is your Pace
-  table: leave that file to Pace correction.
-- **Swimmer limits** in the menu sets the zones, height, training video
-  and frames per second for you, so you rarely need to edit a file.
-- To edit either file, find it with the File Manager and double-click it.
-  After PoolWind has closed, your stick is ejected and doesn't show in the
-  File Manager: pull it out and plug it back in first. Keep the quote marks, commas and brackets exactly as they
-  are. Changes take effect within about a second, even while PoolWind is
-  running (except `recordTrainingVideo` and `logRate`, which take effect at
-  the next start).
+| Setting | What it does |
+|---|---|
+| **Slowest and fastest zone** | The jet never goes slower or faster than these (zone 1 is the jet's slowest speed) |
+| **Height** | Your height in inches. Helps PoolWind judge your position |
+| **Record training video** | Records the video for Swim Plot |
+| **Frames per second** | How often PoolWind records, 5 to 15 (below) |
 
-### User settings
+They're stored on your USB stick, or with no stick in, in the main settings
+file on the Pi, for everyone who swims without a stick.
 
-| Setting | Example | Meaning |
-|---|---|---|
-| `'swimmersHeight'` | `66` | Your height in inches. Helps PoolWind judge your position |
-| `'zoneMin, Max'` | `(8, 22)` | Your slowest and fastest zone (zone 1 is the jet's slowest speed). Set them with [Swimmer limits](#swimmer-limits-your-slowest-and-fastest-zone) |
-| `'paceMin, Max'` | `('5:00', '3:00')` | Instead of zones (older settings files): the slowest and fastest Pace, in minutes per 100 yards, turned into zones by PoolWind. `'zoneMin, Max'` wins if both are there |
-| `'recordTrainingVideo'` | `True` | Record the training video for Swim Plot (`True` or `False`) |
-| `'logRate'` | `5` | Determines the number of video frames and related data that are written per second, 1 to 15. `5` is enough to follow your Pace and stroke rhythm; `15` gives smoother stroke details but fills your stick about three times faster. See [logRate](#lograte-how-often-poolwind-records) |
-
-### logRate: how often PoolWind records
+### Frames per second: how often PoolWind records
 
 While you swim, PoolWind takes **snapshots**: each one is a line in your swim
 log (time, Pace, distance) and one frame of your training video, always
-together, so the plot and the video stay in step in Swim Plot. **logRate**
-is how many snapshots it takes per second, from 1 to 15.
+together, so the plot and the video stay in step in Swim Plot. **Frames per
+second** is how many snapshots it takes each second.
 
-| logRate | Good for | Video | A 32 GB stick holds |
+| Frames per second | Good for | Video | A 32 GB stick holds |
 |---|---|---|---|
-| `5` (shipped) | Everyday swims: following your Pace and stroke rhythm | Steps visibly from frame to frame | About 70 hours |
-| `15` | Studying a single stroke or kick, slowed down in Swim Plot | Smooth, even in slow motion | About 25 hours |
+| 5 (shipped) | Everyday swims: following your Pace and stroke rhythm | Steps visibly from frame to frame | About 70 hours |
+| 15 | Studying a single stroke or kick, slowed down in Swim Plot | Smooth, even in slow motion | About 25 hours |
 
-**Why change it.** Raise it to `15` for sessions where you want to study
+**Why change it.** Raise it to 15 for sessions where you want to study
 your technique closely: each arm pull and kick shows in three times as many
-frames. Go back to `5` for everyday swims, so your stick doesn't fill three
-times as fast. Lower than 5 saves more space but makes the video jumpy.
+frames. Go back to 5 for everyday swims, so your stick doesn't fill three
+times as fast.
 
-**How to change it.** In **Swimmer limits** (menu), under Manual Settings,
-set **Frames per second** and press **Save**. Or add or change this line in
-your stick's `poolwind_ind_defaults.txt`:
-
-```
-,'logRate': 15
-```
+**How to change it.** In **Swimmer limits**, under Manual Settings, set
+**Frames per second** and press **Save**. It takes effect the next time
+PoolWind starts.
 
 **Other settings** (the pool's calibration, the jet's limits and advanced tuning)
 are covered in the setup and calibration guide. They're for technicians
