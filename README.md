@@ -40,7 +40,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 
 
-**PoolWind is a do-it-yourself project.** It comes with no warranty. Limited help may be found in [Discussions](../../discussions), where the author takes part at his discretion. Anyone can read Discussions; to post, sign up for a free GitHub account.
+**PoolWind is a do-it-yourself project.** It comes with no warranty. Limited help may be found in [Discussions](https://github.com/WillyAG/PoolWind/discussions), where the author takes part at his discretion. Anyone can read Discussions; to post, sign up for a free GitHub account.
 
 **Please read [SAFETY.md](SAFETY.md) before building or using PoolWind.**
 
@@ -133,7 +133,7 @@ PoolWind doesn't include other people's software. The install scripts fetch the 
 
 ## Support
 
-- No support is provided:  You're welcome to share builds, questions and answers with other users in [Discussions](../../discussions) in which the author may participate.
+- No support is provided:  You're welcome to share builds, questions and answers with other users in [Discussions](https://github.com/WillyAG/PoolWind/discussions) in which the author may participate.
 
 - An AI assistant such as Claude Code, run in the downloaded PoolWind folder, can help: this repository's [CLAUDE.md](CLAUDE.md) gives it the background. See [Getting help](docs/SETUP_GUIDE.md#12-getting-help) in the setup guide.
 
