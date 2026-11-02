@@ -75,7 +75,7 @@ moved too far, or the picture isn't the pool it knows: put the camera back
 The screen shows the camera's view of the pool swimming area from above, with your
 numbers on top in large letters you can read from anywhere in the pool.
 
-<img src="images/PoolWind_Pool_screen.png" width="300" alt="The pool screen during a swim: the swimmer seen from above, with the zone highlight as a light band across the head and shoulders, the Pace 2:03 in large letters, 2:33 avg and 0.140 mi below it, the Suspend button, and the Hold, View, UP, DN and OnOff buttons along the bottom">
+<img src="images/PoolWind_Pool_screen.png" width="300" alt="The pool screen during a swim: the swimmer seen from above, with the menu button at the top left, the PoolWind version at the top and the close X at the top right; the zone highlight as thin yellow lines between the zones and a light band across the swimmer's back; the Pace 4:03 in large letters, 2:38 avg and 0.049 mi below it, the Suspend button, and the Hold, View, UP, DN and OnOff buttons along the bottom">
 
 **Your numbers:**
 
@@ -509,7 +509,7 @@ Pulling your USB stick while Swim Plot is open closes it. You can plug it (or an
 **The plot and video**:\
 The swim's training video plays together with a plot of your swim:
 
-<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the zone highlight as a light band across the shoulders, and the Pace plot for 10-17-2026 below it: the blue Pace line, the red dashed average and the red cursor, and the goto MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
+<img src="images/PoolWind_Swim_Plot.png" width="300" alt="The Swim Plot screen: the training video of the swimmer from above, with the zone highlight's lines across the pool, and the Pace plot below it: PACE at the left and the date 11-01-2026 above the plot, the blue Pace line, the red dashed cursor lines, Avg Pace overall : 2:56 under the plot, the small box at the lower right with Time 0:08:25 and Pace 2:04, and the goto MPH, Compress Gaps, Play, On/Off and Close buttons above the plot">
 
 - **Pace** over time (shown first), or **MPH** over distance: switch with
   the **goto MPH** / **goto Pace** button (it names the other plot). 
