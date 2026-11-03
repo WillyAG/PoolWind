@@ -363,8 +363,15 @@ usb_sticks() {
     done
 }
 
-copy_newer() {    # copy_newer FROM TO
-    mkdir -p "$2" && cp -r --update --preserve=timestamps "$1/." "$2/"
+copy_newer() {    # copy_newer FROM TO [progress]: newer files only
+    mkdir -p "$2" || return 1
+    if [ -n "${3:-}" ] && command -v rsync > /dev/null; then
+        # the percentage as it goes; a USB stick keeps file times to the
+        # 1/100 s, hence the window
+        rsync -rt --update --modify-window=1 --info=progress2 --no-inc-recursive "$1/" "$2/"
+    else
+        cp -r --update --preserve=timestamps "$1/." "$2/"
+    fi
 }
 
 if [ "${1:-}" = "--restore" ]; then
@@ -415,9 +422,13 @@ if [ -z "$stick" ]; then
     fi
     stick="${sticks[$((n - 1))]}"
 fi
-echo "Copying to the USB stick $(basename "$stick")..."
+echo "Copying to the USB stick $(basename "$stick")."
 echo "(Close Claude first, so the copy has the whole conversation.)"
-if copy_newer "$PROJECTS" "$stick/PoolWind_Claude/projects" && sync; then
+echo "A long conversation can take a few minutes; the line below shows how"
+echo "far it has got (the percentage)."
+echo
+if copy_newer "$PROJECTS" "$stick/PoolWind_Claude/projects" progress && echo &&
+        echo "Finishing writing to the stick..." && sync; then
     echo
     echo "Done: $(du -sh "$stick/PoolWind_Claude" | cut -f1) in PoolWind_Claude on $(basename "$stick")."
     echo "The stick holds everything said and read in those conversations:"
