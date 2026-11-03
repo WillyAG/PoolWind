@@ -761,10 +761,15 @@ script adds. Double-click it:
 
 **By hand** (for example over SSH from a PC, below):
 
-1. **Install it** (once). In a terminal on the Pi, type:
+1. **Install it** (once). In a terminal on the Pi, type these three
+   lines, pressing Enter after each:
    ```
    curl -fsSL https://claude.ai/install.sh | bash
+   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+   source ~/.bashrc
    ```
+   The second and third lines let the terminal find `claude`. If the
+   installer prints a note about PATH, ignore it: those two lines do it.
 2. **Start it in the downloaded folder:**
    ```
    cd PoolWind-download

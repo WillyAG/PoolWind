@@ -284,6 +284,14 @@ if ! command -v claude > /dev/null; then
         read -r -p "Press Enter to close."
         exit 1
     fi
+    # The installer may print a note about PATH with a line to copy; this
+    # does it, so typing claude in any new terminal works too
+    if ! grep -q '\.local/bin' "\$HOME/.bashrc" 2>/dev/null; then
+        echo 'export PATH="\$HOME/.local/bin:\$PATH"  # added by PoolWind for Claude Code' >> "\$HOME/.bashrc"
+    fi
+    echo
+    echo "(If the installer printed a note about PATH, ignore it: that's"
+    echo "already taken care of.)"
     echo
     echo "Installed. Claude Code now asks you to sign in: it shows a link to"
     echo "open in a web browser."
