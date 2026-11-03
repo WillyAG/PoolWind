@@ -411,6 +411,28 @@ copy_newer() {    # copy_newer FROM TO [progress]: newer files only
     fi
 }
 
+# Claude Code keeps each conversation under the folder it was started in,
+# and the Claude icon starts in the download folder. Conversations (and
+# memory notes) from a folder this card doesn't have, such as one on the
+# old card, go there, so the icon carries them on. Newer files win.
+# Bill, 2026-11-03.
+move_to_icon_folder() {
+    local here d f cwd
+    here="$PROJECTS/$(printf '%s' "__SRC_DIR__" | sed 's/[^A-Za-z0-9]/-/g')"
+    for d in "$PROJECTS"/*/; do
+        d="${d%/}"
+        [ "$d" = "$here" ] && continue
+        f="$(ls -t "$d"/*.jsonl 2> /dev/null | head -1)"
+        [ -n "$f" ] || continue
+        cwd="$(grep -m1 -o '"cwd":"[^"]*"' "$f" | cut -d'"' -f4)"
+        [ -n "$cwd" ] && [ ! -d "$cwd" ] || continue
+        if copy_newer "$d" "$here"; then
+            rm -rf "$d"
+            echo "   Claude's conversations from $cwd (not on this card) moved so the Claude icon goes on with them"
+        fi
+    done
+}
+
 if [ "${1:-}" = "--restore" ]; then
     while read -r stick; do
         [ -d "$stick/PoolWind_Claude/projects" ] || continue
@@ -419,8 +441,9 @@ if [ "${1:-}" = "--restore" ]; then
         else
             echo "   Claude's conversations on the USB stick $(basename "$stick") couldn't all be copied"
         fi
-        exit 0
+        break
     done < <(usb_sticks)
+    [ -d "$PROJECTS" ] && move_to_icon_folder
     exit 0
 fi
 
@@ -476,6 +499,7 @@ echo
 echo "The copy didn't finish (is the stick full?). Nothing on the Pi was changed."
 finish 1
 EOF
+sed -i "s|__SRC_DIR__|$SRC_DIR|" "$CLAUDE_USB_SH"
 run chmod +x "$CLAUDE_USB_SH"
 tmp="$(mktemp)"
 cat > "$tmp" << EOF
