@@ -293,9 +293,28 @@ if ! command -v claude > /dev/null; then
     echo "(If the installer printed a note about PATH, ignore it: that's"
     echo "already taken care of.)"
     echo
-    echo "Installed. Claude Code now asks you to sign in: it shows a link to"
-    echo "open in a web browser."
+    echo "Installed."
     echo
+fi
+# Not signed in yet: the claude.ai sign-in page first, in the browser, so
+# Claude Code's own sign-in only needs Authorize (Bill, 2026-11-03: its
+# browser page offered only upgrades, and its c key copies the link, not
+# the code)
+if [ ! -s "\$HOME/.claude/.credentials.json" ]; then
+    echo "Signing in. The web browser opens on claude.ai: sign in there with"
+    echo "your Claude account (the one with the paid plan)."
+    xdg-open https://claude.ai/login > /dev/null 2>&1 &
+    echo
+    read -r -p "When you see the Claude chat page, come back here and press Enter. "
+    echo
+    echo "Now Claude Code starts. Choose \"Claude account with subscription\"."
+    echo "  1. A browser page asks to authorize Claude Code: click Authorize."
+    echo "     (No page? Press c here, which copies the link, and paste it into"
+    echo "     the browser's address bar.)"
+    echo "  2. The page then shows a code: copy it, paste it here and press"
+    echo "     Enter. Only the last few characters show; that's normal."
+    echo
+    read -r -p "Press Enter to start Claude Code. "
 fi
 # Carry on the last conversation in this folder, if there is one
 if ls "\$HOME/.claude/projects/\$(pwd | sed 's/[^A-Za-z0-9]/-/g')"/*.jsonl > /dev/null 2>&1; then

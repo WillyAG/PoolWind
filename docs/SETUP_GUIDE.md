@@ -755,9 +755,14 @@ change with nobody in the pool first.
 **The easy way: the Claude icon** on the Pi's desktop, which the install
 script adds. Double-click it:
 
-- the first time, it explains Claude Code and offers to install it, then
-  Claude Code asks you to sign in (or to create an account) through a
-  link to open in a web browser;
+- the first time, it explains Claude Code and offers to install it;
+- until you're signed in, it opens the claude.ai sign-in page in the web
+  browser: sign in there with your Claude account (or create one) and
+  press Enter in the terminal. Then choose **Claude account with
+  subscription**, click **Authorize** on the browser page that opens, and
+  copy the code it shows into the terminal. (The `c` key in the terminal
+  copies the sign-in link, not the code: paste that into the browser's
+  address bar if no page opened.);
 - after that, it opens Claude Code in the `PoolWind-download` folder,
   carrying on your last conversation.
 
