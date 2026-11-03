@@ -110,9 +110,10 @@ The install script:
   where the program, its settings files and the `CSV Vault` live;
 - downloads the **sample video**, a recorded swim for testing at a desk
   (section 8);
-- adds four icons to the desktop: **PoolWind**, **Monitor Toggle** for
-  [working from home](#9-working-from-home), **Claude** and **Copy Claude
-  to USB** ([getting help](#12-getting-help));
+- adds three icons to the desktop: **PoolWind**, **Monitor Toggle** for
+  [working from home](#9-working-from-home) and **Claude**
+  ([getting help](#12-getting-help)), and **Copy Claude to USB** when a
+  stick holds Claude's conversations;
 - if a USB stick holds Claude's conversations from another SD card
   (**Copy Claude to USB**, section 12), copies them back;
 - turns the monitor to **portrait** (taller than wide) every time the Pi
@@ -755,16 +756,23 @@ change with nobody in the pool first.
 **The easy way: the Claude icon** on the Pi's desktop, which the install
 script adds. Double-click it:
 
-- the first time, it explains Claude Code and offers to install it;
-- until you're signed in, it opens the claude.ai sign-in page in the web
-  browser: sign in there with your Claude account (or create one) and
-  press Enter in the terminal. Then choose **Claude account with
-  subscription**, click **Authorize** on the browser page that opens, and
-  copy the code it shows into the terminal. (The `c` key in the terminal
-  copies the sign-in link, not the code: paste that into the browser's
-  address bar if no page opened.);
+- the first time, it installs Claude Code and opens the Claude sign-in
+  page in the web browser. Sign in with your email (Claude emails you a
+  code to type in) or with Google, or create an account, then click
+  **Authorize**. Claude Code finishes by itself: there's nothing to copy
+  or paste;
 - after that, it opens Claude Code in the `PoolWind-download` folder,
-  carrying on your last conversation.
+  carrying on your last conversation. Claude has read `CLAUDE.md` as it
+  starts.
+
+Claude runs in a shared session (tmux): the Claude icon on the Pi and the
+same command from a PC (below) show the same Claude, so you can go from
+one to the other in the middle of a conversation. Closing the window
+leaves Claude running for next time; `/exit` in Claude ends it.
+
+The first time the web browser saves a sign-in, it may ask for a password
+for a "Default keyring" (where it keeps saved passwords). Leaving both
+fields blank and clicking **Continue** stops it from asking again.
 
 **By hand** (for example over SSH from a PC, below):
 
@@ -806,8 +814,10 @@ instead of `claude`. To finish, type `/exit`.
 Claude Code keeps its conversations, and the notes it makes about you and
 your pool, on the SD card. To carry on with them on a new card:
 
-1. On the old card, close Claude, plug in a USB stick and double-click
-   **Copy Claude to USB**. It copies them to a `PoolWind_Claude` folder on
+1. On the old card, close Claude (`/exit`), plug in a USB stick and
+   double-click **Copy Claude to USB**. (The install script adds that icon
+   only when it finds a stick with conversations on it. The first time,
+   type `~/.local/bin/poolwind_claude_usb.sh` in a terminal instead.) It copies them to a `PoolWind_Claude` folder on
    the stick (if more than one stick is plugged in, it asks which) and
    says when it's done. A swimmer's stick will do.
 2. On the new card, plug the stick in before running the install script
@@ -842,18 +852,22 @@ has: Claude runs on the Pi, and the PC only shows its terminal.
    ```
    The first time, answer **yes** to the question about the Pi's key, then
    type the Pi's password. The window is now a terminal on the Pi.
-4. **Start Claude** in it, as above:
+4. **Start Claude** in it: this is what the Claude icon runs.
    ```
-   cd PoolWind-download
-   claude
+   .local/bin/poolwind_claude.sh
+   ```
+   Or all in one line from the PC, steps 3 and 4 together:
+   ```
+   ssh -t yourname@poolwind.local .local/bin/poolwind_claude.sh
    ```
 5. **To see the Pi's screen** at the same time, use RealVNC Viewer
    (section 9) in another window, or on a second monitor.
 
-**At the pool**, open a terminal on the Pi and type the same commands
-(`cd PoolWind-download`, then `claude -c` to carry on the same
-conversation). Finish with `/exit` on the PC first: two windows working on
-the same conversation get in each other's way.
+**At the pool**, double-click the Claude icon on the Pi: it shows the same
+Claude as the PC, mid-conversation if you were in one. Closing the PC's
+window leaves Claude running on the Pi. When the Pi is switched off,
+Claude stops, but the conversation is kept: the next start carries on
+with it.
 
 ## 13. Trying PoolWind on a PC
 

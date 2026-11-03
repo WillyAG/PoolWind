@@ -103,10 +103,14 @@ faster than they can handle.
   `PoolWind_demo.mp4` (desk tests; a `'Demo': True` run) from the latest GitHub Release of the repository it
   was cloned from (with `gh` for a private one; a failed download
   doesn't stop the install). Desktop icons: **PoolWind**, **Monitor
-  Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: offers to
-  install Claude Code the first time, then opens it in this download folder,
-  continuing the last conversation), and **Copy Claude to USB**
-  (`~/.local/bin/poolwind_claude_usb.sh`: `~/.claude/projects` to
+  Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: a tmux
+  session `poolwind-claude` shared by the icon and SSH from a PC (`ssh -t
+  user@host .local/bin/poolwind_claude.sh`); the first time it installs
+  Claude Code and runs `claude auth login --claudeai`; then it opens Claude
+  in this download folder, continuing the last conversation), and **Copy
+  Claude to USB** (`~/.local/bin/poolwind_claude_usb.sh`, its icon only
+  when the install finds a stick with `PoolWind_Claude` or the icon is
+  there already: `~/.claude/projects` to
   `PoolWind_Claude/projects` on a USB stick, newer files only; install.sh
   runs it with `--restore` to copy them back on a new card; it skips the SD
   card and any disk with an ext partition or mounted outside `/media`, such

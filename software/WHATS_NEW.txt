@@ -19,9 +19,10 @@ section 4); without them PoolWind says so and doesn't start.
   clears that box.
 - The calibration's Start with the pump off offers to turn it on.
 
-Copy Claude to USB, a new desktop icon: copies Claude Code's conversations
-to a USB stick, and the install script on a new SD card copies them back
-(setup guide, section 12).
+The Claude icon installs Claude Code and signs in with nothing to type or
+paste, and runs it in a session the Pi and a PC over SSH share (setup
+guide, section 12). Copy Claude to USB copies Claude Code's conversations
+to a USB stick, and the install script on a new SD card copies them back.
 
 Also since v15.5:
 

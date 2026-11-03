@@ -34,7 +34,7 @@ PIP_PACKAGES="opencv-python==4.13.0.92 scipy==1.17.1 adafruit-circuitpython-ina2
 
 # Debian packages.
 APT_PACKAGES="python3-numpy python3-scipy python3-matplotlib python3-pyside6.qtwidgets \
-python3-lgpio python3-pip ffmpeg exfatprogs i2c-tools realvnc-vnc-server"
+python3-lgpio python3-pip ffmpeg exfatprogs i2c-tools realvnc-vnc-server tmux"
 
 # --------------------------------------------------------------------------
 # Helpers
@@ -261,68 +261,86 @@ run chmod +x "$DESKTOP/PoolWind.desktop" "$DESKTOP/Monitor_Toggle.desktop"
 say "   added PoolWind and Monitor Toggle"
 
 # The Claude icon: Claude Code (an AI assistant, setup guide section 12)
-# in this downloaded folder, which holds CLAUDE.md. The first time, it
-# offers to install Claude Code; Claude Code then asks the user to sign in.
+# in this downloaded folder, which holds CLAUDE.md. Bill, 2026-11-03: the
+# first click installs it and signs in, with nothing to type or paste; it
+# runs in a tmux session, so the PC (over SSH) and the Pi share one live
+# Claude.
 CLAUDE_SH="$HOME/.local/bin/poolwind_claude.sh"
-cat > "$CLAUDE_SH" << EOF
+cat > "$CLAUDE_SH" << 'EOF'
 #!/bin/bash
 # PoolWind's Claude icon (written by install.sh): Claude Code in the
 # PoolWind download folder, where CLAUDE.md gives it PoolWind's background.
-cd "$SRC_DIR" || { echo "The folder $SRC_DIR is missing."; read -r -p "Press Enter to close."; exit 1; }
-export PATH="\$HOME/.local/bin:\$PATH"
+# It runs in a tmux session, poolwind-claude: the icon on the Pi and this
+# script from a PC over SSH both show that one session, so you can go from
+# one to the other mid-conversation:
+#     ssh -t yourname@poolwind.local .local/bin/poolwind_claude.sh
+# Closing a window leaves Claude running; /exit in Claude ends it.
+SRC_DIR="__SRC_DIR__"
+SESSION=poolwind-claude
+export PATH="$HOME/.local/bin:$PATH"
+
+if [ "${1:-}" != "--inside" ] && command -v tmux > /dev/null; then
+    if ! tmux has-session -t "$SESSION" 2> /dev/null; then
+        tmux new-session -d -s "$SESSION" -x 120 -y 40 "$(readlink -f "$0") --inside"
+        tmux set-option -t "$SESSION" window-size latest > /dev/null
+        tmux set-option -t "$SESSION" status off > /dev/null
+    fi
+    exec tmux attach-session -t "$SESSION"
+fi
+
+done_key() { echo; read -r -p "Press Enter to close." _; exit "$1"; }
+cd "$SRC_DIR" || { echo "The folder $SRC_DIR is missing."; done_key 1; }
+
 if ! command -v claude > /dev/null; then
-    echo "Claude Code isn't installed yet."
+    echo "Installing Claude Code, an AI assistant that can help you set up, fix"
+    echo "or change PoolWind (setup guide, section 12). It needs a paid Claude"
+    echo "account; you can create one when you sign in."
     echo
-    echo "Claude Code is an AI assistant that can help you set up, fix or"
-    echo "change PoolWind (setup guide, section 12). It needs a paid Claude"
-    echo "account; you can create one when it asks you to sign in."
-    echo
-    read -r -p "Install Claude Code now? (y/n) " answer
-    case "\$answer" in [Yy]*) ;; *) exit 0 ;; esac
     if ! curl -fsSL https://claude.ai/install.sh | bash; then
         echo "The install didn't work. Check the internet connection and try again."
-        read -r -p "Press Enter to close."
-        exit 1
+        done_key 1
     fi
-    # The installer may print a note about PATH with a line to copy; this
+    # The installer may print a note about PATH with a line to copy: this
     # does it, so typing claude in any new terminal works too
-    if ! grep -q '\.local/bin' "\$HOME/.bashrc" 2>/dev/null; then
-        echo 'export PATH="\$HOME/.local/bin:\$PATH"  # added by PoolWind for Claude Code' >> "\$HOME/.bashrc"
+    if ! grep -q '\.local/bin' "$HOME/.bashrc" 2> /dev/null; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"  # added by PoolWind for Claude Code' >> "$HOME/.bashrc"
     fi
-    echo
-    echo "(If the installer printed a note about PATH, ignore it: that's"
-    echo "already taken care of.)"
-    echo
-    echo "Installed."
+    clear
+    echo "Claude Code is installed."
     echo
 fi
-# Not signed in yet: the claude.ai sign-in page first, in the browser, so
-# Claude Code's own sign-in only needs Authorize (Bill, 2026-11-03: its
-# browser page offered only upgrades, and its c key copies the link, not
-# the code)
-if [ ! -s "\$HOME/.claude/.credentials.json" ]; then
-    echo "Signing in. The web browser opens on claude.ai: sign in there with"
-    echo "your Claude account (the one with the paid plan)."
-    xdg-open https://claude.ai/login > /dev/null 2>&1 &
+
+if ! claude auth status 2> /dev/null | grep -q '"loggedIn": *true'; then
+    echo "Signing in to Claude."
     echo
-    read -r -p "When you see the Claude chat page, come back here and press Enter. "
+    echo "The web browser opens on the Claude sign-in page:"
+    echo "  - sign in with your email (Claude emails you a code to type in) or"
+    echo "    with Google, or create an account (a paid plan is needed);"
+    echo "  - then click Authorize. Claude Code finishes by itself."
     echo
-    echo "Now Claude Code starts. Choose \"Claude account with subscription\"."
-    echo "  1. A browser page asks to authorize Claude Code: click Authorize."
-    echo "     (No page? Press c here, which copies the link, and paste it into"
-    echo "     the browser's address bar.)"
-    echo "  2. The page then shows a code: copy it, paste it here and press"
-    echo "     Enter. Only the last few characters show; that's normal."
+    echo "From a PC over SSH, open the link it shows in the PC's browser, and"
+    echo "paste the code that page gives you back here."
     echo
-    read -r -p "Press Enter to start Claude Code. "
+    if ! claude auth login --claudeai; then
+        echo
+        echo "Not signed in. Click the Claude icon to try again."
+        done_key 1
+    fi
+    clear
+    echo "Signed in."
+    echo
 fi
+
+echo "Starting Claude. It has read CLAUDE.md, PoolWind's background."
+sleep 2
 # Carry on the last conversation in this folder, if there is one
-if ls "\$HOME/.claude/projects/\$(pwd | sed 's/[^A-Za-z0-9]/-/g')"/*.jsonl > /dev/null 2>&1; then
+if ls "$HOME/.claude/projects/$(pwd | sed 's/[^A-Za-z0-9]/-/g')"/*.jsonl > /dev/null 2>&1; then
     claude -c
 else
     claude
 fi
 EOF
+sed -i "s|__SRC_DIR__|$SRC_DIR|" "$CLAUDE_SH"
 run chmod +x "$CLAUDE_SH"
 # Written beside the desktop and moved in, so the file manager shows its name
 tmp="$(mktemp)"
@@ -470,9 +488,15 @@ Icon=drive-removable-media
 Terminal=false
 EOF
 chmod +x "$tmp"
-run mv "$tmp" "$DESKTOP/Copy_Claude_to_USB.desktop"
-say "   added Copy Claude to USB"
+# Its icon only for whoever keeps Claude's conversations on a stick: a stick
+# with them plugged in now (copied back here), or the icon there already
 restored="$("$CLAUDE_USB_SH" --restore 2>> "$LOG")"
+if [ -n "$restored" ] || [ -e "$DESKTOP/Copy_Claude_to_USB.desktop" ]; then
+    run mv "$tmp" "$DESKTOP/Copy_Claude_to_USB.desktop"
+    say "   added Copy Claude to USB"
+else
+    rm -f "$tmp"
+fi
 [ -n "$restored" ] && say "$restored"
 
 # Turn the monitor to portrait every time the desktop starts, so it's
