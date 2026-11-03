@@ -1,6 +1,49 @@
 
 if True:  # keep this here as an  easy way to skip over all this
-    # poolwindAI_v15.7   -- A PACE TABLE PER SWIMMER (planned). Bill,
+    # poolwindAI_v15.8   -- PUMP SENSING. Bill, 2026-11-03:
+    #                       "Such a major change. We should archive v15.7
+    #                       and put the new work in v15.8". R6 (72.1 k) and
+    #                       R3 (5 k) fitted on the interface board: the Pace
+    #                       Display port's pump line (39.5 V, 0 V the moment
+    #                       the pump stops) to GPIO 23, 2.51 V measured;
+    #                       read high/low with every pull. PoolWind will know
+    #                       whether the pump is on (the plan: TODO.md).
+    #                       Needs R3/R6; no setting for boards without them.
+    #                       Starts as a copy of v15.7.
+    #                       - THE PUMP LINE: pump_pin_check reads GPIO 23
+    #                         with the Pi's pull-up and pull-down at start:
+    #                         the same both ways = on / off; following the
+    #                         pull = R6/R3 not fitted, a box and PoolWind
+    #                         (or the calibration) doesn't start.
+    #                       - ON/OFF (PumpSwitch): pressed until the pump
+    #                         line follows. Turning on: one press, the
+    #                         button goes back if it didn't start. Turning
+    #                         off: pressed again for up to 30 s, then "Turn
+    #                         the pump off" (the other remote; nothing sent
+    #                         to the pool while it's open; once cleared, no
+    #                         more automatic pump moves). The wind-down box
+    #                         before either; "Stop pump now" (was "On/Off
+    #                         now") only when turning off: it can never
+    #                         start the pump.
+    #                       - EVERY PUMP BUTTON (pool screen, Swim Plot's
+    #                         dates and video, calibration): the power
+    #                         symbol, red and down while the pump runs, grey
+    #                         and up while it's off; it changes at the press.
+    #                       - The pump off (any remote): the swim pauses
+    #                         (Suspend) and goes on when it's back on.
+    #                         Begin / Resume with it off: "Turn pump on?".
+    #                       - No swimmer for 5 minutes on the pool screen,
+    #                         the pump on: a box with "Keep swimming" for
+    #                         30 s, then the pump off and PoolWind closes.
+    #                       - Closing with the pump on: "Pump still running"
+    #                         (Shut Down / Exit) after the window has gone;
+    #                         a new start clears it (clear_pump_running_box,
+    #                         the pid in poolwind_pump_box.pid).
+    #                       - Calibration: Start (scan, Pace Entry's Auto
+    #                         scan, PingPong) with the pump off asks to turn
+    #                         it on, then starts.
+    #
+    # poolwindAI_v15.7   -- A PACE TABLE PER SWIMMER. Bill,
     #                       2026-10-29: "Such a major change, let's archive
     #                       v15.6 and go on to v15.7." The swimmer's own Pace
     #                       table on their USB stick (no stick: the Master
@@ -145,6 +188,33 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       - recordRawVideo moved from the calibration file
     #                         to the defaults file's developer tools (built
     #                         in False); the calibration file drops it.
+    #                       - START-UP ERROR BOX (2026-11-02): a broken
+    #                         defaults or calibration file shows "PoolWind
+    #                         can't start" with the file, the line and the
+    #                         problem in plain words (Close), instead of
+    #                         hanging or closing silently; a wrong choice
+    #                         ('poolx') and a misspelled setting name too;
+    #                         "Unknown problem while starting" as a last
+    #                         resort.
+    #                       - DEMO built in True only on a computer without
+    #                         the Pi's libraries (the PC demo); on the Pi a
+    #                         fresh install controls the pool. No voltage
+    #                         sensor: a box instead of an error.
+    #                       - WIND-DOWNS (2026-11-02, "an equipment saving
+    #                         feature"): at start and close to the jet's
+    #                         lowest step; Swim Plot, leaving and coming
+    #                         back, to the swimmer's slowest zone; OnOff,
+    #                         Set Swim Area and the calibration to the
+    #                         lowest; never up.
+    #                       - SWIMMER LIMITS: "Limits - Auto or Manual
+    #                         Settings" and "Manual Settings" (height,
+    #                         training video, 5-15 frames per second),
+    #                         saved to the stick or the main defaults file;
+    #                         a new stick asks for video and rate too.
+    #                         Pace Entry's REVIEW_IDLE_S back to 5 s.
+    #                       Archived 2026-11-03; v15.8 for pump sensing
+    #                       (R3/R6 to GPIO 23: PoolWind knows whether the
+    #                       pump is on).
     #
     # poolwindAI_v15.6   -- CALIBRATION CHANGES. Bill, 2026-10-25:
     #                       "I've been swimming and testing. I'd like to
@@ -516,6 +586,10 @@ if True:  # keep this here as an  easy way to skip over all this
         import lgpio
     except ImportError:
         board = adafruit_ina260 = lgpio = None
+    try:
+        import shiboken6            # (tells whether a Qt widget still exists)
+    except ImportError:
+        shiboken6 = None
     import os
     # Qt for Python: PySide6 (LGPL), since v15.3. matplotlib's Qt canvas
     # uses the same binding.
@@ -1088,6 +1162,26 @@ class App:
         self.GPIO.output(self.PIN_UP, True)
         self.GPIO.output(self.PIN_DN, True)
         self.GPIO.output(self.PIN_PUMP, True)
+
+        # Pump sensing (v15.8): GPIO 23 reads the pump line through R6/R3.
+        # None: the simulated pump (SimulatedValve.pump_on).
+        self.pump_sense = None
+        if self.valveOption == "real" and self.GPIO.chip is not None:
+            state = pump_pin_check(lgpio, self.GPIO.chip)
+            print("Pump line (GPIO 23):", state)
+            if state == "not fitted":
+                QMessageBox.critical(None, "PoolWind can't start", PUMP_NOT_FITTED_TEXT,
+                                     QMessageBox.Close)
+                self.GPIO.cleanup()
+                sys.exit(1)
+            self.pump_sense = PUMP_SENSE_PIN
+            self.GPIO.claimed_pins.add(PUMP_SENSE_PIN)       # freed by cleanup()
+        self._pump_last = True
+        self.pump_switch = PumpSwitch(self._pump_press, self.pump_is_on)
+        self._pump_target = None        # what the button shows while switching
+        self._remote_locked = False     # the "turn it off with the other remote" box is open
+        self._pump_hands_off = False    # ...and was cleared: no more automatic pump moves
+        self._resume_when_pump_on = False
 
         # ---------------------------------------------------------
         # App state variables (UI / display)
@@ -2686,6 +2780,9 @@ class App:
             self.suspendButtonText = "Resume"
 
     def UP_relay(self): 
+        if getattr(self, "_remote_locked", False):
+            self.relay_off()            # the other-remote box is open: nothing to the pool
+            return
         if self.valveOption == "simulate":
             self.valve.sim_UP_relay_on()
         else:
@@ -2695,6 +2792,9 @@ class App:
         self.currentDirection = "UP"
 
     def DN_relay(self):
+        if getattr(self, "_remote_locked", False):
+            self.relay_off()            # the other-remote box is open: nothing to the pool
+            return
         if self.valveOption == "simulate":
             self.valve.sim_DN_relay_on()
         else:
@@ -2779,59 +2879,315 @@ class App:
     # remote, which can't send two buttons at once -- so UP/DN is released
     # first and the jet drive stays hands-off for the whole sequence.
     PUMP_PRE_DELAY_MS  = 300    # after releasing UP/DN, before pressing OnOff
-    PUMP_PULSE_MS      = 2000   # OnOff held this long
     PUMP_POST_DELAY_MS = 500    # after releasing OnOff, before UP/DN may resume
+    # (OnOff held PUMP_PRESS_MS: PumpSwitch)
 
     # Pump buttons off the main screen ask first (Bill, 2026-10-17: "they
     # are too easy to press ... a message pop up like: 'Are you sure? This
     # will toggle the pump on or off - OK, Cancel'"). The pool screen's
-    # OnOff stays one touch, for emergencies. All pump buttons are tinted
-    # a light red (PUMP_BTN_*).
-    PUMP_BTN_BGR = (185, 185, 225)                  # pool screen (OpenCV, BGR)
-    # Qt buttons, same tint. The border is needed: the Pi desktop's button
-    # style ignores a background colour on its own (seen 2026-10-17).
+    # OnOff stays one touch, for emergencies. Since v15.8 every pump button
+    # shows the pump: red and down while it runs (style_pump_button).
+    # "Stop pump now" in the wind-down box, light red. The border is
+    # needed: the Pi desktop's button style ignores a background colour on
+    # its own (seen 2026-10-17).
     PUMP_BTN_STYLE = ("QPushButton { background-color: #e1b9b9; border: 1px solid #9c7c7c;"
                       " border-radius: 3px; padding: 5px; }"
                       " QPushButton:pressed { background-color: #c99d9d; }")
 
     def OnOff_confirm(self, parent=None):
+        if self._remote_locked or self.pump_switch.busy or getattr(self, "_pump_pulsing", False):
+            return
+        on = self.pump_is_on()
         box = QMessageBox(parent)
         box.setIcon(QMessageBox.Question)
         box.setWindowTitle("Pump On/Off")
-        box.setText("Are you sure? This will turn the pool's pump on or off.")
+        box.setText("Are you sure? This will turn the pool's pump " + ("off." if on else "on."))
         box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         box.setDefaultButton(QMessageBox.Cancel)
         if box.exec() == QMessageBox.Ok:
-            self.OnOff_btn_press()
+            self.switch_pump(not self.pump_is_on())
 
     def OnOff_btn_press(self):
-        # Momentary pulse on Qt timers (mouse-release is not wired to any
-        # button action, so we can't rely on btn_release() here). Takes
-        # priority over the jet drive: UpdateLoop skips _hold_drive while
-        # _pump_pulsing is set.
-        if getattr(self, "_pump_pulsing", False):
-            return  # ignore repeat presses while a pulse is in progress
+        """The pool screen's OnOff: one touch, for emergencies."""
+        self.switch_pump(not self.pump_is_on())
+
+    # ------------------------------------------------------------------
+    # The pump (v15.8): PoolWind sees whether it runs (GPIO 23, R6/R3)
+    # ------------------------------------------------------------------
+    def pump_is_on(self):
+        """The pump line, or the simulated pump."""
+        if self.pump_sense is None:
+            self._pump_last = bool(getattr(self.valve, "pump_on", True))
+        else:
+            try:
+                self._pump_last = bool(lgpio.gpio_read(self.GPIO.chip, self.pump_sense))
+            except Exception:
+                pass                    # (keeps the last reading)
+        return self._pump_last
+
+    def pump_button_on(self):
+        """What the pump buttons show: the pump, or while switching the
+        way it's going (Bill, 2026-11-02: "Button should change
+        immediately")."""
+        return self._pump_target if self._pump_target is not None else self._pump_last
+
+    def _pump_press(self, down):
+        """Holds (True) or lets go of (False) the remote's On/Off."""
+        if down and self._remote_locked:
+            return
+        if self.valveOption == "simulate":
+            if getattr(self, "_sim_pump_down", False) and not down:
+                self.valve.pump_on = not getattr(self.valve, "pump_on", True)
+            self._sim_pump_down = down
+            return
+        self.GPIO.output(self.PIN_PUMP, not down)      # False = ON, True = OFF
+
+    def switch_pump(self, want_on, then=None, title="Pump On/Off"):
+        """Turns the pump on or off: the jet wound down first (a pump may
+        not start with the jet set high, Bill 2026-10-22; and both ways,
+        Bill 2026-11-02: "Keep both with the popup emergency window"), UP/DN
+        let go, then On/Off pressed until the pump line follows
+        (PumpSwitch). Turning off, the wind-down box has "Stop pump now"; it
+        can only stop the pump, never start it. The jet drive is hands-off
+        meanwhile (_pump_pulsing). then(ok) at the end."""
+        if self._remote_locked or self.pump_switch.busy or getattr(self, "_pump_pulsing", False):
+            return False
         self._pump_pulsing = True
-        # Wind the jet down first, whether the pump is going on or off
-        # (PoolWind can't tell which): a pump may not start with the jet
-        # set high (Bill, 2026-10-22).
-        # The box offers "On/Off now" to skip the wind-down in an emergency
-        # (Bill, 2026-10-22).
-        self.initial_voltage_winddown("Pump On/Off", now_button=True)
+        self._pump_target = bool(want_on)
+        self.initial_voltage_winddown(title, now_button=not want_on, pump_on=bool(want_on))
         self.relay_off()                         # let go of UP/DN first
-        QTimer.singleShot(self.PUMP_PRE_DELAY_MS, self._pump_pulse_start)
 
-    def _pump_pulse_start(self):
-        self.relay_off()                         # still nothing else pressed
-        self.GPIO.output(self.PIN_PUMP, False)   # False = ON, True = OFF
-        QTimer.singleShot(self.PUMP_PULSE_MS, self._pump_pulse_release)
+        def press():
+            self.relay_off()                     # still nothing else pressed
+            self.pump_switch.start(want_on, lambda ok: self._pump_switched(want_on, ok, then))
+        QTimer.singleShot(self.PUMP_PRE_DELAY_MS, press)
+        return True
 
-    def _pump_pulse_release(self):
-        self.GPIO.output(self.PIN_PUMP, True)   # False = ON, True = OFF
+    def _pump_switched(self, want_on, ok, then):
+        self._pump_target = None
         QTimer.singleShot(self.PUMP_POST_DELAY_MS, self._pump_pulse_done)
+        if not ok and not want_on:
+            self.pump_manual_off()
+        if then is not None:
+            then(ok)
 
     def _pump_pulse_done(self):
         self._pump_pulsing = False
+
+    def pump_manual_off(self, parent=None):
+        """The pump didn't turn off: the box asking for the other remote,
+        nothing sent to the pool while it's open; once a person has cleared
+        it, PoolWind goes on and makes no more automatic pump moves (Bill,
+        2026-11-03: "After giving a warning and a live person cleared it,
+        poolwind shouldn't care anymore")."""
+        self._remote_locked = True
+        self.pump_switch.cancel()
+        self._close_pump_warning()
+        try:
+            self.relay_off()
+        except Exception:
+            pass
+        try:
+            pump_manual_off_box(parent or getattr(self, "window", None))
+        finally:
+            self._remote_locked = False
+            self._pump_hands_off = True
+            self._no_swimmer_since = time.time()
+
+    def ask_pump_on(self, parent=None):
+        """Begin / Resume with the pump off: offer to turn it on; the swim
+        starts once it runs (the pump monitor)."""
+        if self._remote_locked or self.pump_switch.busy or getattr(self, "_pump_pulsing", False):
+            return
+        box = QMessageBox(parent or getattr(self, "window", None))
+        box.setIcon(QMessageBox.Question)
+        box.setWindowTitle("The pump is off")
+        box.setText("The pool's pump is off. Turn it on?")
+        turn = box.addButton("Turn pump on", QMessageBox.AcceptRole)
+        box.addButton("Cancel", QMessageBox.RejectRole)
+        box.exec()
+        if box.clickedButton() is turn:
+            self._resume_when_pump_on = True
+            self.switch_pump(True)
+
+    # The pump monitor: a timer of its own (it goes on while a menu has the
+    # pool screen paused). Reads the pump line; shows it on every pump
+    # button; pauses the swim while the pump is off and goes on when it's
+    # back (Bill, 2026-11-02: "Just pause the swim and recording like any
+    # other thing that pauses the swim"); and with no swimmer in sight for
+    # five minutes, turns the pump off and closes PoolWind ("if no swimmer
+    # in sight for five minutes turn off the pump and close the program"),
+    # after a box with "Keep swimming" for PUMP_OFF_WARNING_S.
+    def start_pump_monitor(self):
+        self._pump_buttons = getattr(self, "_pump_buttons", [])
+        self._no_swimmer_since = time.time()
+        self._pump_monitor = QTimer()
+        self._pump_monitor.timeout.connect(self._pump_monitor_tick)
+        self._pump_monitor.start(250)
+
+    def register_pump_button(self, btn, extra=""):
+        """A Qt pump button that shows the pump (style_pump_button)."""
+        btn._pump_extra = extra
+        if not hasattr(self, "_pump_buttons"):
+            self._pump_buttons = []
+        self._pump_buttons.append(btn)
+        style_pump_button(btn, self.pump_button_on(), extra)
+
+    def _pump_monitor_tick(self):
+        if getattr(self, "_already_shutdown", False):
+            return
+        now = time.time()
+        on = self.pump_is_on()
+        shown = self.pump_button_on()
+        alive = []
+        for b in getattr(self, "_pump_buttons", []):
+            try:
+                if shiboken6 is not None and not shiboken6.isValid(b):
+                    continue                    # its window has closed
+                style_pump_button(b, shown, getattr(b, "_pump_extra", ""))
+                alive.append(b)
+            except RuntimeError:
+                pass
+        self._pump_buttons = alive
+        if self._remote_locked or self.REPdefaults.get("Demo"):
+            return
+        if not on and self.suspendButtonText == "Suspend":
+            print("The pump is off: the swim pauses")
+            self.Suspend_btn_press()
+            self._resume_when_pump_on = True
+        elif on and self._resume_when_pump_on and not self.pump_switch.busy:
+            self._resume_when_pump_on = False
+            if self.suspendButtonText in ("Begin", "Resume"):
+                print("The pump is on: the swim goes on")
+                self.Suspend_btn_press()
+        self._pump_auto_off_tick(now, on)
+
+    def _pump_auto_off_tick(self, now, on):
+        w = getattr(self, "window", None)
+        watching = (on and w is not None and not self.REPdefaults.get("Demo")
+                    and not self._pump_hands_off and not self.pump_switch.busy
+                    and not getattr(self, "_pump_pulsing", False)
+                    and not self.pause_update_loop and not getattr(self, "_winding_down", False)
+                    and not getattr(self, "_calibrating", False))
+        if not watching or getattr(w, "swimmerFound", False):
+            self._no_swimmer_since = now
+            self._close_pump_warning()
+            return
+        idle = now - self._no_swimmer_since
+        if idle < NO_SWIMMER_PUMP_OFF_S:
+            return
+        left = NO_SWIMMER_PUMP_OFF_S + PUMP_OFF_WARNING_S - idle
+        if left > 0:
+            self._show_pump_warning(left)
+            return
+        self._close_pump_warning()
+        print(f"No swimmer for {NO_SWIMMER_PUMP_OFF_S // 60} minutes: the pump off, then PoolWind closes")
+        self.switch_pump(False, then=self._auto_off_done, title="No swimmer: turning the pump off")
+
+    def _show_pump_warning(self, left):
+        box = getattr(self, "_pump_warning", None)
+        if box is None:
+            box = QMessageBox(getattr(self, "window", None))
+            box.setIcon(QMessageBox.Warning)
+            box.setWindowTitle("No swimmer")
+            keep = box.addButton("Keep swimming", QMessageBox.AcceptRole)
+            keep.setStyleSheet("QPushButton { padding: 14px 28px; font-size: 14pt; }")
+            box.buttonClicked.connect(lambda _b: self._keep_swimming())
+            box.setModal(False)
+            box.show()
+            self._pump_warning = box
+        box.setText(f"No swimmer seen for {NO_SWIMMER_PUMP_OFF_S // 60} minutes.\n\n"
+                    f"PoolWind turns the pump off and closes in {max(0, left):.0f} s.")
+
+    def _keep_swimming(self):
+        print("Keep swimming pressed: the pump stays on")
+        self._no_swimmer_since = time.time()
+        self._pump_warning = None
+
+    def _close_pump_warning(self):
+        box = getattr(self, "_pump_warning", None)
+        self._pump_warning = None
+        if box is not None:
+            try:
+                box.hide()
+                box.deleteLater()
+            except RuntimeError:
+                pass
+
+    def _auto_off_done(self, ok):
+        if ok and getattr(self, "window", None) is not None:
+            self._auto_closing = True           # no questions at close: nobody is there
+            self.window.close()
+
+    def _pump_running_box(self):
+        """Closing with the pump running (Bill, 2026-11-02: "the main screen
+        goes away but a popup for 'Pump still running || Shut Down   Exit'.
+        I know I really need that feature. And if poolwind is started up
+        again with that popup open, it looks for the box and if found will
+        clear it."): Shut Down turns the pump off (PumpSwitch, its retries,
+        then the other-remote box), Exit leaves it running. A new start
+        finds this process by PUMP_BOX_PID_PATH and sends SIGTERM
+        (clear_pump_running_box): the box closes and the pump is left
+        alone."""
+        import signal
+        cleared = []
+        try:
+            with open(PUMP_BOX_PID_PATH, "w") as f:
+                f.write(str(os.getpid()))
+        except Exception as e:
+            print("Couldn't write", PUMP_BOX_PID_PATH, e)
+        try:
+            old_handler = signal.signal(signal.SIGTERM, lambda *_a: cleared.append(True))
+        except Exception:
+            old_handler = None
+        box = QMessageBox()
+        box.setIcon(QMessageBox.Warning)
+        box.setWindowTitle("Pump still running")
+        box.setText("PoolWind is closed, but the pool's pump is still running.")
+        box.setInformativeText("Shut Down turns the pump off. Exit leaves it running.")
+        shut = box.addButton("Shut Down", QMessageBox.AcceptRole)
+        box.addButton("Exit", QMessageBox.RejectRole)
+        for b in box.buttons():
+            b.setStyleSheet("QPushButton { padding: 12px 24px; font-size: 13pt; }")
+        box.setWindowFlags(box.windowFlags() | Qt.WindowStaysOnTopHint)
+        poll = QTimer()
+        poll.timeout.connect(lambda: box.done(0) if cleared and box.isVisible() else None)
+        poll.start(200)
+        box.exec()
+        if not cleared and box.clickedButton() is shut:
+            print("Pump still running: Shut Down")
+            note = QMessageBox()
+            note.setWindowTitle("Pump still running")
+            note.setText("Turning the pump off…")
+            note.setStandardButtons(QMessageBox.NoButton)
+            note.show()
+            result = []
+            loop = QtCore.QEventLoop()
+            stop = QTimer()
+            stop.timeout.connect(lambda: (self.pump_switch.cancel(), loop.quit()) if cleared else None)
+            stop.start(200)
+            if self.pump_switch.start(False, lambda ok: (result.append(ok), loop.quit())):
+                loop.exec()
+            stop.stop()
+            note.hide()
+            if not cleared and not (result and result[0]):
+                self._remote_locked = True
+                pump_manual_off_box()
+                self._remote_locked = False
+        poll.stop()
+        if cleared:
+            print("A new PoolWind start cleared the box: the pump stays on")
+        try:
+            with open(PUMP_BOX_PID_PATH) as f:
+                if f.read().strip() == str(os.getpid()):
+                    os.remove(PUMP_BOX_PID_PATH)
+        except Exception:
+            pass
+        if old_handler is not None:
+            try:
+                signal.signal(signal.SIGTERM, old_handler)
+            except Exception:
+                pass
 
     def btn_release(self, event=None):
         self.manual_direction = "LEVEL"
@@ -2844,6 +3200,11 @@ class App:
         self._already_shutdown = True
 
         print("Shutting down system...")
+        try:
+            self.pump_switch.cancel()           # a press under way: let go of the button
+            self._close_pump_warning()
+        except Exception:
+            pass
 
         # ------------------------------------------------------------
         # 0. Stop timers FIRST (prevents Qt from staying alive)
@@ -2906,13 +3267,8 @@ class App:
         except:
             pass
 
-        # ------------------------------------------------------------
-        # 6. CLEAN UP GPIO
-        # ------------------------------------------------------------
-        try:
-            self.GPIO.cleanup()
-        except Exception:
-            pass
+        # (6. GPIO cleanup: after the pump box, 7d, which may still need
+        #     the On/Off relay)
 
         # ------------------------------------------------------------
         # 7. Compress RAW video (background, safe, non-blocking)
@@ -2960,6 +3316,25 @@ class App:
         #     closing message for each case.
         # ------------------------------------------------------------
         self._close_stick()
+
+        # ------------------------------------------------------------
+        # 7d. The pump still running: the "Pump still running" box (v15.8)
+        # ------------------------------------------------------------
+        try:
+            if (self.pump_sense is not None and self.PIN_PUMP is not None
+                    and not self.REPdefaults.get("Demo") and not self._pump_hands_off
+                    and self.pump_is_on()):
+                self._pump_running_box()
+        except Exception as e:
+            print("Pump still running box:", e)
+
+        # ------------------------------------------------------------
+        # 6. CLEAN UP GPIO
+        # ------------------------------------------------------------
+        try:
+            self.GPIO.cleanup()
+        except Exception:
+            pass
 
         print("Shutdown complete.")
 
@@ -3265,7 +3640,8 @@ class App:
         self._apply_individual_defaults(ind_defaults)
         print("USB stick settings reloaded.")
 
-    def initial_voltage_winddown(self, title="Starting Up", now_button=False, to_swimmer=False):
+    def initial_voltage_winddown(self, title="Starting Up", now_button=False, to_swimmer=False,
+                                 pump_on=None):
         """
         Force the valve DOWN until voltage < minV: at start and close, when
         OnOff is pressed (before the pump is switched), and when leaving or
@@ -3275,10 +3651,13 @@ class App:
         step, or with to_swimmer to the swimmer's slowest zone (Swim Plot:
         "Lowest Swimmer setting for 'Swim Plot'"); never up.
         Shows a small modal window with live voltage updates. With
-        now_button (OnOff), it has an "On/Off now" button that stops the
-        wind-down at once, so the pump can be switched immediately.
+        now_button (turning the pump off), it has a "Stop pump now" button
+        that stops the wind-down at once, so the pump is switched off
+        immediately (v15.8: only ever to stop it, Bill 2026-11-02).
+        pump_on: True / False, the pump is about to be turned on / off.
+        Nothing while the other-remote box is open (no signals to the pool).
         """
-        if self.valveOption != "real":
+        if self.valveOption != "real" or self._remote_locked:
             return
 
         # --- Create modal popup ---
@@ -3292,10 +3671,12 @@ class App:
         msg.setText("Please wait for voltage wind down…")
         msg.setInformativeText("Voltage: ---.--- V")
         stop_now = []
+        if pump_on is True:
+            msg.setText("Winding the jet down before turning the pump on…")
         if now_button:
-            msg.setText("Winding the jet down before switching the pump…\n\n"
-                        "In an emergency, press On/Off now to switch it at once.")
-            now_btn = msg.addButton("On/Off now", QtWidgets.QMessageBox.AcceptRole)
+            msg.setText("Winding the jet down before turning the pump off…\n\n"
+                        "In an emergency, press Stop pump now to turn it off at once.")
+            now_btn = msg.addButton("Stop pump now", QtWidgets.QMessageBox.AcceptRole)
             now_btn.setStyleSheet(self.PUMP_BTN_STYLE + " QPushButton { padding: 14px 28px; }")
             now_btn.clicked.connect(lambda: stop_now.append(True))
         msg.show()
@@ -3340,7 +3721,7 @@ class App:
             if volts <= minV:
                 break
             if stop_now:
-                print(f"Wind-down stopped by On/Off now at {volts:.3f} V")
+                print(f"Wind-down stopped by Stop pump now at {volts:.3f} V")
                 break
             if time.time() > give_up_at:
                 print(f"Wind-down stopped after {self.WINDDOWN_TIMEOUT_S:.0f} s: the voltage "
@@ -4753,8 +5134,11 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
                 label = "Resume"
 
             elif name == "OnOff":
-                fill_color = self.app.PUMP_BTN_BGR   # light red: the pump
-                label = name
+                # The pump: red and down while it runs, grey and up while
+                # it's off, the power symbol (v15.8, Bill 2026-11-02)
+                pump_on = self.app.pump_button_on()
+                fill_color = (60, 60, 210) if pump_on else (200, 200, 200)
+                label = ""
 
             else:
                 fill_color = (200, 200, 200)
@@ -4765,6 +5149,8 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             # reversed, label nudged down-right.
             pressed = (self._btn_key(name) == self.pressed_btn and
                        (self.mouseDown or time.time() - self.pressed_t < 0.15))
+            if name == "OnOff":
+                pressed = pump_on               # stays down while the pump runs
             if pressed:
                 fill_color = tuple(int(c * 0.75) for c in fill_color)
                 hi, sh, nudge = (120, 120, 120), (255, 255, 255), 2
@@ -4781,6 +5167,13 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             # Bevel shadow (bottom/right) -- highlight color when pressed
             cv2.line(frame, (x1+1, y2-1), (x2-1, y2-1), sh, thickness)
             cv2.line(frame, (x2-1, y1+1), (x2-1, y2-1), sh, thickness)
+
+            if name == "OnOff":
+                ink = (255, 255, 255) if pump_on else (0, 0, 0)
+                cx, cy, r = x1 + bw // 2 + nudge, y1 + bh // 2 + 2 + nudge, 13
+                cv2.ellipse(frame, (cx, cy), (r, r), 0, -60, 240, ink, 3, cv2.LINE_AA)
+                cv2.line(frame, (cx, cy - r - 4), (cx, cy - 2), ink, 3, cv2.LINE_AA)
+                continue
 
             # Centered text
             text_size = cv2.getTextSize(label, font_face, font_scale, thickness)[0]
@@ -4816,7 +5209,10 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
     def handle_button(self, name):
         self.any_button_pressed = True
-        if name in ("Suspend", "Resume", "Begin"):
+        if name in ("Resume", "Begin") and not self.app.pump_is_on() and not self.app.REPdefaults.get("Demo"):
+            self.app.ask_pump_on(self)          # the pump is off: turn it on first? (v15.8)
+        elif name in ("Suspend", "Resume", "Begin"):
+            self.app._resume_when_pump_on = False
             self.app.Suspend_btn_press()
         elif name == "Hold":
             self.app.Hold_btn_press()
@@ -4838,7 +5234,10 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # Pace correction's changes still pending (Bill, 2026-10-29: "Before
         # program closes, if there are still changes pending, pop up message
         # saying so and offer choices: 'Keep pending' , 'Make permanent'.")
-        if getattr(self.app, "pending", None) is not None and not getattr(self.app, "_already_shutdown", False):
+        # (Not when PoolWind closes itself, no swimmer for five minutes:
+        # nobody is there to answer, and the changes stay pending.)
+        if (getattr(self.app, "pending", None) is not None and not getattr(self.app, "_already_shutdown", False)
+                and not getattr(self.app, "_auto_closing", False)):
             box = QMessageBox(self)
             box.setWindowTitle("Pace correction")
             box.setText("Pace correction has changes that aren't permanent yet.")
@@ -6193,6 +6592,242 @@ class SwimController:
     def _get_pace_from_voltage(self, voltage):
         return float(np.interp(voltage, self.voltage_asc, self.pace_desc))
 
+# ----------------------------------------------------------------------
+# Pump sensing (v15.8). R6 and R3 on the interface board bring the Pace
+# Display port's pump line (about 39.5 V while the pump runs, 0 V the
+# moment it stops) down to about 2.5 V at GPIO 23: high = the pump is on.
+# Bill, 2026-11-03: 2.51 V measured with R6 72.1 k, R3 5 k; the Pi read it
+# high with the pump on and low with it off, with every pull.
+# ----------------------------------------------------------------------
+PUMP_SENSE_PIN = 23
+PUMP_PRESS_MS = 2000          # On/Off held this long
+PUMP_CHECK_MS = 500           # after letting go, before the pump line is read
+PUMP_RETRY_GAP_MS = 500       # turning off: before pressing again
+PUMP_OFF_RETRY_S = 30.0       # turning off: pressed again until this long (Bill,
+                              # 2026-11-02: "a retry feature for a 1/2 minute")
+NO_SWIMMER_PUMP_OFF_S = 300   # no swimmer this long: the pump off, PoolWind closes
+PUMP_OFF_WARNING_S = 30       # ...after a box saying so for this long
+PUMP_BOX_PID_PATH = os.path.join(os.environ.get("XDG_RUNTIME_DIR") or "/tmp",
+                                 "poolwind_pump_box.pid")
+PUMP_NOT_FITTED_TEXT = (
+    "The pump sensing line (GPIO 23) isn't connected.\n\n"
+    "This version of PoolWind needs R6 and R3 fitted on the interface board: "
+    "they let PoolWind see whether the pool's pump is running. "
+    "See the build guide, section 4.\n\n"
+    "If they are fitted, check that the Pace cable carries all its wires.")
+
+
+def pump_pin_check(lgpio, chip, pin=PUMP_SENSE_PIN):
+    """Reads the pump line with the Pi's own pull-up and then its pull-down
+    (Bill, 2026-11-03: "If no voltage is there and the input is floating,
+    would the Pi be able to tell?"). R3 is much stronger than the Pi's pull
+    (about 50 k), so a fitted board reads the same both ways; a pin with
+    nothing on it follows the pull. Leaves the pin claimed as an input with
+    no pull. Returns "on", "off" or "not fitted"."""
+    highs = []
+    for flag in (lgpio.SET_PULL_UP, lgpio.SET_PULL_DOWN):
+        try:
+            lgpio.gpio_free(chip, pin)
+        except Exception:
+            pass
+        lgpio.gpio_claim_input(chip, pin, flag)
+        time.sleep(0.02)
+        highs.append(sum(lgpio.gpio_read(chip, pin) for _ in range(10)))
+        lgpio.gpio_free(chip, pin)
+    lgpio.gpio_claim_input(chip, pin, lgpio.SET_PULL_NONE)
+    up, down = highs
+    if up >= 8 and down >= 8:
+        return "on"
+    if up <= 2 and down <= 2:
+        return "off"
+    return "not fitted"
+
+
+class PumpSwitch:
+    """Presses the remote's On/Off until the pump line says it worked
+    (v15.8). press(True / False) holds / lets go of the On/Off relay;
+    is_on() reads the pump line. Turning on: one press; if the pump didn't
+    start, the button goes back (Bill, 2026-11-02: "if the press didn't
+    work after the two seconds, it will revert"). Turning off: pressed
+    again until it's off, for up to PUMP_OFF_RETRY_S. done(ok) at the end.
+    """
+
+    def __init__(self, press, is_on):
+        self._press_fn = press
+        self._is_on = is_on
+        self.busy = False
+        self.want = None
+        self._gen = 0
+
+    def start(self, want_on, done=None):
+        if self.busy:
+            return False
+        self._gen += 1
+        self.busy, self.want, self._done = True, bool(want_on), done
+        self._t0 = time.time()
+        self.tries = 0
+        self._press(self._gen)
+        return True
+
+    def _press(self, gen):
+        if not self.busy or gen != self._gen:
+            return
+        self.tries += 1
+        self._press_fn(True)
+        QTimer.singleShot(PUMP_PRESS_MS, lambda: self._release(gen))
+
+    def _release(self, gen):
+        if gen != self._gen:
+            return
+        self._press_fn(False)
+        if self.busy:
+            QTimer.singleShot(PUMP_CHECK_MS, lambda: self._check(gen))
+
+    def _check(self, gen):
+        if not self.busy or gen != self._gen:
+            return
+        if self._is_on() == self.want:
+            self._finish(True)
+        elif not self.want and time.time() - self._t0 < PUMP_OFF_RETRY_S:
+            print(f"Pump still on after press {self.tries}: pressing On/Off again")
+            QTimer.singleShot(PUMP_RETRY_GAP_MS, lambda: self._press(gen))
+        else:
+            self._finish(False)
+
+    def _finish(self, ok):
+        want = self.want
+        self.busy, self.want = False, None
+        print(f"Pump {'on' if want else 'off'}: "
+              f"{'done' if ok else 'did NOT change'} ({self.tries} press(es))")
+        if self._done is not None:
+            self._done(ok)
+
+    def cancel(self):
+        """Stop at once and let go of the button (closing)."""
+        self._gen += 1
+        self.busy, self.want = False, None
+        try:
+            self._press_fn(False)
+        except Exception:
+            pass
+
+    def run_blocking(self, want_on):
+        """start() and wait for the end in a local event loop: ok."""
+        result = []
+        loop = QtCore.QEventLoop()
+        if not self.start(want_on, lambda ok: (result.append(ok), loop.quit())):
+            return False
+        loop.exec()
+        return bool(result and result[0])
+
+
+def clear_pump_running_box():
+    """A PoolWind closed with the pump running may still show its "Pump
+    still running" box (App._pump_running_box): a new start clears it and
+    carries on, the pump left running (Bill, 2026-11-02: "if poolwind is
+    started up again with that popup open, it looks for the box and if found
+    will clear it. Then like 8), the pump keeps running and poolwind
+    continues"). Waits until that PoolWind has gone, so the relays are free."""
+    try:
+        with open(PUMP_BOX_PID_PATH) as f:
+            pid = int(f.read().strip())
+    except Exception:
+        return
+    if pid == os.getpid():
+        return
+
+    def alive():
+        try:
+            with open(f"/proc/{pid}/status") as f:
+                return "\tZ" not in next((l for l in f if l.startswith("State:")), "")
+        except Exception:
+            return False
+
+    try:
+        with open(f"/proc/{pid}/cmdline", "rb") as f:
+            cmd = f.read().decode(errors="replace").lower()
+    except Exception:
+        cmd = ""
+    if "poolwind" not in cmd or not alive():
+        try:
+            os.remove(PUMP_BOX_PID_PATH)
+        except Exception:
+            pass
+        return
+    import signal
+    print(f"Clearing the 'Pump still running' box of the PoolWind before (process {pid})")
+    try:
+        os.kill(pid, signal.SIGTERM)
+    except Exception:
+        return
+    for _ in range(50):
+        if not alive():
+            return
+        time.sleep(0.1)
+    try:
+        os.kill(pid, signal.SIGKILL)
+        time.sleep(0.3)
+    except Exception:
+        pass
+
+
+def pump_manual_off_box(parent=None):
+    """The pump didn't turn off: the swimmer turns it off with the pool's
+    other remote. While this box is open, PoolWind sends nothing to the pool
+    (the caller makes sure), so the pool controller turns the pump off by
+    itself after 30 minutes without a signal (Bill, 2026-11-02)."""
+    print("The pump didn't turn off: asking for the other remote")
+    box = QMessageBox(parent)
+    box.setIcon(QMessageBox.Warning)
+    box.setWindowTitle("Turn the pump off")
+    box.setText("The pump didn't turn off.\n\n"
+                "Please turn it off with the pool's other remote.")
+    box.setInformativeText("While this box is open, PoolWind sends nothing to the pool. "
+                           "The pool turns its pump off by itself after 30 minutes "
+                           "without a signal.")
+    box.addButton("Exit", QMessageBox.AcceptRole)
+    box.setWindowModality(Qt.ApplicationModal)
+    box.exec()
+
+
+def power_icon(color, size=22):
+    """The power symbol (a circle open at the top, a line down into it)."""
+    pm = QPixmap(size, size)
+    pm.fill(Qt.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.Antialiasing)
+    pen = QPen(QColor(color), max(2, size // 9))
+    pen.setCapStyle(Qt.RoundCap)
+    p.setPen(pen)
+    m = size * 0.18
+    rect = QtCore.QRectF(m, m, size - 2 * m, size - 2 * m)
+    p.drawArc(rect, 120 * 16, 300 * 16)          # from 120° round to 60°: open at the top
+    p.drawLine(QtCore.QPointF(size / 2, size * 0.08), QtCore.QPointF(size / 2, size * 0.5))
+    p.end()
+    return QtGui.QIcon(pm)
+
+
+def style_pump_button(btn, on, extra=""):
+    """A pump button shows the pump: red and down while it runs, grey and
+    up while it's off (Bill, 2026-11-02: "when on the button turns red and
+    stays down. Off and the button is grey and up. Carry this over into the
+    other displays.")."""
+    if getattr(btn, "_pump_shown", None) == (on, extra):
+        return
+    btn._pump_shown = (on, extra)
+    if on:
+        btn.setStyleSheet("QPushButton { background-color: #d23c3c; color: white;"
+                          " border: 2px inset #7a1e1e; border-radius: 3px; padding: 5px 5px 3px 7px; }"
+                          + extra)
+        btn.setIcon(power_icon("white"))
+    else:
+        btn.setStyleSheet("QPushButton { background-color: #d4d4d4; color: black;"
+                          " border: 2px outset #8c8c8c; border-radius: 3px; padding: 4px 6px 4px 6px; }"
+                          + extra)
+        btn.setIcon(power_icon("black"))
+    btn.setToolTip("The pool's pump is " + ("on" if on else "off"))
+
+
 class GPIOWrapper:
     """
     Drop-in replacement for RPi.GPIO using lgpio on Raspberry Pi 5.
@@ -6384,6 +7019,9 @@ class SimulatedValve:
 
         # Noise (optional)
         self.noise = 0.00
+
+        # The simulated pump (v15.8): running; On/Off toggles it
+        self.pump_on = True
 
         # Limits based on plateau count
         self.max_index = len(self.app.plateau_voltages) - 1
@@ -6949,7 +7587,12 @@ class EmbeddedJet:
         self.app.relay_off()
 
     def pump(self, on):
-        self.app.GPIO.output(self.app.PIN_PUMP, not on)    # False = ON
+        if on and self.app._remote_locked:
+            return
+        self.app._pump_press(on)
+
+    def pump_on(self):
+        return self.app.pump_is_on()
 
     def close(self):
         self.app.relay_off()
@@ -8897,9 +9540,10 @@ class SwimDateRangeDialog(QDialog):
         self.ok_btn.setAutoDefault(True)
         self.close_btn = QPushButton("Close")   # consistent with SwimPlotWindow's Close
         # The pool's On/Off, also off the main screen (Bill, 2026-10-16)
-        self.pump_btn = QPushButton("Pump On/Off")
+        self.pump_btn = QPushButton(" Pump")
         self.pump_btn.setAutoDefault(False)
-        self.pump_btn.setStyleSheet(self.app.PUMP_BTN_STYLE)
+        self.pump_btn.setIconSize(QtCore.QSize(18, 18))
+        self.app.register_pump_button(self.pump_btn)    # red and down while the pump runs (v15.8)
         self.ok_btn.clicked.connect(self._ok_if_data)
         self.close_btn.clicked.connect(self.reject)
         self.pump_btn.clicked.connect(lambda: self.app.OnOff_confirm(self))
@@ -9813,6 +10457,8 @@ class SwimPlotWindow(QDialog):
         overlay.toggle_btn.clicked.connect(on_toggle)
         overlay.plot_btn.clicked.connect(self.on_close)
         overlay.pump_btn.clicked.connect(lambda: self.app.OnOff_confirm(self))
+        self.app.register_pump_button(overlay.pump_btn,
+                                      " QPushButton { font-size: 11px; padding: 0px; border-width: 1px; }")
 
         # Compress Gaps toggle — rebuilds the whole overlay against the
         # other array (short_gap_array vs full_gap_array), preserving the
@@ -10277,12 +10923,11 @@ class DraggableOverlay(QFrame):
         handle_layout.addStretch()
 
         # The pool's On/Off, also off the main screen (Bill, 2026-10-16)
-        self.pump_btn = QPushButton("On/Off", self.handle)
-        self.pump_btn.setFixedSize(50, 20)
-        self.pump_btn.setStyleSheet(
-            "QPushButton { font-size: 11px; padding: 0px; background-color: #e1b9b9;"
-            " border: 1px solid #9c7c7c; border-radius: 3px; }"
-            " QPushButton:pressed { background-color: #c99d9d; }")
+        self.pump_btn = QPushButton(" Pump", self.handle)
+        self.pump_btn.setFixedSize(58, 20)
+        self.pump_btn.setIconSize(QtCore.QSize(14, 14))
+        # (shown red and down while the pump runs: App.register_pump_button,
+        # by SwimPlotWindow)
         handle_layout.addWidget(self.pump_btn)
 
         self.plot_btn = QPushButton("Close", self.handle)   # closes SwimPlotWindow, back to the calendar
@@ -10446,7 +11091,6 @@ PACE_CURVE_V = (1.229, 2.515)                   # the stretch of the original ta
 PACE_CURVE_ENDS = (7.0, 1.0)                    # slowest step, top: min/100 yd
 
 PIN_UP, PIN_DN, PIN_PUMP = 17, 18, 27
-PUMP_PULSE_S = 2.0
 
 CAL_BUILDER_KEYS = ("usableSwimLength", "middleSwimZone %")   # as App's
 CAL_DERIVED_KEYS = ("pace_voltage", "swimAreaPoints", "InitialCalFinished", "PacesFromFormula", "jetVoltageRange", "jetStepVolts", "jetSteps",
@@ -10724,6 +11368,10 @@ def fix_table(table, fixed):
 # Hardware: the INA260 voltage sensor and the UP / DN / On-Off relays
 # (active low: 0 = relay on).
 # ----------------------------------------------------------------------
+class PumpNotFitted(RuntimeError):
+    """R6/R3 aren't fitted: GPIO 23 floats (pump_pin_check)."""
+
+
 class RealJet:
     def __init__(self):
         import board
@@ -10737,6 +11385,20 @@ class RealJet:
             lgpio.gpio_claim_output(self.chip, pin, 1)      # claimed OFF
             self.pins.append(pin)
         self._last = 0.0
+        # The pump line (v15.8): R6/R3 to GPIO 23
+        state = pump_pin_check(lgpio, self.chip)
+        self.pins.append(PUMP_SENSE_PIN)
+        if state == "not fitted":
+            self.close()
+            raise PumpNotFitted(PUMP_NOT_FITTED_TEXT)
+        self._pump_last = state == "on"
+
+    def pump_on(self):
+        try:
+            self._pump_last = bool(self.lgpio.gpio_read(self.chip, PUMP_SENSE_PIN))
+        except Exception:
+            pass
+        return self._pump_last
 
     def read(self):
         """Average of 5 reads (a failed read is skipped)."""
@@ -10772,7 +11434,8 @@ class RealJet:
     def close(self):
         for pin in self.pins:
             try:
-                self._set(pin, False)
+                if pin != PUMP_SENSE_PIN:
+                    self._set(pin, False)
                 self.lgpio.gpio_free(self.chip, pin)
             except Exception:
                 pass
@@ -11256,6 +11919,9 @@ class CalibrateWindow(QWidget):
         self._last_tick = time.time()
         self.session_path = None
         self._pump_busy = False
+        self.pump_switch = PumpSwitch(self.jet.pump, self.jet.pump_on)
+        self._pump_target = None        # what the pump button shows while switching
+        self._pump_then = None          # a Start waiting for the pump (_pump_ready)
         self.scan = None               # the voltage scan's result
         self._scan_stage = None        # the scan's stage when Stop was pressed: "noise", "down", "up"
         self._scan_steps = 0
@@ -11527,9 +12193,9 @@ class CalibrateWindow(QWidget):
         self.finish_btn.clicked.connect(self.finish)
         self.save_btn = QPushButton("Save table")
         self.save_btn.clicked.connect(self.save)
-        self.pump_btn = QPushButton("Pump On/Off")
-        self.pump_btn.setStyleSheet("QPushButton { background-color: #e1b9b9; font-size: 14pt; border: 1px solid #9c7c7c;"
-                                    " border-radius: 3px; padding: 5px; }")
+        self.pump_btn = QPushButton(" Pump")         # red and down while the pump runs (tick, v15.8)
+        self.pump_btn.setIconSize(QtCore.QSize(22, 22))
+        style_pump_button(self.pump_btn, self.jet.pump_on(), " QPushButton { font-size: 14pt; }")
         self.pump_btn.clicked.connect(self.pump_toggle)
         self.quit_btn = QPushButton("Quit")
         self.quit_btn.clicked.connect(self.quit)
@@ -12102,6 +12768,10 @@ class CalibrateWindow(QWidget):
         now = time.time()
         self._last_tick = now
         self.v = self.jet.read()
+        if now - getattr(self, "_pump_shown_t", 0.0) > 0.25:
+            self._pump_shown_t = now
+            on = self.jet.pump_on() if self._pump_target is None else self._pump_target
+            style_pump_button(self.pump_btn, on, " QPushButton { font-size: 14pt; }")
         self.hist.append((now, self.v))
         while self.hist and now - self.hist[0][0] > 6.0:
             self.hist.popleft()
@@ -12268,6 +12938,8 @@ class CalibrateWindow(QWidget):
     # Buttons
     # ------------------------------------------------------------------
     def start(self):
+        if not self._pump_ready(self.start):
+            return
         if self.mode == "scan":
             self._start_scan()
             return
@@ -12893,18 +13565,64 @@ class CalibrateWindow(QWidget):
     def pump_toggle(self):
         if self._pump_busy:
             return
-        if not self._ask("Pump On/Off", "Are you sure? This will turn the pool's pump on or off."):
+        on = self.jet.pump_on()
+        if not self._ask("Pump On/Off", "Are you sure? This will turn the pool's pump "
+                         + ("off." if on else "on.")):
+            return
+        self._switch_pump(not on)
+
+    def _switch_pump(self, want_on, then=None):
+        """On/Off pressed until the pump line follows (PumpSwitch, v15.8):
+        turning on, the button goes back if the pump didn't start; turning
+        off, pressed again for up to 30 s, then the box asking for the other
+        remote. then(ok) at the end."""
+        if self._pump_busy:
             return
         if self.state in ("flow", "balls"):
             self.stop()
         self._pump_busy = True
+        self._pump_target = bool(want_on)
+        self._pump_shown_t = 0.0
         self._hold(None)
-        self.jet.pump(True)
-        QTimer.singleShot(int(PUMP_PULSE_S * 1000), self._pump_release)
+        self.pump_switch.start(want_on, lambda ok: self._pump_switched(want_on, ok, then))
 
-    def _pump_release(self):
-        self.jet.pump(False)
+    def _pump_switched(self, want_on, ok, then):
         self._pump_busy = False
+        self._pump_target = None
+        self._pump_shown_t = 0.0
+        if not ok and not want_on:
+            app = getattr(self.jet, "app", None)
+            if app is not None:
+                app.pump_manual_off(self)       # (PoolWind's: nothing to the pool meanwhile)
+            else:
+                pump_manual_off_box(self)
+        if then is not None:
+            then(ok)
+
+    def _pump_ready(self, then):
+        """A run needs the pump (Bill, 2026-11-02: "If pump isn't on, the
+        screens show up anyway but as soon as it is needed and isn't on, pop
+        up a turn on pump box"): True if it runs; else the box, and then()
+        once it has started."""
+        if self.jet.pump_on():
+            return True
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Question)
+        box.setWindowTitle("The pump is off")
+        box.setText("The pool's pump is off, and this needs it running. Turn it on?")
+        turn = box.addButton("Turn pump on", QMessageBox.AcceptRole)
+        box.addButton("Cancel", QMessageBox.RejectRole)
+        box.exec()
+        if box.clickedButton() is turn:
+            def started(ok):
+                if ok:
+                    then()
+                else:
+                    QMessageBox.warning(self, "The pump is off",
+                                        "The pump didn't start. Try again, or turn it on "
+                                        "with the pool's other remote.")
+            self._switch_pump(True, started)
+        return False
 
     def _ask_replace_scan(self):
         rng = self.cal.get("jetVoltageRange")
@@ -13249,7 +13967,7 @@ class CalibrateWindow(QWidget):
             # Closed during Pump On/Off's 2 s press: let go of the button now,
             # or it stays pressed (Bill, 2026-10-26: the pump came on when
             # PoolWind was started again)
-            self.jet.pump(False)
+            self.pump_switch.cancel()
             self._pump_busy = False
         self.jet.off()
         self.jet.close()
@@ -13300,8 +14018,12 @@ def calibration_main():
         QMessageBox.critical(None, "PoolWind calibration",
                              f"No calibration file at {cal_path}.\n\nInstall PoolWind first (setup guide, section 3).")
         return 1
+    clear_pump_running_box()            # (a PoolWind closed with the pump running, v15.8)
     try:
         jet = RealJet()
+    except PumpNotFitted as e:
+        QMessageBox.critical(None, "PoolWind calibration", str(e))
+        return 1
     except Exception as e:
         QMessageBox.critical(None, "PoolWind calibration",
                              "Couldn't reach the relays or the voltage sensor.\n\n"
@@ -13338,6 +14060,10 @@ if __name__ == "__main__":
     # 1. Create QApplication FIRST
     qt_app = QApplication(sys.argv)
 
+    # A PoolWind closed with the pump running may still show its "Pump still
+    # running" box: clear it, the pump left running (v15.8)
+    clear_pump_running_box()
+
     # 2. Create App (logic only, NO Qt widgets), 4. then QtMainWindow.
     # Anything not caught on the way gets a box too, as a last resort,
     # instead of PoolWind seeming to do nothing (Bill, 2026-11-02).
@@ -13357,6 +14083,7 @@ if __name__ == "__main__":
     app.window = window       # allow App.shutdown() to close the window
     window.show()
     app.start_relay_watchdog()
+    app.start_pump_monitor()
     # The jet down to its lowest before swimming (Bill, 2026-11-02)
     app.initial_voltage_winddown("Starting PoolWind")
 

@@ -57,13 +57,31 @@ faster than they can handle.
   table, never from a swimmer's table on a USB stick.
 - **The pump relay (GPIO 27) turns the pool's pump on and off.** Don't
   pulse it in tests.
+- **PoolWind sees whether the pump runs** (since v15.8): GPIO 23, from the
+  Pace Display port's pump line (about 38 V while the pump runs, 0 V the
+  moment it stops) through R6/R3, about 2.5 V. `pump_pin_check` reads it
+  at start with the Pi's pull-up and pull-down; a floating pin (R6/R3 not
+  fitted) stops PoolWind and the calibration with a box. `PumpSwitch`
+  presses On/Off until the line follows: on, one press (the button goes
+  back if it didn't start); off, pressed again for up to 30 s, then
+  `pump_manual_off_box` asks for the other remote, with **nothing sent to
+  the pool** while it's open (`_remote_locked`; the pool turns its pump
+  off after 30 minutes without a signal), and no more automatic pump moves
+  after (`_pump_hands_off`). The pump monitor (`_pump_monitor_tick`)
+  pauses the swim (Suspend) while the pump is off and resumes it when it's
+  back, and with no swimmer for 5 minutes turns the pump off and closes
+  PoolWind after a 30 s "Keep swimming" box. Closing with the pump on
+  shows "Pump still running" (Shut Down / Exit) after the window has gone;
+  a new start clears it (`clear_pump_running_box`, SIGTERM via a pid
+  file). Keep all of these.
 - **PoolWind winds the jet down** (`initial_voltage_winddown`, a box with
   the voltage) to the lowest step at start and close (`App.shutdown`),
-  when OnOff is pressed, before it pulses the pump relay
-  (`OnOff_btn_press`), and when leaving the pool screen for Set Swim Area
+  when OnOff is pressed, before it presses the pump relay
+  (`switch_pump`), and when leaving the pool screen for Set Swim Area
   or the calibration; for Swim Plot only to the swimmer's slowest zone
-  (`to_swimmer`). It never drives up. The OnOff box's **On/Off now**
-  button stops it so the pump switches at once, for emergencies. Any
+  (`to_swimmer`). It never drives up. Turning the pump off, the box's
+  **Stop pump now** button stops it so the pump turns off at once, for
+  emergencies; it can never start the pump. Any
   change you make must keep these, along with the relay watchdog
   (`RELAY_WATCHDOG_S`): if the loop stalls, it lets go of UP and DN.
 - Changes that affect jet speed (zones, zone limits, the pace table, relay
@@ -135,6 +153,9 @@ faster than they can handle.
   0 turns a relay on. They "press" the buttons of a spare pool remote.
 - The jet speed is read as a voltage from the pool's Pace Display port by an
   INA260 on I2C (`i2cdetect -y 1` should show it, normally at 0x40).
+- Pump sensing on GPIO 23 (input, no pull): the port's pump line, 39.5 V on
+  the author's pool, through R6 72.1 kΩ and R3 5 kΩ: 2.51 V measured
+  (the parts list's 100 kΩ / 7.5 kΩ give about 2.7 V).
 - One UP/DN step moves the voltage about 0.04 V, all at once (under 0.05 s).
   Reading noise is about 0.0013 V. On the author's pool the jet runs from
   about 1.2 V (slowest) up.
@@ -206,7 +227,8 @@ faster than they can handle.
   settings or calibration file it can't read (file, line, plain-words
   problem; `settings_file_error`), a misspelled setting name or a wrong word
   for a choice setting (`CHOICE_SETTINGS`; `RETIRED_SETTINGS` are still
-  ignored), no voltage sensor, or as a last resort "Unknown problem while
+  ignored), no voltage sensor, the pump sensing line not connected (R6/R3
+  not fitted, or a Pace cable without contact 5), or as a last resort "Unknown problem while
   starting" with the error. Swimmers' settings (zones, height, training
   video, logRate 5-15) are set in Swimmer limits (`save_swimmer_settings`),
   so they rarely need a file edited.
@@ -272,13 +294,12 @@ faster than they can handle.
   **Calibrate pool...**, or `python3 poolwind.py --calibrate`; setup guide
   5.3) scans the user's jet steps and rewrites the table.
 - **A pool whose speed voltage drops to zero while its pump is off.** On the
-  author's pool the voltage is always there, and PoolWind assumes so. On
-  such a pool, with the pump off and a swimmer in the swim area, PoolWind
-  sees the jet below the slowest zone and holds UP; if that pool's valve
-  can move while it is off, the jet could start fast when it's turned on.
-  A fix: treat a reading far below the table's first row as "no feedback" and
-  press neither UP nor DN until a good reading returns, then wind down
-  once.
+  author's pool the voltage is always there, and PoolWind assumes so.
+  Since v15.8 PoolWind sees the pump (GPIO 23) and pauses the swim while
+  it's off, so the jet is asked for its slowest step then; check on such a
+  pool that it doesn't hold UP with the reading at zero. If it does: treat
+  a reading far below the table's first row as "no feedback" and press
+  neither UP nor DN until a good reading returns, then wind down once.
 - **A pool whose speed voltage rises continuously, not in steps.** The
   author's pool (and the program) has discrete jet steps: each press or
   repeat of the remote's UP or DN moves the voltage one step and it stays

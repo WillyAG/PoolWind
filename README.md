@@ -61,7 +61,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Control: wires are soldered to a spare copy of the pool's own handheld remote, and relays driven by a Raspberry Pi "press" its speed Up, Down, and On/Off buttons.
 
-- Feedback: the jet speed is read back as a voltage through the port that the manufacturer already provides for its optional Pace Display.
+- Feedback: the jet speed is read back as a voltage through the port that the manufacturer already provides for its optional Pace Display. The same port shows whether the pump is running.
 
 - Vision: a camera above the pool tracks where the swimmer is.
 
@@ -93,6 +93,8 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Jet flow winds down to its lowest level when PoolWind starts and closes, and before it turns the pump on or off, to save wear on the equipment
 
+- Pump sensing: the OnOff button shows whether the pump is running and checks that a press worked, retrying to turn it off. The swim pauses while the pump is off. With no swimmer in sight for 5 minutes, PoolWind turns the pump off and closes. Closing PoolWind with the pump running asks whether to turn it off
+
 - Waterproof: mouse, keyboard, case with clear door holding the Raspberry Pi and monitor at the poolside
 
 - Demo: try PoolWind on a Windows PC, with a recorded swim and a simulated jet
@@ -117,6 +119,7 @@ The program will probably need modifications. You do not need to be a programmer
 - Overhead camera looking down on the swim area
 - INA260 voltage/current sensor (I2C) reading the Pace Display port
 - Relay board driven by GPIO 17 (Up), GPIO 18 (Down) and GPIO 27 (pump On/Off)
+- Pump sensing on GPIO 23, through two resistors from the Pace Display port
 - A spare pool remote, with wires soldered to its buttons
 
 Full details are in the [parts list](hardware/PARTS_LIST.md) and the [build guide](docs/BUILD_GUIDE.md); the interface board's files are in the [hardware folder](hardware/). **Everything can be read or downloaded right here on GitHub, on any computer, before you buy the Pi:** open a file and use its download button.

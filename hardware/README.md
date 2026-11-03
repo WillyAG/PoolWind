@@ -36,10 +36,12 @@ agree.
 | Jet speed Down (remote button) | Relay on GPIO 18 (active low) |
 | Pump On/Off (remote button) | Relay on GPIO 27 (active low, 2-second pulse) |
 | Jet speed feedback | INA260 sensor on I2C at address 0x40, reading the Pace Display port voltage on its VBUS pin (its V+ to VBUS jumper cut) |
+| Pump running | GPIO 23, from the Pace Display port's pump line (about 38 V while the pump runs) through the R6/R3 divider: high while the pump runs |
 | Camera | Spedal 920 Pro Conference Camera (120°, USB) above the swim area, opened as video device 0 |
 
 The program never energizes Up and Down at the same time. Before pressing
-On/Off, it releases Up and Down.
+On/Off, it releases Up and Down, and after pressing it, it checks GPIO 23 to
+see whether the pump followed.
 
 The Raspberry Pi pin numbers and the RJ45 jack pins are in the
 [build guide, section 4](../docs/BUILD_GUIDE.md#4-the-interface-board).

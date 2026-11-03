@@ -143,7 +143,8 @@ starting:
 Double-click the **PoolWind** icon. The pool screen appears, showing the
 camera's view from above, and a box winds the jet down to its lowest step.
 If a box says the voltage sensor isn't found, check the interface board
-(build guide, section 9).
+(build guide, section 9). If it says the pump sensing line isn't connected,
+fit R6 and R3 on the interface board (build guide, section 4).
 
 Check that:
 
@@ -151,10 +152,14 @@ Check that:
 - **the jet answers.** With nobody in the pool, press **Hold**, then
   **UP** a few times and **DN** a few times (one jet step per press, see
   the [user manual](USER_MANUAL.md)), and watch the jet change.
+- **OnOff shows the pump.** The button (the power symbol) is red while the
+  pool's pump runs and grey while it's off: turn the pump off and on with
+  the pool's remote and watch it follow.
 - **OnOff winds the jet down.** Press **OnOff**: the jet winds down to its
-  lowest setting first, then the pump turns off. Press it again to turn the
-  pump back on. While it winds down, **On/Off now** in the message switches
-  the pump at once, for emergencies: try it once.
+  lowest setting first, then the pump turns off and the button turns grey.
+  Press it again to turn the pump back on. While it winds down before
+  turning off, **Stop pump now** in the message turns the pump off at once,
+  for emergencies: try it once.
 
 ## 5. Calibrating for your pool
 
@@ -259,7 +264,8 @@ Basically, the program operates with only the voltages, jet speed is determined 
 
 The Pace-volt table's first and last rows become the jet's limits. This procedure combined with **Swimmer limits** and programming establish the "feel" of the pool, how fast the swimmer swims in the highest zone, how slow in the lowest zone, and how it "feels" to transition through the zones. Pace settings have nothing to do with the "feel".
 
-1. Press **Begin initial voltage scan**, then **Start**. The calibration
+1. Press **Begin initial voltage scan**, then **Start** (with the pool's
+   pump running: if it's off, Start offers to turn it on). The calibration
    reads the voltage for a few seconds, takes the jet down to its slowest
    speed, then steps it up, counting the steps.
 2. **Watch and listen to the pool.** When it sounds too fast or strained,
@@ -297,7 +303,7 @@ training. You can only measure an accurate Pace in a regular pool.
 **Before you start**
 
 - **Nobody in the pool.** The jet goes up to fast speeds.
-- The pool's **pump on**, and the swim area set (5.2).
+- The pool's **pump on** (if it isn't, **Start** offers to turn it on), and the swim area set (5.2).
 
 **Edit screen** This routine opens the edit screen first where it displays the current Pace-volt table. **If you have not done a 'Pace entry Auto scan' before, skip edits and press the 'Auto scan' button (see below).**
 You can select a row on the table and the jet speed will step to the row selected. It will pause a moment to let the pool settle and then allow you to re-enter the Pace showing on the Pace display. Enter the correct three digits - entering the third digit completes the edit.
@@ -344,7 +350,7 @@ training. You can only measure an accurate Pace in a regular pool.
 **Before you start**
 
 - **Nobody in the pool.** The jet goes up to fast speeds.
-- The pool's **pump on**, and the swim area set (5.2).
+- The pool's **pump on** (if it isn't, **Start** offers to turn it on), and the swim area set (5.2).
 
 You need five **orange** ping-pong balls (bright or fluorescent; white ones don't work). 
 
@@ -602,7 +608,9 @@ change a value: for a desk test, change `'pool'` on the workplace line to
 
 The pump relay is only connected when the workplace is `'pool'`. So
 `'default'` with `'Valve (real or simulate)': 'real'` tests the speed
-relays at a desk with no chance of starting the pool's pump.
+relays at a desk with no chance of starting the pool's pump. OnOff then
+presses nothing, and its button still shows the pool's pump. With the
+simulated valve the pump is simulated too: OnOff turns it on and off.
 
 The last line is the built-in value, for the sample video. To use your own
 recording, add the line to `poolwind_defaults.txt` with its file name
@@ -620,9 +628,9 @@ open it says **Using Swimmer dataset** or **Using Master dataset**, and its
 **The calibration** has no simulation: it always drives the real jet. With
 the simulated valve, **Calibrate pool...** uses the pool's relays, voltage
 sensor and camera itself (with `'developerMode': True`, which these settings
-need, it and **Pace correction...** stay in the menu). The pump doesn't need to run: with it off, the
-jet's valve still moves to each voltage, so the calibration screens can be
-tried at the Pi without swimming.
+need, it and **Pace correction...** stay in the menu). Its screens open with the pump off, and a
+tapped Pace Entry row still drives the jet's valve, which moves with the pump off too; **Start**
+needs the pump running and offers to turn it on.
 
 ## 9. Working from home
 
@@ -680,8 +688,14 @@ as it is: your settings, your pool's calibration, swim logs, videos and USB
 sticks. When it finishes it says which version it updated from and to, and
 what's new.
 
+**Updating to v15.8 or later needs R6 and R3 fitted** on the interface
+board (build guide, section 4): PoolWind uses them to see whether the pump
+is running, and doesn't start without them. Updating from an earlier
+version, the install script asks first, and changes nothing if they
+aren't fitted.
+
 The new version reads the older files as they are. Updating from v15.5 to
-v15.7, for example:
+v15.7 or later, for example:
 
 - the calibration's old `'SafetyVoltageLimits'` line is ignored (the jet's
   limits are the Pace table's ends, 5.8);

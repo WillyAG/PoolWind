@@ -33,7 +33,7 @@ these fails, the rest of this guide won't help, so check all three first.
    should change steadily as you change the jet speed. Without it, PoolWind
    can't tell how fast the jet is running. Another range works too, as long
    as the INA260 sensor can read it (0 to 36 V): after installing, the
-   calibration's voltage scan fits PoolWind to your pool's range. On the author's pool the voltage changes in steps, one for each press of Up or Down. If yours rises continuously instead, PoolWind will have to be modified by the builder (with Claude's help), but it is very likely to work. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified. On the author's pool the voltage is there whether the pump is running or not; if yours drops to zero while the pump is off, PoolWind may need changes too. An AI assistant such as Claude Code can help with them (setup guide, [section 12](SETUP_GUIDE.md#12-getting-help)).
+   calibration's voltage scan fits PoolWind to your pool's range. On the author's pool the voltage changes in steps, one for each press of Up or Down. If yours rises continuously instead, PoolWind will have to be modified by the builder (with Claude's help), but it is very likely to work. If you have another brand of pool, check with the dealer or manufacturer. It is likely there will be some sort of pool speed indicator but it may not operate on a simple voltage change. PoolWind would have to be modified. On the author's pool the voltage is there whether the pump is running or not; if yours drops to zero while the pump is off, PoolWind may need changes too. PoolWind also uses a second line on the same port, powered only while the pump runs (about 38 V on the author's pool): it tells PoolWind whether the pump is on. Check it too: it should read about 38 V with the pump on and 0 V with it off. An AI assistant such as Claude Code can help with them (setup guide, [section 12](SETUP_GUIDE.md#12-getting-help)).
 3. **Your skills.** PoolWind is a do-it-yourself project, not a product: it
    isn't for sale, and there's no kit. You buy the parts from various
    suppliers, then build, install and set it up yourself, at your own risk
@@ -193,7 +193,7 @@ layout.
 
 *The interface board's wiring, from the Fritzing design (breadboard view).
 Left: the two RJ45 jacks, the Remote jack (UP-DN) and the Pace jack (Pace Volt In),
-the INA260 sensor, the two resistors R3 and R6 (not needed, see below) and,
+the INA260 sensor, the two resistors R3 and R6 (the pump sensing, see below) and,
 along the bottom, the header for the ribbon cable to the Raspberry Pi.
 Right: the two 2-channel relay modules on headers JP1-JP4.*
 
@@ -224,11 +224,16 @@ are separate boards, connected to headers JP1-JP4 with jumper wires.*
 There's no special soldering order: the only delicate part, the INA260
 sensor, plugs in afterward.
 
-1. **Resistors R3 and R6: leave them out.** They form a voltage divider
-   for detecting whether the pool's pump is running, from the Pace Display
-   port's 38 V power line, which PoolWind doesn't use. If you ever fit them,
-   use **R6 = 100 kΩ and R3 = 7.5 kΩ** (about 2.7 V at GPIO 23). Lower
-   values would destroy the Raspberry Pi's GPIO pin.
+1. **Resistors R3 and R6: the pump sensing.** They form a voltage divider
+   that tells PoolWind whether the pool's pump is running: the Pace Display
+   port's pump line (about 38 V while the pump runs, 0 V when it stops)
+   through R6 to GPIO 23, and R3 from GPIO 23 to ground. Use **R6 = 100 kΩ
+   and R3 = 7.5 kΩ**, or any pair that puts **2.4 V to 2.8 V** on GPIO 23
+   (the author's 72.1 kΩ and 5 kΩ give 2.51 V from 39.5 V). **Don't swap
+   them:** R6, the large one, goes to the pump line; the small one, R3, to
+   ground. Swapped, or with lower values, they would destroy the Raspberry
+   Pi's GPIO pin. PoolWind needs them: without them it says so at start
+   and doesn't run.
 2. **Headers:**
    - Ribbon cable to the Pi: **male header pins, 2 × 12** (the cable's plug
      is female).
@@ -278,7 +283,7 @@ marked by hand: Up, DN and On/Off. The second module's K2 is the spare.*
 
 ![The finished interface board](images/PoolWind_Interface.jpg)
 
-*The author's finished interface board. Top: the INA260 sensor, with the
+*The author's finished interface board, before R3 and R6 were fitted. Top: the INA260 sensor, with the
 empty places for R3 and R6 to its left, and the two RJ45 jacks, labeled
 "Pace" and "Remote" on this first-batch board (boards made from the
 current Gerber files print "Pace Volt In" and "UP-DN"). Below: the two relay modules (Up and Down on the first,
@@ -321,7 +326,7 @@ The pins PoolWind uses:
 | 11 (GPIO 17) | Relay: jet speed Up |
 | 12 (GPIO 18) | Relay: jet speed Down |
 | 13 (GPIO 27) | Relay: pump On/Off |
-| 16 (GPIO 23) | Pool-on detection (R3/R6 divider), not used |
+| 16 (GPIO 23) | Pump sensing (R3/R6 divider): high while the pump runs |
 | 20 (ground) | Relay modules' ground |
 
 ### The RJ45 jacks
@@ -330,7 +335,7 @@ The pins PoolWind uses:
 |---|---|---|
 | Pace jack (Pace Volt In) | 5 | Jet-speed voltage from the Pace Display port, to the INA260's VBUS input |
 | | 3 | Ground |
-| | 6 | Pace Display power, 38 V, to the pool-on detection (R6), not used |
+| | 6 | The pump line, about 38 V while the pump runs, through R6 to the pump sensing |
 | Remote jack (UP-DN) | 3 and 6 | Up button (Up relay's NO and COM) |
 | | 4 and 2 | Down button (Down relay's NO and COM) |
 | | 5 and 7 | On/Off button (On/Off relay's NO and COM) |
@@ -453,8 +458,8 @@ board needs; a 6-wire cable (6P6C, sometimes sold as RJ25 or RJ12) works
 too. The phone plug is smaller but fits the board's 8-pin RJ45 jack: its
 six contacts land on the middle six pins of the jack.
 
-The board uses two of the wires: the pool's ground and the jet speed
-voltage.
+The board uses three of the wires: the pool's ground, the jet speed
+voltage and the pump line.
 
 **Note:** this is the only ground connection between the pool and the
 interface board. It is not a safety ground (see [SAFETY.md](../SAFETY.md));
@@ -464,7 +469,7 @@ it is used only as the reference for the jet speed voltage.
 |---|---|---|
 | 2 | 3 | Ground (the Raspberry Pi's ground) |
 | 4 | 5 | The jet speed voltage, to the INA260's VBUS pin: about 1.2 V to 3.2 V, always present |
-| 5 | 6 | Not used (goes to R6, which is left out): about 38 V when the pool pump is powered up |
+| 5 | 6 | The pump line, through R6 to GPIO 23: about 38 V while the pool pump runs, 0 V when it's off |
 
 The other contacts aren't connected on the board.
 
@@ -492,9 +497,13 @@ nothing else connected:
 change with the jet speed, PoolWind will not work.** It is the feedback
 that tells PoolWind what its remote button presses did.
 
-You could also check pin 6, but it isn't needed, as pin 6 isn't currently
-used. On the author's pool it shows about 38 V, only while the pool pump
-motor is turned on.
+4. Check pin 6, with the ground probe still on pin 3: with the pool's
+   pump running it should read about 38 V (39.5 V on the author's pool),
+   and 0 V as soon as the pump is turned off. If yours is much higher than
+   40 V, choose R6 and R3 (section 4) so GPIO 23 still gets 2.4 V to 2.8 V.
+
+**Essential too: PoolWind needs pin 6 to see whether the pump is running.**
+A cable with only the center four wires carries it.
 
 ### If you have a Pace Display
 
@@ -594,13 +603,17 @@ Before connecting anything to the pool:
 4. **Check that the INA260 is found:** in a terminal, `i2cdetect -y 1`
    should show `40` in its table.
 5. **Check the On/Off relay clicks**, with the remote not yet connected:
-   start PoolWind and press **OnOff**. You should hear a click, and another
-   2 seconds later.
+   start PoolWind and press **OnOff** (the power symbol). You should hear a
+   click, and another 2 seconds later. The button turns red and then grey
+   again: with no Pace Display cable, PoolWind sees that the pump didn't
+   start.
    The Up and Down relays are checked once everything is connected (step
    6): without the Pace Display cable PoolWind reads no voltage and, for
    safety, won't press Down.
 6. **Connect the remote and the Pace Display cable**, then check that **the
    jet answers** (setup guide, [section 4](SETUP_GUIDE.md#4-first-start)):
    with nobody in the pool, press **Hold**, then **UP** and **DN** a few
-   times, and watch the jet change one step per press. Continue with
+   times, and watch the jet change one step per press. Check the pump
+   sensing too: the **OnOff** button is red while the pool's pump runs, and
+   grey when you turn it off with the pool's remote. Continue with
    calibration in the [setup guide](SETUP_GUIDE.md).

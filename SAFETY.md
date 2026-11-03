@@ -53,8 +53,17 @@ for the full disclaimer.
   - **OnOff** is pressed
   - Calibration routines are opened, including Swim Area
   - **Swim Plot** is opened (except the jet winds down to the slowest swimmer setting)
-- **In an emergency, press OnOff, then On/Off now** and the jet motor 
-  pump switches at once, without waiting for the jet to wind down.
+- **In an emergency, press OnOff, then Stop pump now** and the jet motor 
+  pump turns off at once, without waiting for the jet to wind down. It can
+  only stop the pump, never start it.
+- **If the pump doesn't turn off,** PoolWind presses again for 30 seconds,
+  then asks you to turn it off with the pool's other remote. While that
+  box is open, PoolWind sends nothing to the pool.
+- **With no swimmer in sight for 5 minutes,** PoolWind warns for 30 seconds
+  (**Keep swimming** cancels it), then turns the pump off and closes. Don't
+  rely on it: turn the pump off when you leave the pool.
+- **Closing PoolWind with the pump running** asks **Shut Down** (turn the
+  pump off) or **Exit** (leave it running).
 - **Close PoolWind before putting on a pool cover:** it can take the cover
   for a swimmer and move the jet.
 - **Before relying on PoolWind, confirm the pool's own remote works** to slow

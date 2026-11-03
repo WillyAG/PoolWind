@@ -1,4 +1,25 @@
-What's new in PoolWind v15.7 (since v15.5)
+What's new in PoolWind v15.8 (since v15.5)
+
+PoolWind now sees whether the pool's pump is running. This needs two
+resistors, R6 and R3, fitted on the interface board (build guide,
+section 4); without them PoolWind says so and doesn't start.
+- The pump buttons (OnOff on the pool screen, Pump in Swim Plot and the
+  calibration) show the pump: the power symbol, red and pressed in while
+  it runs, grey while it's off.
+- OnOff checks that the pump followed. Turning it off, PoolWind presses
+  again for up to 30 seconds; if it still runs, a box asks you to turn it
+  off with the pool's other remote. "Stop pump now" (was "On/Off now") in
+  the wind-down box can only stop the pump, never start it.
+- The pump turned off (by any remote) pauses the swim; it goes on when the
+  pump is back on. Begin or Resume with the pump off offers to turn it on.
+- No swimmer for 5 minutes with the pump running: a box with "Keep
+  swimming" for 30 seconds, then PoolWind turns the pump off and closes.
+- Closing PoolWind with the pump running: "Pump still running" asks Shut
+  Down (turn it off) or Exit (leave it running). Starting PoolWind again
+  clears that box.
+- The calibration's Start with the pump off offers to turn it on.
+
+Also since v15.5:
 
 For swimmers (user manual):
 - Your own Pace table on your USB stick, made from the pool's the first

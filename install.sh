@@ -104,6 +104,28 @@ if ! command -v raspi-config > /dev/null; then
     exit 1
 fi
 
+# Since v15.8 PoolWind needs R6 and R3 on the interface board (it sees
+# whether the pump is running). An update from a version without that asks
+# first; nothing is changed if they aren't fitted (Bill, 2026-11-02: "let
+# user decide if they want to upgrade to the version that requires the
+# hardware change").
+if [ -f "$PW_DIR/poolwind.py" ] && ! grep -q "PUMP_SENSE_PIN" "$PW_DIR/poolwind.py" \
+        && grep -q "PUMP_SENSE_PIN" "$SOFTWARE/poolwind.py"; then
+    echo
+    say "This version of PoolWind needs two resistors, R6 and R3, fitted on the"
+    say "interface board: they let PoolWind see whether the pool's pump is running"
+    say "(build guide, section 4). Without them the new version won't start."
+    read -r -p "Are R6 and R3 fitted on your interface board? (y/n) " answer
+    echo "Answer: $answer" >> "$LOG"
+    case "$answer" in
+        [yY]*) ;;
+        *)  say "Nothing was changed: your PoolWind stays as it is."
+            say "Fit R6 and R3 first, then run this again."
+            read -r -p "Press Enter to close."
+            exit 0 ;;
+    esac
+fi
+
 echo "Type your password when asked: the one you chose in Raspberry Pi Imager."
 echo "(Nothing shows on the screen while you type it. Press Enter at the end.)"
 if ! sudo -v; then

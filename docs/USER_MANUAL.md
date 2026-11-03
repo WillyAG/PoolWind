@@ -97,7 +97,7 @@ them also change color to warn you that PoolWind isn't running normally:
 | **Vary** (yellow) | Shown while Hold is on. Use **UP** and **DN** to vary the held speed, and press **Vary** to go back to automatic control |
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
-| **OnOff** (light red) | Turns the pool's pump on or off, at one touch. The jet winds down first (see [OnOff](#onoff-the-pump)) |
+| **OnOff** (the power symbol) | Turns the pool's pump on or off, at one touch. Red and pressed in while the pump runs, grey while it's off. The jet winds down first (see [OnOff](#onoff-the-pump)) |
 | **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the builder), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...** (your zones, height and video settings), then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
@@ -187,6 +187,8 @@ Press **Suspend** to take a break.
 
 As mentioned directly above, leaving the swimZone also suspends dataTracking but pressing the "Suspend" button will not allow dataTracking to resume if you re-enter the swimZone.
 
+If the pump is turned off, with **OnOff** or the pool's other remote, your swim pauses the same way, and goes on by itself when the pump is back on. **Begin** or **Resume** with the pump off asks **"Turn pump on?"**.
+
 ### Hold: a steady jet
 
 Press **Hold** to adjust the jet flow to a constant level.
@@ -215,14 +217,31 @@ the jet doesn't slow down if you fall back, get out of the swim zone, or even le
 ### OnOff: the pump
 
 **OnOff** turns the pool's pump on or off, the same as the button on the
-pool's remote. PoolWind first winds the jet down to its lowest setting
-(**"Winding the jet down before switching the pump…"**), then switches the
-pump, so you feel the jet slow down before it stops, and it always starts
-slow. PoolWind stops adjusting the speed while it does this, giving OnOff
-top priority.
+pool's remote. PoolWind sees whether the pump is running: the button is
+**red and pressed in** while it runs, and **grey** while it's off. It
+changes as soon as you press it.
 
-**In an emergency**, press **On/Off now** in that message: the wind-down
-stops and the pump is switched at once.
+PoolWind first winds the jet down to its lowest setting (**"Winding the
+jet down before turning the pump off…"**, or **on**), then presses the
+pool's On/Off, so you feel the jet slow down before it stops, and it always
+starts slow. PoolWind stops adjusting the speed while it does this, giving
+OnOff top priority.
+
+- **Turning on:** if the pump didn't start, the button goes back to grey
+  after a couple of seconds. Press it again.
+- **Turning off:** if the pump keeps running, PoolWind presses again, for up
+  to 30 seconds. If it still runs, a box asks you to **turn it off with the
+  pool's other remote**. While the box is open PoolWind sends nothing to
+  the pool, which turns its pump off by itself after 30 minutes without a
+  signal. Press **Exit** when you've seen it.
+
+**In an emergency**, press **Stop pump now** in the wind-down message: the
+wind-down stops and the pump is turned off at once. It only ever stops the
+pump, never starts it.
+
+**No swimmer for 5 minutes:** with the pump running and nobody in sight,
+PoolWind shows a box for 30 seconds, then turns the pump off and closes.
+Press **Keep swimming** in the box to carry on.
 
 ### Pace correction: when the Paces don't feel right
 
@@ -370,11 +389,13 @@ Press **OnOff** to turn the pump off: the jet winds down first. Then press
 **X** at the top right of the screen to close PoolWind. It then:
 
 1. winds the jet down to its slowest setting and releases its control of
-   the pool's remote (the pump stays as it is),
+   the pool's remote (if the pump is still running, a box asks **Shut
+   Down**, to turn it off, or **Exit**, to leave it running; starting
+   PoolWind again also clears that box),
 2. finishes saving your swim to your USB stick, or the Raspberry Pi if there's no stick, and
 3. **ejects your USB stick**, so it's safe to remove.
 
-There's no message: once PoolWind has closed, you can remove your stick,
+Otherwise there's no message: once PoolWind has closed, you can remove your stick,
 and the next swimmer can insert theirs before starting PoolWind. Or leave
 it in: if you start PoolWind again, it finds your stick and your settings
 without unplugging it.
@@ -542,7 +563,7 @@ The swim's training video plays together with a plot of your swim:
 | Left click on the plot and drag | Moves the cursor and swim video through time or distance |
 | Right click on the plot and drag | Moves the entire plot and cursor left or right |
 | Click on the video | Turns the [zone highlight](#seeing-the-jets-zone-the-zone-highlight) on or off (swims recorded since it was added) |
-| **On/Off** (light red) | Turns the pool's pump on or off, after "Are you sure?" (**OK** / **Cancel**) |
+| **Pump** (the power symbol) | Turns the pool's pump on or off, after "Are you sure?" (**OK** / **Cancel**). Red while the pump runs, grey while it's off |
 | **Close** | Back to the calendars, to pick another day |
 
 <a id="master-vs-swimmer-datasets"></a>**Master vs Swimmer datasets:**
