@@ -58,11 +58,12 @@ pool's jet. Do them with nobody in the pool.
 ## 3. Installing PoolWind
 
 Open a terminal on the Pi: click the **Terminal** icon (a black screen
-with `>_`) on the bar at the top of the desktop. Type these three lines,
+with `>_`) on the bar at the top of the desktop. Type these four lines,
 pressing Enter after each:
 
 ```
-git clone https://github.com/WillyAG/PoolWind.git PoolWind-download
+cd ~
+git clone https://github.com/WillyAG/PoolWind.git PoolWind-download || git -C PoolWind-download pull
 cd PoolWind-download
 bash install.sh
 ```
@@ -74,16 +75,18 @@ bash install.sh
    top, and press Enter.
 2. On that page, click the **docs** folder, then **SETUP_GUIDE.md**, and
    scroll down to this section, **3. Installing PoolWind**.
-3. Click the copy button (⧉) at the top right of the box of three lines.
+3. Click the copy button (⧉) at the top right of the box of four lines.
 4. In the terminal, right-click and choose **Paste** (or press
    Ctrl+Shift+V; plain Ctrl+V doesn't work in a terminal). Press Enter if
    the last line hasn't run.
 
-The first line downloads PoolWind into a `PoolWind-download` folder in your
-home folder (where a new terminal starts). The second goes into that
-folder, and the third runs the install script. Capitals and the `-` matter.
+The first line goes to your home folder. The second downloads PoolWind
+into a `PoolWind-download` folder there; if that folder is already there
+from an earlier install, the download says "fatal: ... already exists"
+(that's fine) and the folder is brought up to date instead. The third goes
+into that folder, and the fourth runs the install script. Capitals and the `-` matter.
 
-If the third line says "No such file or directory", open the
+If the fourth line says "No such file or directory", open the
 `PoolWind-download` folder in the File Manager instead, press **F4**
 (Open Current Folder in Terminal) and type `bash install.sh` there.
 
@@ -678,9 +681,9 @@ bash install.sh
 ```
 
 (In a new terminal, which starts in your home folder; copy and paste the
-lines the same way as in section 3.) If you no longer
-have the `PoolWind-download` folder, follow section 3 again: it's the same
-script.
+lines the same way as in section 3.) The four lines of section 3 also
+update, whether or not the `PoolWind-download` folder is still there: it's
+the same script.
 
 The same script installs and updates. On an update it replaces the program
 (keeping the old one as `poolwind.py.previous`) and leaves everything else

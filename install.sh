@@ -1,7 +1,7 @@
 #!/bin/bash
 # PoolWind install script.
 #
-#   git clone https://github.com/WillyAG/PoolWind.git PoolWind-download
+#   git clone https://github.com/WillyAG/PoolWind.git PoolWind-download || git -C PoolWind-download pull
 #   cd PoolWind-download
 #   bash install.sh
 #
