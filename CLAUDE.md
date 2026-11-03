@@ -107,15 +107,12 @@ faster than they can handle.
   session `poolwind-claude` shared by the icon and SSH from a PC (`ssh -t
   user@host .local/bin/poolwind_claude.sh`); the first time it installs
   Claude Code and runs `claude auth login --claudeai`; then it opens Claude
-  in this download folder, continuing the last conversation), and **Copy
-  Claude to USB** (`~/.local/bin/poolwind_claude_usb.sh`, its icon only
-  when the install finds a stick with `PoolWind_Claude` or the icon is
-  there already: `~/.claude/projects` to
-  `PoolWind_Claude/projects` on a USB stick, newer files only; install.sh
-  runs it with `--restore` to copy them back on a new card; it skips the SD
-  card and any disk with an ext partition or mounted outside `/media`, such
-  as a card in SD Card Copier). PoolWind never offers to format a stick with
-  a `PoolWind_Claude` folder. It also switches the desktop to X11,
+  in this download folder, continuing the last conversation; the
+  author's own: with a USB stick that has a `PoolWind_Claude` folder it
+  keeps `~/.claude/projects` in step with `PoolWind_Claude/projects` (in
+  at start, out every 5 minutes and at `/exit`; `folder.txt` there names
+  the folder Claude starts in), and PoolWind never offers to format such a
+  stick). It also switches the desktop to X11,
   turns on I2C and RealVNC, adds the user to the `gpio`, `i2c` and `video`
   groups, and allows the four sudo commands used to set up USB sticks.
 - `install_windows.bat`: the demo on a Windows PC. Installs Python 3.13

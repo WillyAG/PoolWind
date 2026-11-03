@@ -43,8 +43,8 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         scan, PingPong) with the pump off asks to turn
     #                         it on, then starts.
     #                       - A stick with a PoolWind_Claude folder (Claude's
-    #                         conversations, from the "Copy Claude to USB"
-    #                         icon) is never offered for formatting.
+    #                         conversations, kept there by the Claude icon)
+    #                         is never offered for formatting.
     #                       - Pace correction open: the swimmer out of the
     #                         swim area doesn't wind the jet down; it holds
     #                         at its step until they swim back in.
@@ -1731,8 +1731,8 @@ class App:
                 continue
             if os.path.isfile(os.path.join(mount_path, "poolwind_ind_defaults.txt")):
                 continue
-            # Claude's conversations, copied there by the "Copy Claude to
-            # USB" icon: never offer to format that stick
+            # Claude's conversations, kept there by the Claude icon:
+            # never offer to format that stick
             if os.path.isdir(os.path.join(mount_path, "PoolWind_Claude")):
                 continue
             try:

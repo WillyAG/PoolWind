@@ -331,7 +331,122 @@ if ! claude auth status 2> /dev/null | grep -q '"loggedIn": *true'; then
     echo
 fi
 
-echo "Starting Claude. It has read CLAUDE.md, PoolWind's background."
+# Claude's conversations kept on a USB stick (Bill, 2026-11-03): with a
+# stick plugged in that has a PoolWind_Claude folder, its conversations
+# come to this card first; the new lines go back every 5 minutes, and
+# everything at /exit (a shutdown with Claude open loses at most 5
+# minutes). PoolWind_Claude/folder.txt can name the folder Claude starts
+# in (one line, such as ~/poolwind). No such stick: nothing is copied.
+PROJECTS="$HOME/.claude/projects"
+SYNC_LOG="$HOME/.claude/poolwind_claude_sync.log"
+QUICK_S="${POOLWIND_QUICK_S:-300}"
+log() { echo "$(date '+%F %T')  $*" >> "$SYNC_LOG"; }
+
+# Mounted USB sticks: removable disks only (never the SD card), mounting
+# one left unmounted (PoolWind unmounts its stick when it closes). Not a
+# disk with a Linux partition or one mounted outside /media: a Raspberry
+# Pi system card in a card reader, perhaps being written by SD Card Copier.
+usb_sticks() {
+    local r disk dev fs mp parts
+    for r in /sys/block/sd*/removable; do
+        [ "$(cat "$r" 2> /dev/null)" = 1 ] || continue
+        disk="/dev/$(basename "$(dirname "$r")")"
+        parts="$(lsblk -rpno PATH,FSTYPE,MOUNTPOINT "$disk" 2> /dev/null)"
+        awk '$2 ~ /^ext/ || ($3 != "" && $3 !~ /^\/media\//) {bad = 1} END {exit !bad}' \
+            <<< "$parts" && continue
+        while read -r dev fs mp; do
+            case "$fs" in exfat|vfat|ntfs|ntfs3) ;; *) continue ;; esac
+            if [ -z "$mp" ]; then
+                udisksctl mount -b "$dev" --no-user-interaction > /dev/null 2>&1
+                mp="$(lsblk -rno MOUNTPOINT "$dev")"
+            fi
+            mp="$(printf '%b' "$mp")"          # lsblk writes a space as \x20
+            [ -n "$mp" ] && [ -d "$mp" ] && echo "$mp"
+        done <<< "$parts"
+    done
+}
+
+# A conversation file only grows at the end. FROM continues TO (or TO is
+# missing): FROM's new lines are added; TO continues FROM: nothing; they
+# differ: the newer wins and the other is kept as <name>.kept-<date>.
+CHUNK=65536
+continues() {  # continues LONG SHORT: SHORT's end matches LONG at the same place
+    local n skip; n="$(stat -c %s "$2")"
+    [ "$n" -le "$(stat -c %s "$1")" ] || return 1
+    [ "$n" -eq 0 ] && return 0
+    skip=$(( n > CHUNK ? n - CHUNK : 0 ))
+    cmp -s -n $(( n - skip )) -i "$skip:$skip" "$1" "$2"
+}
+merge_file() { # merge_file FROM TO
+    local f="$1" t="$2" n kept
+    if [ ! -f "$t" ]; then
+        mkdir -p "$(dirname "$t")" && cp --preserve=timestamps "$f" "$t"; return
+    fi
+    if continues "$f" "$t"; then
+        n="$(stat -c %s "$t")"
+        if [ "$n" -lt "$(stat -c %s "$f")" ]; then
+            tail -c +$(( n + 1 )) "$f" >> "$t" && touch -r "$f" "$t"
+        fi
+        return
+    fi
+    continues "$t" "$f" && return
+    if [ "$f" -nt "$t" ]; then
+        kept="$t.kept-$(date +%Y%m%d-%H%M)"
+        cp --preserve=timestamps "$t" "$kept" && cp --preserve=timestamps "$f" "$t"
+        log "differed: kept $kept"
+        echo "Two copies of a conversation differed; the older is kept as"
+        echo "  $kept"
+    fi
+}
+merge() {      # merge FROM TO: the conversations, then the rest (newer files)
+    local f
+    mkdir -p "$2" || return 1
+    while IFS= read -r -d '' f; do
+        merge_file "$f" "$2/${f#"$1"/}"
+    done < <(find "$1" -type f -name '*.jsonl' -print0)
+    rsync -rt --update --exclude='*.jsonl' "$1/" "$2/" >> "$SYNC_LOG" 2>&1
+    sync
+}
+
+STICK=""
+while read -r s; do
+    [ -d "$s/PoolWind_Claude" ] && { STICK="$s/PoolWind_Claude/projects"; FOLDER_TXT="$s/PoolWind_Claude/folder.txt"; break; }
+done < <(usb_sticks)
+if [ -n "$STICK" ]; then
+    if [ -f "$FOLDER_TXT" ]; then
+        folder="$(head -1 "$FOLDER_TXT" | tr -d '\r')"
+        folder="${folder/#\~/$HOME}"
+        mkdir -p "$folder" && cd "$folder"
+    fi
+    echo "Bringing Claude's conversations up to date from the USB stick..."
+    mkdir -p "$STICK"
+    merge "$STICK" "$PROJECTS" && log "in from $STICK" || log "in from $STICK FAILED"
+    # every 5 minutes (its sleep ends with it, so nothing is left behind)
+    ( exec > /dev/null 2>&1
+      trap 'kill "$nap" 2> /dev/null; exit 0' TERM
+      while :; do
+          sleep "$QUICK_S" & nap=$!; wait "$nap"
+          [ -d "$STICK" ] && merge "$PROJECTS" "$STICK" && log "out (5 minutes)"
+      done ) &
+    LOOP=$!
+fi
+finish() {
+    trap - EXIT HUP TERM INT
+    [ -n "${LOOP:-}" ] && kill "$LOOP" 2> /dev/null
+    if [ -n "$STICK" ] && [ -d "$STICK" ]; then
+        echo "Copying Claude's conversations to the USB stick..."
+        if merge "$PROJECTS" "$STICK"; then log "out to $STICK"; echo "Done."
+        else log "out to $STICK FAILED"; echo "The copy to the USB stick didn't finish."; sleep 5; fi
+    fi
+}
+trap finish EXIT
+trap 'exit 0' HUP TERM INT
+
+if [ "$PWD" = "$SRC_DIR" ]; then
+    echo "Starting Claude. It has read CLAUDE.md, PoolWind's background."
+else
+    echo "Starting Claude in $PWD."
+fi
 sleep 2
 # Carry on the last conversation in this folder, if there is one
 if ls "$HOME/.claude/projects/$(pwd | sed 's/[^A-Za-z0-9]/-/g')"/*.jsonl > /dev/null 2>&1; then
@@ -358,170 +473,6 @@ chmod +x "$tmp"
 run mv "$tmp" "$DESKTOP/Claude.desktop"
 say "   added Claude (Claude Code, offered the first time it's opened)"
 
-# The Copy Claude to USB icon: Claude Code's conversations and memory notes
-# (~/.claude/projects) to a PoolWind_Claude folder on a USB stick, so they
-# can go on with a new SD card. This script brings them back from the stick
-# (--restore, below). Bill, 2026-11-03.
-CLAUDE_USB_SH="$HOME/.local/bin/poolwind_claude_usb.sh"
-cat > "$CLAUDE_USB_SH" << 'EOF'
-#!/bin/bash
-# PoolWind's Copy Claude to USB icon (written by install.sh).
-#   poolwind_claude_usb.sh             copy Claude Code's conversations and
-#                                      memory notes (~/.claude/projects) to
-#                                      PoolWind_Claude on a USB stick
-#   poolwind_claude_usb.sh --restore   copy them back from a stick, if one
-#                                      has them (install.sh does this)
-# Files already on the Pi are only replaced by newer ones. Sign-in isn't
-# copied: Claude Code asks for it again on a new card.
-PROJECTS="$HOME/.claude/projects"
-
-# Mounted USB sticks: removable disks only (never the SD card), mounting
-# one left unmounted (PoolWind unmounts its stick when it closes). Not a
-# disk with a Linux partition or one mounted outside /media: a Raspberry
-# Pi system card in a card reader, perhaps being written by SD Card Copier.
-usb_sticks() {
-    local r disk dev fs mp parts
-    for r in /sys/block/sd*/removable; do
-        [ "$(cat "$r" 2> /dev/null)" = 1 ] || continue
-        disk="/dev/$(basename "$(dirname "$r")")"
-        parts="$(lsblk -rpno PATH,FSTYPE,MOUNTPOINT "$disk" 2> /dev/null)"
-        awk '$2 ~ /^ext/ || ($3 != "" && $3 !~ /^\/media\//) {bad = 1} END {exit !bad}' \
-            <<< "$parts" && continue
-        while read -r dev fs mp; do
-            case "$fs" in exfat|vfat|ntfs|ntfs3) ;; *) continue ;; esac
-            if [ -z "$mp" ]; then
-                udisksctl mount -b "$dev" --no-user-interaction > /dev/null 2>&1
-                mp="$(lsblk -rno MOUNTPOINT "$dev")"
-            fi
-            mp="$(printf '%b' "$mp")"          # lsblk writes a space as \x20
-            [ -n "$mp" ] && [ -d "$mp" ] || continue
-            echo "$mp"
-        done <<< "$parts"
-    done
-}
-
-copy_newer() {    # copy_newer FROM TO [progress]: newer files only
-    mkdir -p "$2" || return 1
-    if [ -n "${3:-}" ] && command -v rsync > /dev/null; then
-        # the percentage as it goes; a USB stick keeps file times to the
-        # 1/100 s, hence the window
-        rsync -rt --update --modify-window=1 --info=progress2 --no-inc-recursive "$1/" "$2/"
-    else
-        cp -r --update --preserve=timestamps "$1/." "$2/"
-    fi
-}
-
-# Claude Code keeps each conversation under the folder it was started in,
-# and the Claude icon starts in the download folder. Conversations (and
-# memory notes) from a folder this card doesn't have, such as one on the
-# old card, go there, so the icon carries them on. Newer files win.
-# Bill, 2026-11-03.
-move_to_icon_folder() {
-    local here d f cwd
-    here="$PROJECTS/$(printf '%s' "__SRC_DIR__" | sed 's/[^A-Za-z0-9]/-/g')"
-    for d in "$PROJECTS"/*/; do
-        d="${d%/}"
-        [ "$d" = "$here" ] && continue
-        f="$(ls -t "$d"/*.jsonl 2> /dev/null | head -1)"
-        [ -n "$f" ] || continue
-        cwd="$(grep -m1 -o '"cwd":"[^"]*"' "$f" | cut -d'"' -f4)"
-        [ -n "$cwd" ] && [ ! -d "$cwd" ] || continue
-        if copy_newer "$d" "$here"; then
-            rm -rf "$d"
-            echo "   Claude's conversations from $cwd (not on this card) moved so the Claude icon goes on with them"
-        fi
-    done
-}
-
-if [ "${1:-}" = "--restore" ]; then
-    while read -r stick; do
-        [ -d "$stick/PoolWind_Claude/projects" ] || continue
-        if copy_newer "$stick/PoolWind_Claude/projects" "$PROJECTS"; then
-            echo "   Claude's conversations copied from the USB stick $(basename "$stick")"
-        else
-            echo "   Claude's conversations on the USB stick $(basename "$stick") couldn't all be copied"
-        fi
-        break
-    done < <(usb_sticks)
-    [ -d "$PROJECTS" ] && move_to_icon_folder
-    exit 0
-fi
-
-finish() { echo; read -r -p "Press Enter to close."; exit "$1"; }
-
-echo "Copy Claude to USB"
-echo
-echo "Copies Claude Code's conversations and memory notes to a USB stick,"
-echo "so they can go on with a new SD card: plug the stick in before running"
-echo "the install script there, and it copies them back."
-echo
-if [ ! -d "$PROJECTS" ]; then
-    echo "There are no Claude conversations on this Pi yet."
-    finish 0
-fi
-mapfile -t sticks < <(usb_sticks)
-if [ "${#sticks[@]}" -eq 0 ]; then
-    echo "No USB stick found. Plug one in and try again."
-    finish 1
-fi
-stick=""
-for s in "${sticks[@]}"; do        # the stick that has them already
-    [ -d "$s/PoolWind_Claude" ] && { stick="$s"; break; }
-done
-if [ -z "$stick" ] && [ "${#sticks[@]}" -eq 1 ]; then
-    stick="${sticks[0]}"
-fi
-if [ -z "$stick" ]; then
-    echo "Which USB stick?"
-    for i in "${!sticks[@]}"; do echo "  $((i + 1))  $(basename "${sticks[$i]}")"; done
-    read -r -p "Number: " n
-    case "$n" in ''|*[!0-9]*) n=0 ;; esac
-    if [ "$n" -lt 1 ] || [ "$n" -gt "${#sticks[@]}" ]; then
-        echo "Nothing was copied."
-        finish 1
-    fi
-    stick="${sticks[$((n - 1))]}"
-fi
-echo "Copying to the USB stick $(basename "$stick")."
-echo "(Close Claude first, so the copy has the whole conversation.)"
-echo "A long conversation can take a few minutes; the line below shows how"
-echo "far it has got (the percentage)."
-echo
-if copy_newer "$PROJECTS" "$stick/PoolWind_Claude/projects" progress && echo &&
-        echo "Finishing writing to the stick..." && sync; then
-    echo
-    echo "Done: $(du -sh "$stick/PoolWind_Claude" | cut -f1) in PoolWind_Claude on $(basename "$stick")."
-    echo "The stick holds everything said and read in those conversations:"
-    echo "keep it to yourself."
-    finish 0
-fi
-echo
-echo "The copy didn't finish (is the stick full?). Nothing on the Pi was changed."
-finish 1
-EOF
-sed -i "s|__SRC_DIR__|$SRC_DIR|" "$CLAUDE_USB_SH"
-run chmod +x "$CLAUDE_USB_SH"
-tmp="$(mktemp)"
-cat > "$tmp" << EOF
-[Desktop Entry]
-Type=Application
-Name=Copy Claude to USB
-Comment=Copy Claude Code's conversations to a USB stick, for a new SD card (setup guide, section 12)
-Exec=x-terminal-emulator -e $CLAUDE_USB_SH
-Icon=drive-removable-media
-Terminal=false
-EOF
-chmod +x "$tmp"
-# Its icon only for whoever keeps Claude's conversations on a stick: a stick
-# with them plugged in now (copied back here), or the icon there already
-restored="$("$CLAUDE_USB_SH" --restore 2>> "$LOG")"
-if [ -n "$restored" ] || [ -e "$DESKTOP/Copy_Claude_to_USB.desktop" ]; then
-    run mv "$tmp" "$DESKTOP/Copy_Claude_to_USB.desktop"
-    say "   added Copy Claude to USB"
-else
-    rm -f "$tmp"
-fi
-[ -n "$restored" ] && say "$restored"
 
 # Turn the monitor to portrait every time the desktop starts, so it's
 # always ready for swimming. (The Monitor Toggle icon still switches to
