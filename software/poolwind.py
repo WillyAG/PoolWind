@@ -42,8 +42,11 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       - Calibration: Start (scan, Pace Entry's Auto
     #                         scan, PingPong) with the pump off asks to turn
     #                         it on, then starts.
+    #                       - A stick with a PoolWind_Claude folder (Claude's
+    #                         conversations, from the "Copy Claude to USB"
+    #                         icon) is never offered for formatting.
     #
-    # poolwindAI_v15.7   -- A PACE TABLE PER SWIMMER. Bill,
+    # poolwindAI_v15.7  -- A PACE TABLE PER SWIMMER. Bill,
     #                       2026-10-29: "Such a major change, let's archive
     #                       v15.6 and go on to v15.7." The swimmer's own Pace
     #                       table on their USB stick (no stick: the Master
@@ -1724,6 +1727,10 @@ class App:
             if not os.path.isdir(mount_path):
                 continue
             if os.path.isfile(os.path.join(mount_path, "poolwind_ind_defaults.txt")):
+                continue
+            # Claude's conversations, copied there by the "Copy Claude to
+            # USB" icon: never offer to format that stick
+            if os.path.isdir(os.path.join(mount_path, "PoolWind_Claude")):
                 continue
             try:
                 src = subprocess.run(

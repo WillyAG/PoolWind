@@ -110,9 +110,11 @@ The install script:
   where the program, its settings files and the `CSV Vault` live;
 - downloads the **sample video**, a recorded swim for testing at a desk
   (section 8);
-- adds three icons to the desktop: **PoolWind**, **Monitor Toggle** for
-  [working from home](#9-working-from-home), and **Claude**
-  ([getting help](#12-getting-help));
+- adds four icons to the desktop: **PoolWind**, **Monitor Toggle** for
+  [working from home](#9-working-from-home), **Claude** and **Copy Claude
+  to USB** ([getting help](#12-getting-help));
+- if a USB stick holds Claude's conversations from another SD card
+  (**Copy Claude to USB**, section 12), copies them back;
 - turns the monitor to **portrait** (taller than wide) every time the Pi
   starts, ready for swimming.
 
@@ -793,6 +795,28 @@ type `/exit`, then start it again with step 2.
 
 To go back to your last conversation later, start it with `claude -c`
 instead of `claude`. To finish, type `/exit`.
+
+### Taking Claude's conversations to a new SD card
+
+Claude Code keeps its conversations, and the notes it makes about you and
+your pool, on the SD card. To carry on with them on a new card:
+
+1. On the old card, close Claude, plug in a USB stick and double-click
+   **Copy Claude to USB**. It copies them to a `PoolWind_Claude` folder on
+   the stick (if more than one stick is plugged in, it asks which) and
+   says when it's done. A swimmer's stick will do.
+2. On the new card, plug the stick in before running the install script
+   (section 3). It copies them back and says so.
+3. Double-click **Claude** and sign in again: the sign-in isn't copied.
+   Claude carries on the last conversation.
+
+Use the same user name on the new card (section 2): the conversations are
+filed under the folder they were held in. Files already on the new card are
+only replaced by newer ones from the stick. PoolWind never offers to format
+a stick with a `PoolWind_Claude` folder.
+
+The stick holds everything said and read in those conversations, so keep
+it to yourself.
 
 ### The author's setup: Claude on a PC, the Pi at the pool
 

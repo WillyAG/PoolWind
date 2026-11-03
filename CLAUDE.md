@@ -105,7 +105,13 @@ faster than they can handle.
   doesn't stop the install). Desktop icons: **PoolWind**, **Monitor
   Toggle**, and **Claude** (`~/.local/bin/poolwind_claude.sh`: offers to
   install Claude Code the first time, then opens it in this download folder,
-  continuing the last conversation). It also switches the desktop to X11,
+  continuing the last conversation), and **Copy Claude to USB**
+  (`~/.local/bin/poolwind_claude_usb.sh`: `~/.claude/projects` to
+  `PoolWind_Claude/projects` on a USB stick, newer files only; install.sh
+  runs it with `--restore` to copy them back on a new card; it skips the SD
+  card and any disk with an ext partition or mounted outside `/media`, such
+  as a card in SD Card Copier). PoolWind never offers to format a stick with
+  a `PoolWind_Claude` folder. It also switches the desktop to X11,
   turns on I2C and RealVNC, adds the user to the `gpio`, `i2c` and `video`
   groups, and allows the four sudo commands used to set up USB sticks.
 - `install_windows.bat`: the demo on a Windows PC. Installs Python 3.13

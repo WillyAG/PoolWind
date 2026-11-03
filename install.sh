@@ -321,6 +321,130 @@ chmod +x "$tmp"
 run mv "$tmp" "$DESKTOP/Claude.desktop"
 say "   added Claude (Claude Code, offered the first time it's opened)"
 
+# The Copy Claude to USB icon: Claude Code's conversations and memory notes
+# (~/.claude/projects) to a PoolWind_Claude folder on a USB stick, so they
+# can go on with a new SD card. This script brings them back from the stick
+# (--restore, below). Bill, 2026-11-03.
+CLAUDE_USB_SH="$HOME/.local/bin/poolwind_claude_usb.sh"
+cat > "$CLAUDE_USB_SH" << 'EOF'
+#!/bin/bash
+# PoolWind's Copy Claude to USB icon (written by install.sh).
+#   poolwind_claude_usb.sh             copy Claude Code's conversations and
+#                                      memory notes (~/.claude/projects) to
+#                                      PoolWind_Claude on a USB stick
+#   poolwind_claude_usb.sh --restore   copy them back from a stick, if one
+#                                      has them (install.sh does this)
+# Files already on the Pi are only replaced by newer ones. Sign-in isn't
+# copied: Claude Code asks for it again on a new card.
+PROJECTS="$HOME/.claude/projects"
+
+# Mounted USB sticks: removable disks only (never the SD card), mounting
+# one left unmounted (PoolWind unmounts its stick when it closes). Not a
+# disk with a Linux partition or one mounted outside /media: a Raspberry
+# Pi system card in a card reader, perhaps being written by SD Card Copier.
+usb_sticks() {
+    local r disk dev fs mp parts
+    for r in /sys/block/sd*/removable; do
+        [ "$(cat "$r" 2> /dev/null)" = 1 ] || continue
+        disk="/dev/$(basename "$(dirname "$r")")"
+        parts="$(lsblk -rpno PATH,FSTYPE,MOUNTPOINT "$disk" 2> /dev/null)"
+        awk '$2 ~ /^ext/ || ($3 != "" && $3 !~ /^\/media\//) {bad = 1} END {exit !bad}' \
+            <<< "$parts" && continue
+        while read -r dev fs mp; do
+            case "$fs" in exfat|vfat|ntfs|ntfs3) ;; *) continue ;; esac
+            if [ -z "$mp" ]; then
+                udisksctl mount -b "$dev" --no-user-interaction > /dev/null 2>&1
+                mp="$(lsblk -rno MOUNTPOINT "$dev")"
+            fi
+            mp="$(printf '%b' "$mp")"          # lsblk writes a space as \x20
+            [ -n "$mp" ] && [ -d "$mp" ] || continue
+            echo "$mp"
+        done <<< "$parts"
+    done
+}
+
+copy_newer() {    # copy_newer FROM TO
+    mkdir -p "$2" && cp -r --update --preserve=timestamps "$1/." "$2/"
+}
+
+if [ "${1:-}" = "--restore" ]; then
+    while read -r stick; do
+        [ -d "$stick/PoolWind_Claude/projects" ] || continue
+        if copy_newer "$stick/PoolWind_Claude/projects" "$PROJECTS"; then
+            echo "   Claude's conversations copied from the USB stick $(basename "$stick")"
+        else
+            echo "   Claude's conversations on the USB stick $(basename "$stick") couldn't all be copied"
+        fi
+        exit 0
+    done < <(usb_sticks)
+    exit 0
+fi
+
+finish() { echo; read -r -p "Press Enter to close."; exit "$1"; }
+
+echo "Copy Claude to USB"
+echo
+echo "Copies Claude Code's conversations and memory notes to a USB stick,"
+echo "so they can go on with a new SD card: plug the stick in before running"
+echo "the install script there, and it copies them back."
+echo
+if [ ! -d "$PROJECTS" ]; then
+    echo "There are no Claude conversations on this Pi yet."
+    finish 0
+fi
+mapfile -t sticks < <(usb_sticks)
+if [ "${#sticks[@]}" -eq 0 ]; then
+    echo "No USB stick found. Plug one in and try again."
+    finish 1
+fi
+stick=""
+for s in "${sticks[@]}"; do        # the stick that has them already
+    [ -d "$s/PoolWind_Claude" ] && { stick="$s"; break; }
+done
+if [ -z "$stick" ] && [ "${#sticks[@]}" -eq 1 ]; then
+    stick="${sticks[0]}"
+fi
+if [ -z "$stick" ]; then
+    echo "Which USB stick?"
+    for i in "${!sticks[@]}"; do echo "  $((i + 1))  $(basename "${sticks[$i]}")"; done
+    read -r -p "Number: " n
+    case "$n" in ''|*[!0-9]*) n=0 ;; esac
+    if [ "$n" -lt 1 ] || [ "$n" -gt "${#sticks[@]}" ]; then
+        echo "Nothing was copied."
+        finish 1
+    fi
+    stick="${sticks[$((n - 1))]}"
+fi
+echo "Copying to the USB stick $(basename "$stick")..."
+echo "(Close Claude first, so the copy has the whole conversation.)"
+if copy_newer "$PROJECTS" "$stick/PoolWind_Claude/projects" && sync; then
+    echo
+    echo "Done: $(du -sh "$stick/PoolWind_Claude" | cut -f1) in PoolWind_Claude on $(basename "$stick")."
+    echo "The stick holds everything said and read in those conversations:"
+    echo "keep it to yourself."
+    finish 0
+fi
+echo
+echo "The copy didn't finish (is the stick full?). Nothing on the Pi was changed."
+finish 1
+EOF
+run chmod +x "$CLAUDE_USB_SH"
+tmp="$(mktemp)"
+cat > "$tmp" << EOF
+[Desktop Entry]
+Type=Application
+Name=Copy Claude to USB
+Comment=Copy Claude Code's conversations to a USB stick, for a new SD card (setup guide, section 12)
+Exec=x-terminal-emulator -e $CLAUDE_USB_SH
+Icon=drive-removable-media
+Terminal=false
+EOF
+chmod +x "$tmp"
+run mv "$tmp" "$DESKTOP/Copy_Claude_to_USB.desktop"
+say "   added Copy Claude to USB"
+restored="$("$CLAUDE_USB_SH" --restore 2>> "$LOG")"
+[ -n "$restored" ] && say "$restored"
+
 # Turn the monitor to portrait every time the desktop starts, so it's
 # always ready for swimming. (The Monitor Toggle icon still switches to
 # landscape for working.)
