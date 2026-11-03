@@ -308,7 +308,9 @@ slower Pace); both boxes turn red. Change one of them.
 swim counts toward distance and the log as usual, and while you swim a big
 blue Pace display covers the instructions so you can read your Pace. With
 **Begin** or **Resume** showing, the jet stays wound down until you press
-it. While the box is open PoolWind doesn't suspend the swim by itself.
+it. While the box is open PoolWind doesn't suspend the swim by itself, and
+swimming out of the swim area doesn't wind the jet down: it stays at its
+step until you swim back in.
 
 | Button | What it does |
 |---|---|

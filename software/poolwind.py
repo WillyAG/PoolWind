@@ -45,6 +45,9 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       - A stick with a PoolWind_Claude folder (Claude's
     #                         conversations, from the "Copy Claude to USB"
     #                         icon) is never offered for formatting.
+    #                       - Pace correction open: the swimmer out of the
+    #                         swim area doesn't wind the jet down; it holds
+    #                         at its step until they swim back in.
     #
     # poolwindAI_v15.7  -- A PACE TABLE PER SWIMMER. Bill,
     #                       2026-10-29: "Such a major change, let's archive
@@ -4409,6 +4412,16 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             elif self.app.suspendButtonText == "Resume":
                 ema_input_h = 10.0
                 branch_taken = "suspended"
+
+            elif getattr(self, "pace_panel", None) is not None and self.pace_panel.isVisible():
+                # Pace correction open: the swimmer out of the swim area
+                # doesn't wind the jet down; it holds where they last were
+                # (Bill, 2026-11-03: "that the pool does not wind down when
+                # the swimmer leaves the swim area")
+                self.CoM_h = self.last_real_CoM_h
+                ema_input_h = None   # skip EMA update below
+                self.logDistance = False
+                branch_taken = "pace_correction_hold"
 
             elif self.blob_CoM_w is None:
                 # No blob at all (beyond get_auto_CoM's bounded dropout
