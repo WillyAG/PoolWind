@@ -8082,9 +8082,10 @@ class PaceGraph(QWidget):
             p.setPen(QColor(32, 64, 128))
             for i, text in ((self.mine[-1], "Your Fastest\nSwimmer Limit"), (self.mine[0], "Your Slowest\nSwimmer Limit")):
                 at = x(self.new[i])
-                r = (QtCore.QRectF(at + 8, top(i), w - at - 12, rh) if at < w / 2
-                     else QtCore.QRectF(4, top(i), at - 12, rh))
-                p.drawText(r, (Qt.AlignLeft if at < w / 2 else Qt.AlignRight) | Qt.AlignVCenter, text)
+                right = w - at - 12 >= at - 16       # the side with more room (Bill, 2026-11-04:
+                r = (QtCore.QRectF(at + 8, top(i), w - at - 12, rh) if right     # "'Your Slowest Swimmer
+                     else QtCore.QRectF(4, top(i), at - 12, rh))                 # Limit' is slightly cut off")
+                p.drawText(r, (Qt.AlignLeft if right else Qt.AlignRight) | Qt.AlignVCenter, text)
         # Which line is which, in the bottom zone, away from the curve (Bill,
         # 2026-10-28: "we lost the small letters that tell which plot is
         # which ... A good place would be the botton zone area of the graph")
@@ -8615,7 +8616,7 @@ class PaceCorrectionPanel(OverlayPanel):
         room = self.width() - 20 - width(W) - 30
         narrow = room < 100
         if narrow:
-            W = {"zone": 34, "col": 54, "edit": 64, "back": 26, "sp": 3}
+            W = {"zone": 30, "col": 48, "edit": 60, "back": 24, "sp": 3}
             room = self.width() - 20 - width(W) - 30
         row_w = width(W)
         self.graph_w = max(80, room)
@@ -8632,7 +8633,7 @@ class PaceCorrectionPanel(OverlayPanel):
             lab.setFixedWidth(w)
             lab.setAlignment(Qt.AlignCenter)
             if narrow:
-                lab.setStyleSheet("font-size: 12px;")
+                lab.setStyleSheet("font-size: 11px;")
             head.addWidget(lab, 0, Qt.AlignBottom)
             self.heads["Now" if "stored" in text else "New" if "pending" in text else text] = (lab, text)
         head.addStretch(1)
@@ -8690,7 +8691,7 @@ class PaceCorrectionPanel(OverlayPanel):
         # or "Switch to 'New' values". Whichever column is used will be shown
         # in bold.")
         self.switch_btn = QPushButton()
-        self.switch_btn.setFixedSize(2 * W["col"] + W["sp"], 40)
+        self.switch_btn.setFixedSize(max(2 * W["col"] + W["sp"], 124), 40)
         self.switch_btn.setFocusPolicy(Qt.NoFocus)
         self.switch_btn.setStyleSheet("font-size: 11px;" if narrow else "font-size: 12px;")
         self.switch_btn.clicked.connect(self._switch)
