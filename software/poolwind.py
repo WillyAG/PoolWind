@@ -8450,9 +8450,10 @@ class PaceCorrectionPanel(OverlayPanel):
         "<p><b>Stored or pending</b></p>"
         "<p>Your changes stay pending until you make them permanent, kept even if PoolWind is "
         "closed or the power goes off. The pool uses Your pending Paces (shown bold, and "
-        "\"Pending Paces\" on the pool screen); <b>Swim with 'stored' values</b> swims your "
-        "stored Paces, to compare. The choice holds until PoolWind closes; it starts with "
-        "pending. <b>Make permanent</b> writes your pending Paces into your stored ones and keeps "
+        "\"Pending Paces\" on the pool screen). The button <b>Now swimming with 'pending' "
+        "values</b> says which the pool swims; press it to swim your stored Paces, to compare, "
+        "and again to go back. The choice holds until PoolWind closes; it starts with "
+        "pending. While a value is red, the pool keeps your last good pending Paces. <b>Make permanent</b> writes your pending Paces into your stored ones and keeps "
         "a copy of the file before; <b>Clear</b> drops the pending changes.</p>"
         "<p><b>The pool's values</b> (with your USB stick in)</p>"
         "<p><b>Copy Master values to \"Your pending\"</b> puts the pool's own Paces into Your "
@@ -8991,21 +8992,31 @@ class PaceCorrectionPanel(OverlayPanel):
             self.current.keep_cursor = False
 
     def _show_new(self, red):
-        """Now and New, the one the pool uses bold; red in New: not faster
-        than the zone below. The ↺ beside each box with something in it."""
-        use_new = self.app.use_new
+        """Now and New, the one the pool really uses bold (App.apply_pace_
+        table): New only while something is pending and nothing is red (a
+        red value: the pool keeps the last good pending Paces, shown in
+        neither column, so neither is bold). Red in New: not faster than
+        the zone below. The ↺ beside each box with something in it."""
+        pending = self.app.pending is not None
+        now_used = not (self.app.use_new and pending)
+        new_used = not now_used and not self.bad
         now, new = self._paces(self.table), self._paces(self.new)
         bold = lambda text, b: f"<b>{text}</b>" if b else text
         for i, r in self.trows.items():
-            r["now"].setText(bold(pace_text(now[i]), not use_new))
-            text = bold(pace_text(new[i]), use_new)
+            r["now"].setText(bold(pace_text(now[i]), now_used))
+            text = bold(pace_text(new[i]), new_used)
             r["new"].setText(f"<span style='color:{self.RED}'>{text}</span>" if i in red else text)
-        for key, used in (("Now", not use_new), ("New", use_new)):
+        for key, used in (("Now", now_used), ("New", new_used)):
             lab, text = self.heads[key]
             lab.setText(f"<b>{text}</b>" if used else text)
-        # (Bill, 2026-10-30: "The 'Switch to' in the button should be
-        # changed to 'Swim with' and toggle 'stored' and 'pending' values.")
-        self.switch_btn.setText("Swim with\n'stored' values" if use_new else "Swim with\n'pending' values")
+        # What the pool swims now; a press swims the other (Bill,
+        # 2026-11-04: "'Swim with 'stored' values'. At first glance that
+        # looks like that is the current state when it ies'nt. ... it
+        # would be better if it says 'Now swimming with 'pending' values'
+        # and of course, vice versa."). Nothing pending: only stored.
+        self.switch_btn.setText("Now swimming with\n'stored' values" if now_used
+                                else "Now swimming with\n'pending' values")
+        self.switch_btn.setEnabled(pending)
         for i, b in self.reverts.items():
             b.setVisible(bool(self.edits[i].digits()))
 
@@ -9240,6 +9251,7 @@ class PaceCorrectionPanel(OverlayPanel):
                     self.app.save_pending(pend)
                 except Exception as e:
                     print("Pace correction: couldn't keep the changes:", e)
+                self._show_new(red)             # bold and the button: what the pool uses now
         self.back_btn.setEnabled(not bad)
         # Greyed until there is something pending, so after Make permanent
         # until a further entry (Bill, 2026-10-31: "'Make permanent' button

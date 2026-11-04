@@ -301,7 +301,11 @@ changes the zones on both sides of it, most near your Pace and less toward
 the ends. To hold part of the table where it is, type a Pace there too.
 
 **Red**: two of your Paces are out of sequence (a faster zone with a
-slower Pace); both boxes turn red. Change one of them. 
+slower Pace); both boxes turn red. Change one of them. Until you do, the
+pool keeps your last good pending Paces.
+
+**Bold** marks the column the pool is swimming with: Your stored Pace or
+Your pending Pace. While a value is red, neither is bold.
 
 **Swimming with the Pace correction screen open.** PoolWind runs as usual underneath. With
 **Suspend** showing (a copy of the button is at the top of the box) the
@@ -316,7 +320,7 @@ step until you swim back in.
 |---|---|
 | **Back** | Back to the pool screen. Your changes stay in use, **pending** |
 | **Make permanent** | Writes your pending Paces into your stored ones. It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept. Greyed out until there's something pending, so after a save until you make another change |
-| **Swim with 'stored' values** / **'pending' values** | Swims your stored Paces, to compare. PoolWind starts with pending every time |
+| **Now swimming with 'pending' values** / **'stored' values** | Says which Paces the pool is swimming with. Press it to swim the other ones, to compare, and again to go back. PoolWind starts with pending every time. Greyed out while nothing is pending |
 | **Copy Master values to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
 | **Clear** | Drops the pending changes, after "Are you sure?": your pending Paces are your stored ones again |
 | **Details…** (a link at the end of the instructions) | A typical session, and how it all works |
