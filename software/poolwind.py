@@ -8630,25 +8630,36 @@ class PaceCorrectionPanel(OverlayPanel):
         # stacked." ... "the New column as [Your, pending, Pace]" ... "the
         # Your Pace colums as [Your new Pace]")
         line = lambda c: f"<span style='color:{c.name()}'>━</span> "
-        cols = (("Zone", 50), ("Your<br>stored<br>" + line(PaceGraph.NOW) + "Pace", 72),
-                ("Your<br>pending<br>" + line(PaceGraph.NEW) + "Pace", 72), ("Your<br>new<br>Pace", 84))
-        row_w = sum(w for _, w in cols) + 32 + 5 * 6           # and the ↺
-        # The graph takes what the columns leave; too little (a narrow
-        # window, such as PoolWind beside other windows on a landscape
-        # screen): no graph and no minutes under it, rather than a sliver
-        # (Bill, 2026-11-04: "The graph has all but dissappeared." ...
-        # "Numbers under the table are still there but are meaningless.")
-        room = self.width() - 20 - row_w - 30
-        self.graph_w = max(120, room) if room >= 100 else 0
-        gap = 6 if self.graph_w else 0          # between the graph and the columns
+        # The columns' widths (Zone, the two Paces, the box, its ↺, the
+        # gaps). The graph takes what they leave; in a narrow window (such
+        # as PoolWind beside other windows on a landscape screen) they
+        # close up so the graph keeps its room (Bill, 2026-11-04: "The
+        # graph has all but dissappeared." ... "Now the graph is
+        # completely gone. We need it back. Should be enough room for the
+        # revert buttons.")
+        W = {"zone": 50, "col": 72, "edit": 84, "back": 32, "sp": 6}
+        width = lambda W: W["zone"] + 2 * W["col"] + W["edit"] + W["back"] + 5 * W["sp"]
+        room = self.width() - 20 - width(W) - 30
+        narrow = room < 100
+        if narrow:
+            W = {"zone": 34, "col": 54, "edit": 64, "back": 26, "sp": 3}
+            room = self.width() - 20 - width(W) - 30
+        row_w = width(W)
+        self.graph_w = max(80, room)
+        gap = 6                                 # between the graph and the columns
+        cols = (("Zone", W["zone"]), ("Your<br>stored<br>" + line(PaceGraph.NOW) + "Pace", W["col"]),
+                ("Your<br>pending<br>" + line(PaceGraph.NEW) + "Pace", W["col"]),
+                ("Your<br>new<br>Pace", W["edit"]))
         head = QHBoxLayout()
-        head.setSpacing(6)                      # as the rows': the headers over their columns
+        head.setSpacing(W["sp"])                # as the rows': the headers over their columns
         head.addSpacing(self.graph_w)          # over the graph (Fast / Slow gone, Bill, 2026-11-04)
         self.heads = {}
         for text, w in cols:
             lab = QLabel(f"<b>{text}</b>")
             lab.setFixedWidth(w)
             lab.setAlignment(Qt.AlignCenter)
+            if narrow:
+                lab.setStyleSheet("font-size: 12px;")
             head.addWidget(lab, 0, Qt.AlignBottom)
             self.heads["Now" if "stored" in text else "New" if "pending" in text else text] = (lab, text)
         head.addStretch(1)
@@ -8667,17 +8678,18 @@ class PaceCorrectionPanel(OverlayPanel):
             w.setGeometry(self.graph_w + gap, top(i), row_w, self.ROW_H)
             row = QHBoxLayout(w)
             row.setContentsMargins(0, 0, 0, 0)
-            row.setSpacing(6)
+            row.setSpacing(W["sp"])
             zone = QLabel(f"<b>{self.names[i]}</b>" if i in self.steps else self.names[i])
             now, new = QLabel(), QLabel()
-            for lab, wd in ((zone, 50), (now, 72), (new, 72)):
+            for lab, wd in ((zone, W["zone"]), (now, W["col"]), (new, W["col"])):
                 lab.setFixedWidth(wd)
                 lab.setAlignment(Qt.AlignCenter)
                 row.addWidget(lab)
             edit = self._edit(i, font)
+            edit.setFixedWidth(W["edit"])
             row.addWidget(edit)
             back = QPushButton("↺")         # this box back as it was (Bill, 2026-10-29: "Let's bring
-            back.setFixedSize(32, 30)        # back your little revert buttons for each box changed.")
+            back.setFixedSize(W["back"], 30) # back your little revert buttons for each box changed.")
             back.setFocusPolicy(Qt.NoFocus)
             back.setToolTip("Put this box back")
             back.clicked.connect(lambda _=False, e=edit: e.setText(""))
@@ -8691,25 +8703,23 @@ class PaceCorrectionPanel(OverlayPanel):
         self.graph.on_pick = self._pick
         self.graph.scroll_bar = self.scroll.verticalScrollBar()
         inner.setFixedSize(self.graph_w + gap + row_w, len(self.V) * self.ROW_H)
-        self.graph.setVisible(bool(self.graph_w))
         self.scroll.setWidget(inner)
         self.scroll.setFixedHeight(len(self.V) * self.ROW_H)
         lay.addWidget(self.scroll)
         under = QHBoxLayout()
-        under.setSpacing(6)
+        under.setSpacing(gap)
         scale = PaceScale()
         scale.setFixedSize(self.graph_w, 20)
-        scale.setVisible(bool(self.graph_w))
         under.addWidget(scale, 0, Qt.AlignTop)
-        under.addSpacing(50)                    # under Zone
+        under.addSpacing(W["zone"])             # under Zone
         # Which table the pool uses (Bill, 2026-10-29: "A button directly
         # under the 'Now' and 'New' columns will say "Switch to 'Now' values"
         # or "Switch to 'New' values". Whichever column is used will be shown
         # in bold.")
         self.switch_btn = QPushButton()
-        self.switch_btn.setFixedSize(72 + 6 + 72, 40)
+        self.switch_btn.setFixedSize(2 * W["col"] + W["sp"], 40)
         self.switch_btn.setFocusPolicy(Qt.NoFocus)
-        self.switch_btn.setStyleSheet("font-size: 12px;")
+        self.switch_btn.setStyleSheet("font-size: 11px;" if narrow else "font-size: 12px;")
         self.switch_btn.clicked.connect(self._switch)
         under.addWidget(self.switch_btn)
         under.addStretch(1)

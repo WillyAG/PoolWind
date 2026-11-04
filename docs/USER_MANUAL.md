@@ -288,8 +288,7 @@ before. PoolWind warns you in the Pace correction box and when you press
 
 Tap a box, or a zone on the graph, to choose it. While the swim is running
 (**Suspend** showing), the jet goes to that zone's speed, so you can feel
-it before typing. Drag the graph to scroll (in a narrow window there's no
-graph).
+it before typing. Drag the graph to scroll.
 **Esc**, or **↺** beside a box, puts it back. **▲** in the top corner hides
 the instructions to give the table more room; **▼** brings them back.
 
