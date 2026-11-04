@@ -8384,7 +8384,8 @@ class PaceCorrectionPanel(OverlayPanel):
             "zone's box turns yellow and the jet keeps its speed.<br>"
             "<b>2.</b> Type the Pace it should feel like (1 4 8 = 1:48). The pool uses it at once.<br>"
             "<b>3.</b> Swim again to feel it. Repeat at other speeds as often as you like.<br>"
-            "Another zone: tap its box. <b>Back</b>: to the pool screen, your changes stay pending.")
+            "Tap another zone and the jet goes there. <b>Back</b>: to the pool screen, your changes "
+            "stay pending.")
     DRAG_TEXT = (" After a PingPong, <b>bodyDrag</b> and <b>deltaBodyDrag</b> change the whole table.")
     DETAILS_LINK = " <a href='details'>Details…</a>"
     # Earlier swims are read in the Paces in use (Swim Plot, the calendar):
@@ -8906,20 +8907,37 @@ class PaceCorrectionPanel(OverlayPanel):
         self._focused(edit, None)
 
     def _pick(self, i):
-        """A zone clicked in the graph: its box, ready, the table scrolled to it."""
+        """A zone clicked in the graph: its box, ready, the table scrolled to it,
+        and the jet to its step."""
         if i in self.ends:
             return
         self.picked = True
         self._choose(self.edits[i])
         self.edits[i].ready()
+        self._jet_to(i)
 
     def _focused(self, edit, why):
-        """A box got the focus: the one the digits go to, highlighted."""
+        """A box got the focus: the one the digits go to, highlighted; tapped,
+        the jet to its step."""
         if why == Qt.MouseFocusReason:
             self.picked = True
+            self._jet_to(edit.step)
         if edit is not self.current:
             self.current = edit
             self._paint()
+
+    def _jet_to(self, step):
+        """A zone tapped: the jet goes to its step (Bill, 2026-11-04: "Yes,
+        tapping a zone should move the jet there"). The position held while
+        the swimmer is out of the swim area (QtMainWindow, branch
+        "pace_correction_hold") moves to the middle of that zone, so the
+        jet drives there as if they had swum to it; swimming takes over
+        again as usual. Only the swimmer's own zones; not while the swim is
+        suspended (the jet stays wound down) or Hold is on."""
+        if step not in self.steps or self.app.hold_mode:
+            return
+        k, n = self.steps.index(step), len(self.steps)
+        self.app.window.last_real_CoM_h = (k + 0.5) / n * 1000.0
 
     def _paint(self):
         """The boxes: the chosen one with a blue frame, yellow, or red when
