@@ -244,6 +244,14 @@ faster than they can handle.
   PowerShell: `cd $HOME\PoolWind` then `py -X utf8 poolwind.py`.
 - **The install log:** `~/PoolWind/install.log` records every install step
   and its output.
+- **The update notice** (`UpdateCheck`, since v15.8): at start, in a thread,
+  PoolWind asks the GitHub API for the latest Release of the repository in
+  `~/PoolWind/poolwind_source.txt` (written by install.sh: `folder=` the
+  download folder, `repo=`); a newer tag than `poolwind_version()` gives a
+  box when nobody is swimming. Update now runs `git pull && bash
+  install.sh` in that folder in a terminal and closes PoolWind; Later
+  writes the tag to `poolwind_update_later.txt` (install.sh deletes it).
+  No internet, no Release or a private repository: no box.
 - **Desk testing** (setup guide, section 8): `'developerMode': True` plus a
   simulated valve and/or a recorded video, so nothing at the pool moves.
 - **Developer traces:**

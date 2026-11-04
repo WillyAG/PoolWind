@@ -208,6 +208,11 @@ if [ -f "$PW_DIR/poolwind.py" ]; then
 fi
 run cp "$SOFTWARE/poolwind.py" "$PW_DIR/poolwind.py"
 say "   installed poolwind.py"
+# Where this copy came from, for PoolWind's update notice (UpdateCheck): it
+# asks that repository whether a newer version is published, and updates
+# from this folder. A newer version replaces it.
+printf 'folder=%s\nrepo=%s\n' "$SRC_DIR" "$REPO_URL" > "$PW_DIR/poolwind_source.txt"
+rm -f "$PW_DIR/poolwind_update_later.txt"        # "Later" was for the version before this one
 copy_if_missing "$SOFTWARE/poolwind_defaults.txt"    "$PW_DIR/poolwind_defaults.txt"
 copy_if_missing "$SOFTWARE/poolwind_calibration.txt" "$PW_DIR/poolwind_calibration.txt"
 # The sample swim (desk tests, and a 'Demo': True developer run), from the latest GitHub Release.

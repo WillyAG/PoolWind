@@ -48,6 +48,14 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       - Pace correction open: the swimmer out of the
     #                         swim area doesn't wind the jet down; it holds
     #                         at its step until they swim back in.
+    #                       - UPDATE NOTICE (UpdateCheck): at start PoolWind
+    #                         asks GitHub for the latest Release of the
+    #                         repository it was installed from
+    #                         (poolwind_source.txt, by install.sh); newer:
+    #                         Update now / Later, when nobody is swimming.
+    #                         The published version stays as it is; new
+    #                         work goes to PoolWindTest until published
+    #                         (Bill, 2026-11-04).
     #
     # poolwindAI_v15.7  -- A PACE TABLE PER SWIMMER. Bill,
     #                       2026-10-29: "Such a major change, let's archive
@@ -597,6 +605,8 @@ if True:  # keep this here as an  easy way to skip over all this
     except ImportError:
         shiboken6 = None
     import os
+    import shlex                    # (the update's terminal command)
+    import threading                # (the update check, in the background)
     # Qt for Python: PySide6 (LGPL), since v15.3. matplotlib's Qt canvas
     # uses the same binding.
     os.environ.setdefault("QT_API", "pyside6")
@@ -8145,6 +8155,150 @@ def poolwind_version():
         return ""
 
 
+# ----------------------------------------------------------------------
+# A newer published PoolWind (Bill, 2026-11-04: "When we finally want to
+# publish that, there should be some kind of notice that version has
+# changed and allow users to update." ... "yes, build the notice now").
+# At start, in the background, PoolWind asks GitHub for the latest
+# Release of the repository it was installed from (install.sh writes
+# poolwind_source.txt beside the program: the download folder and the
+# repository). Newer than this one: a box, when nobody is swimming, with
+# Update now (PoolWind closes and a terminal runs the update, setup guide
+# section 10) or Later (asked again only for a newer version still). No
+# internet, no Release, a private repository, a demo: nothing.
+# ----------------------------------------------------------------------
+UPDATE_SOURCE_FILE = "poolwind_source.txt"
+UPDATE_LATER_FILE = "poolwind_update_later.txt"
+UPDATE_TIMEOUT_S = 8
+
+
+def version_tuple(v):
+    """'v15.9' -> (15, 9), for comparing versions; () if none."""
+    return tuple(int(n) for n in re.findall(r"\d+", v or ""))
+
+
+def update_source():
+    """{'folder': the download folder, 'repo': 'owner/name'} from
+    poolwind_source.txt beside the program, or None (not installed by
+    install.sh: a developer's copy, or Windows)."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), UPDATE_SOURCE_FILE)
+    try:
+        with open(path, encoding="utf-8") as f:
+            info = dict(line.strip().split("=", 1) for line in f if "=" in line)
+    except OSError:
+        return None
+    repo = info.get("repo", "")
+    m = re.match(r"(?:https://github\.com/)?([\w.-]+/[\w.-]+?)(?:\.git)?/?$", repo)
+    return {"folder": info.get("folder", ""), "repo": m.group(1)} if m else None
+
+
+def latest_release(repo):
+    """(tag, what's new, web page) of the repository's latest GitHub
+    Release, or None (no internet, no Release, a private repository)."""
+    import json
+    import urllib.request
+    req = urllib.request.Request(f"https://api.github.com/repos/{repo}/releases/latest",
+                                 headers={"Accept": "application/vnd.github+json",
+                                          "User-Agent": "PoolWind"})
+    try:
+        with urllib.request.urlopen(req, timeout=UPDATE_TIMEOUT_S) as r:
+            data = json.load(r)
+        return data.get("tag_name", ""), data.get("body") or "", data.get("html_url", "")
+    except Exception:
+        return None
+
+
+class UpdateCheck(QtCore.QObject):
+    """The background question to GitHub and, if there is a newer PoolWind,
+    the box (App.start_update_check)."""
+    found = QtCore.Signal(str, str, str)
+
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.source = update_source()
+        self.found.connect(self._offer)
+
+    def start(self):
+        if self.source is None or self.app.REPdefaults.get("Demo"):
+            return
+        threading.Thread(target=self._ask, daemon=True).start()
+
+    def _ask(self):
+        rel = latest_release(self.source["repo"])
+        if not rel:
+            return
+        tag, notes, url = rel
+        mine = poolwind_version()
+        if not mine or version_tuple(tag) <= version_tuple(mine):
+            return
+        if self._later() == tag:
+            return
+        self.found.emit(tag, notes, url)                # to the Qt thread (_offer)
+
+    def _later_path(self):
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), UPDATE_LATER_FILE)
+
+    def _later(self):
+        try:
+            with open(self._later_path(), encoding="utf-8") as f:
+                return f.read().strip()
+        except OSError:
+            return ""
+
+    def _offer(self, tag, notes, url):
+        """The box, once nobody is swimming (Suspend showing: asked again in
+        30 s)."""
+        app = self.app
+        if app.suspendButtonText == "Suspend" or QApplication.activeModalWidget() is not None:
+            QTimer.singleShot(30000, lambda: self._offer(tag, notes, url))
+            return
+        box = QMessageBox(app.window)
+        box.setWindowTitle("PoolWind update")
+        box.setIcon(QMessageBox.Information)
+        box.setText(f"PoolWind {tag} is available. This is {poolwind_version()}.")
+        lines = [l for l in notes.strip().splitlines()][:14]
+        more = "\n..." if len(notes.strip().splitlines()) > 14 else ""
+        box.setInformativeText(("What's new:\n" + "\n".join(lines) + more) if lines else
+                               "Update now closes PoolWind and updates it in a terminal "
+                               "(it asks for your password).")
+        if lines:
+            box.setDetailedText(notes.strip())
+        now = box.addButton("Update now", QMessageBox.AcceptRole)
+        box.addButton("Later", QMessageBox.RejectRole)
+        box.exec()
+        if box.clickedButton() is now:
+            self._update(tag)
+        else:
+            try:
+                with open(self._later_path(), "w", encoding="utf-8") as f:
+                    f.write(tag + "\n")
+            except OSError:
+                pass
+
+    def _update(self, tag):
+        """A terminal runs the update in the download folder (git pull, then
+        install.sh, which asks for the password); PoolWind closes."""
+        folder = self.source["folder"]
+        if not folder or not os.path.isdir(os.path.join(folder, ".git")):
+            QMessageBox.information(self.app.window, "PoolWind update",
+                                    "The PoolWind-download folder isn't there any more.\n\n"
+                                    "To update, follow section 3 of the setup guide: its four "
+                                    "lines download and install the new version.")
+            return
+        script = (f"cd {shlex.quote(folder)} && echo 'Updating PoolWind to {tag}' && echo && "
+                  "git pull && bash install.sh; echo; "
+                  "read -r -p 'Press Enter to close. Then start PoolWind again.' _")
+        try:
+            subprocess.Popen(["x-terminal-emulator", "-e", "bash", "-c", script],
+                             start_new_session=True)
+        except Exception as e:
+            QMessageBox.warning(self.app.window, "PoolWind update", f"Couldn't open a terminal:\n{e}")
+            return
+        print(f"Update to {tag}: PoolWind closes, the terminal updates it")
+        self.app.window.close()
+
+
 def pool_fullscreen(win, app):
     """On the pool screen: the window marked full screen for the window
     manager (openbox), so it stays over the Pi's header bar while it, or
@@ -14082,6 +14236,9 @@ if __name__ == "__main__":
     window.show()
     app.start_relay_watchdog()
     app.start_pump_monitor()
+    # A newer published PoolWind? Asked in the background (UpdateCheck)
+    app.update_check = UpdateCheck(app)
+    app.update_check.start()
     # The jet down to its lowest before swimming (Bill, 2026-11-02)
     app.initial_voltage_winddown("Starting PoolWind")
 

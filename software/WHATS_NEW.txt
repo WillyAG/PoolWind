@@ -19,6 +19,9 @@ section 4); without them PoolWind says so and doesn't start.
   clears that box.
 - The calibration's Start with the pump off offers to turn it on.
 
+PoolWind tells you when a newer version is published, with Update now
+and Later (setup guide, section 10).
+
 The Claude icon installs Claude Code and signs in with nothing to type or
 paste, and runs it in a session the Pi and a PC over SSH share (setup
 guide, section 12).

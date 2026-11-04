@@ -674,7 +674,17 @@ terminal. Updating PoolWind keeps these settings.
 
 ## 10. Updating PoolWind
 
-Download the new version and run the install script again:
+**PoolWind tells you when there's a new version.** When it starts with an
+internet connection, it checks whether a newer version has been published
+and, when nobody is swimming, shows what's new with two buttons:
+
+- **Update now**: PoolWind closes and a terminal runs the update below. It
+  asks for your password (the one from section 2); when it says it's done,
+  start PoolWind again.
+- **Later**: it doesn't ask again until there's a newer version still.
+
+To update by hand, download the new version and run the install script
+again:
 
 ```
 cd PoolWind-download
