@@ -8386,7 +8386,8 @@ class PaceCorrectionPanel(OverlayPanel):
             "<b>3.</b> Swim again to feel it. Repeat at other speeds as often as you like.<br>"
             "Tap another zone and the jet goes there. <b>Back</b>: to the pool screen, your changes "
             "stay pending.")
-    DRAG_TEXT = (" After a PingPong, <b>bodyDrag</b> and <b>deltaBodyDrag</b> change the whole table.")
+    DRAG_TEXT = (" After a PingPong calibration, <b>bodyDrag</b> and <b>deltaBodyDrag</b> change the "
+                 "whole table.")
     DETAILS_LINK = " <a href='details'>Details…</a>"
     # Earlier swims are read in the Paces in use (Swim Plot, the calendar):
     # said first, every time (Bill, 2026-11-01: "The swimmer and builder (or
@@ -8416,7 +8417,7 @@ class PaceCorrectionPanel(OverlayPanel):
         "your stored Paces. The slowest and fastest zones (grey) are the pool's and can't be "
         "changed.</p>"
         "<p>With your USB stick in, <b>Copy Pool Default to \"Your pending\"</b> starts you from "
-        "the pool's Paces; ↺ beside it brings yours back. After a PingPong, <b>bodyDrag</b> and "
+        "the pool's Paces; ↺ beside it brings yours back. After a PingPong calibration, <b>bodyDrag</b> and "
         "<b>deltaBodyDrag</b> shift the whole table; <b>Defaults</b> puts them back.</p>")
     text_hidden = False                # ▲ / ▼: the instructions hidden (kept while PoolWind runs)
 
@@ -8632,7 +8633,14 @@ class PaceCorrectionPanel(OverlayPanel):
         cols = (("Zone", 50), ("Your<br>stored<br>" + line(PaceGraph.NOW) + "Pace", 72),
                 ("Your<br>pending<br>" + line(PaceGraph.NEW) + "Pace", 72), ("Your<br>new<br>Pace", 84))
         row_w = sum(w for _, w in cols) + 32 + 5 * 6           # and the ↺
-        self.graph_w = max(120, self.width() - 20 - row_w - 30)
+        # The graph takes what the columns leave; too little (a narrow
+        # window, such as PoolWind beside other windows on a landscape
+        # screen): no graph and no minutes under it, rather than a sliver
+        # (Bill, 2026-11-04: "The graph has all but dissappeared." ...
+        # "Numbers under the table are still there but are meaningless.")
+        room = self.width() - 20 - row_w - 30
+        self.graph_w = max(120, room) if room >= 100 else 0
+        gap = 6 if self.graph_w else 0          # between the graph and the columns
         head = QHBoxLayout()
         head.setSpacing(6)                      # as the rows': the headers over their columns
         head.addSpacing(self.graph_w)          # over the graph (Fast / Slow gone, Bill, 2026-11-04)
@@ -8656,7 +8664,7 @@ class PaceCorrectionPanel(OverlayPanel):
             w = QWidget(inner)
             w.setObjectName("trow")
             w.setAttribute(Qt.WA_StyledBackground, True)
-            w.setGeometry(self.graph_w + 6, top(i), row_w, self.ROW_H)
+            w.setGeometry(self.graph_w + gap, top(i), row_w, self.ROW_H)
             row = QHBoxLayout(w)
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(6)
@@ -8682,7 +8690,8 @@ class PaceCorrectionPanel(OverlayPanel):
         self.graph.setGeometry(0, 0, self.graph_w, len(self.V) * self.ROW_H)
         self.graph.on_pick = self._pick
         self.graph.scroll_bar = self.scroll.verticalScrollBar()
-        inner.setFixedSize(self.graph_w + 6 + row_w, len(self.V) * self.ROW_H)
+        inner.setFixedSize(self.graph_w + gap + row_w, len(self.V) * self.ROW_H)
+        self.graph.setVisible(bool(self.graph_w))
         self.scroll.setWidget(inner)
         self.scroll.setFixedHeight(len(self.V) * self.ROW_H)
         lay.addWidget(self.scroll)
@@ -8690,6 +8699,7 @@ class PaceCorrectionPanel(OverlayPanel):
         under.setSpacing(6)
         scale = PaceScale()
         scale.setFixedSize(self.graph_w, 20)
+        scale.setVisible(bool(self.graph_w))
         under.addWidget(scale, 0, Qt.AlignTop)
         under.addSpacing(50)                    # under Zone
         # Which table the pool uses (Bill, 2026-10-29: "A button directly
@@ -8934,10 +8944,16 @@ class PaceCorrectionPanel(OverlayPanel):
         jet drives there as if they had swum to it; swimming takes over
         again as usual. Only the swimmer's own zones; not while the swim is
         suspended (the jet stays wound down) or Hold is on."""
-        if step not in self.steps or self.app.hold_mode:
+        app = self.app
+        if step not in self.steps or app.hold_mode or app.suspendButtonText != "Suspend":
             return
         k, n = self.steps.index(step), len(self.steps)
-        self.app.window.last_real_CoM_h = (k + 0.5) / n * 1000.0
+        app.window.last_real_CoM_h = (k + 0.5) / n * 1000.0
+        # The yellow bar (the zone "you're in") moves there too (Bill,
+        # 2026-11-04: "Clicking a different zone entry box does not move
+        # the yellow bar."): it shows the zone remembered while away
+        if not app.window.swimmerFound:
+            app._seen_zone, app._seen_voltage = k, self.V[step]
 
     def _paint(self):
         """The boxes: the chosen one with a blue frame, yellow, or red when
