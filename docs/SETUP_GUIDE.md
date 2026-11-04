@@ -72,7 +72,9 @@ bash install.sh
 
 1. Click the web browser icon (a globe) on the bar at the top of the
    desktop, type `github.com/WillyAG/PoolWind` in its address bar at the
-   top, and press Enter.
+   top, and press Enter. The first time the browser opens, it may ask for
+   a password for a "Default keyring": click **Cancel**. It won't ask
+   again once PoolWind is installed.
 2. On that page, click the **docs** folder, then **SETUP_GUIDE.md**, and
    scroll down to this section, **3. Installing PoolWind**.
 3. Click the copy button (⧉) at the top right of the box of four lines.
