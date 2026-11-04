@@ -180,6 +180,22 @@ run sudo install -m 0440 -o root -g root "$tmp" /etc/sudoers.d/poolwind
 rm -f "$tmp"
 say "   allowed setting up USB sticks without a password"
 
+# The web browser without the "Default keyring" box: it keeps saved
+# sign-ins (such as Claude's) in its own files, not a keyring that asks for
+# a password every time it starts. Bill, 2026-11-04: "What is "Default
+# Keyring" ? ... Have to keep entering the Pi password."
+if [ -d /etc/chromium.d ]; then
+    tmp="$(mktemp)"
+    cat > "$tmp" << 'EOF'
+# Written by PoolWind's install.sh: saved sign-ins in Chromium's own files,
+# so it never asks for a "Default keyring" password.
+export CHROMIUM_FLAGS="$CHROMIUM_FLAGS --password-store=basic"
+EOF
+    run sudo install -m 0644 -o root -g root "$tmp" /etc/chromium.d/poolwind-keyring
+    rm -f "$tmp"
+    say "   the web browser won't ask for a keyring password"
+fi
+
 step "7/8  Copying PoolWind to $PW_DIR"
 # An update: which version it was (the program's first line names it)
 OLD_VER=""

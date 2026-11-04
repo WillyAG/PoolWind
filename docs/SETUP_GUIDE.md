@@ -767,9 +767,10 @@ same command from a PC (below) show the same Claude, so you can go from
 one to the other in the middle of a conversation. Closing the window
 leaves Claude running for next time; `/exit` in Claude ends it.
 
-The first time the web browser saves a sign-in, it may ask for a password
-for a "Default keyring" (where it keeps saved passwords). Leaving both
-fields blank and clicking **Continue** stops it from asking again.
+The install script sets up the web browser so it doesn't ask for a
+"Default keyring" password when it saves the sign-in. If it asks anyway
+(on a Pi set up before November 2026), leave both fields blank and click
+**Continue**, and it won't ask again.
 
 **By hand** (for example over SSH from a PC, below):
 
