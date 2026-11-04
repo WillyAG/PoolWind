@@ -8002,8 +8002,8 @@ class PaceGraph(QWidget):
     90 degrees. It will be lined up with the entry boxes and scrolled with
     them. It makes visualizing the upside down nature of Pace easier to
     see."): the zones down the side, fastest at the top; Pace across, 1:00
-    at the left to 7:00 at the right (PaceScale labels it: Fast / Slow
-    above the table, the minutes under it); Now grey, New blue, the Paces typed as dots, New's zones not
+    at the left to 7:00 at the right (PaceScale: the minutes under
+    it); Now grey, New blue, the Paces typed as dots, New's zones not
     faster than the one below red, the swimmer's zones shaded, the lit one
     yellow, thin lines at the zone boundaries, the swimmer's fastest and
     slowest zones labelled (Bill, 2026-10-28: "in the highest blue zone could
@@ -8133,36 +8133,27 @@ class PaceGraph(QWidget):
 
 
 class PaceScale(QWidget):
-    """The Pace graph's minutes, under the table, or (ends) "Fast" and
-    "Slow" in bold at its ends, above it (Bill, 2026-10-28: "Put the Pace
-    axis numbers under the plot and replace that line with bold letters:
-    'Fast       Slow' at the end points."); they stay put while the table
-    scrolls."""
-
-    def __init__(self, ends=False):
-        super().__init__()
-        self.ends = ends
+    """The Pace graph's minutes, under the table (Bill, 2026-10-28: "Put
+    the Pace axis numbers under the plot"); they stay put while the table
+    scrolls. ("Fast" and "Slow" above it are gone, Bill, 2026-11-04.)"""
 
     def paintEvent(self, event):
         p = QPainter(self)
-        if self.ends:
-            f = QFont(self.font())
-            f.setBold(True)
-            f.setPixelSize(15)                  # as the column headers
-            p.setFont(f)
-            p.setPen(QColor(0, 0, 0))
-            r = QtCore.QRectF(PaceGraph.PAD - 4, 0, self.width() - 2 * PaceGraph.PAD + 8, self.height())
-            p.drawText(r, Qt.AlignLeft | Qt.AlignVCenter, "Fast")
-            p.drawText(r, Qt.AlignRight | Qt.AlignVCenter, "Slow")
-            p.end()
-            return
         fm = p.fontMetrics()
         p.setPen(QColor(90, 90, 90))
-        for m in range(int(PaceGraph.FAST), int(PaceGraph.SLOW) + 1):
-            text = f"{m}:00" if m in (PaceGraph.FAST, PaceGraph.SLOW) else str(m)
+        # The ends first, then the minutes between that fit: in a narrow
+        # window they wrote over each other (Bill, 2026-11-04: "Under the
+        # table there are numbers overwriting other numbers")
+        lo, hi = int(PaceGraph.FAST), int(PaceGraph.SLOW)
+        taken = []
+        for m in [lo, hi] + list(range(lo + 1, hi)):
+            text = f"{m}:00" if m in (lo, hi) else str(m)
             cx = PaceGraph.x(m, self.width())
             tw = fm.horizontalAdvance(text)
             left = min(max(0, cx - tw / 2), self.width() - tw)
+            if any(left < r + 4 and left + tw + 4 > l for l, r in taken):
+                continue
+            taken.append((left, left + tw))
             p.drawText(QtCore.QPointF(left, self.height() - fm.descent() - 2), text)
         p.end()
 
@@ -8385,13 +8376,15 @@ class PaceCorrectionPanel(OverlayPanel):
     # The instructions: plain steps; the theory behind them in Details (Bill,
     # 2026-10-28: "The main instructions should just be plain instructions.
     # The 'details' will bring up more theoritical explanation.")
-    TEXT = ("Swim until the current feels like a Pace you know, then move aside: your zone turns "
-            "yellow and its box is ready. Type the Pace it should be (1 4 8 = 1:48); Your pending "
-            "Pace and the graph change as you type, and the pool uses them at once. Tap a box, or a zone on the "
-            "graph, to choose it; drag the graph to scroll; Esc or ↺ puts a box back. "
-            "<span style='color:#b00000'>Red</span>: out of sequence, change one of the red "
-            "boxes. <b>Back</b> keeps your changes in use; <b>Make permanent</b> stores your "
-            "pending Paces; <b>Clear</b> starts again.")
+    # Rewritten for a swimmer standing wet at the pool (Bill, 2026-11-04:
+    # "Take the swimmers view who just wants to know what button to click
+    # or what to enter while they are dripping wet and standing in the
+    # cold."). Clear, Make permanent, ↺ and Esc explain themselves.
+    TEXT = ("<b>1.</b> Swim. When the Pace shown feels wrong, swim out of the swim area: your "
+            "zone's box turns yellow and the jet keeps its speed.<br>"
+            "<b>2.</b> Type the Pace it should feel like (1 4 8 = 1:48). The pool uses it at once.<br>"
+            "<b>3.</b> Swim again to feel it. Repeat at other speeds as often as you like.<br>"
+            "Another zone: tap its box. <b>Back</b>: to the pool screen, your changes stay pending.")
     DRAG_TEXT = (" After a PingPong, <b>bodyDrag</b> and <b>deltaBodyDrag</b> change the whole table.")
     DETAILS_LINK = " <a href='details'>Details…</a>"
     # Earlier swims are read in the Paces in use (Swim Plot, the calendar):
@@ -8399,81 +8392,38 @@ class PaceCorrectionPanel(OverlayPanel):
     # coach) should be warned about this in the program if they change Pace
     # settings in the 'Pace correction screen' regardless of working with
     # Master or Swimmer datasets.")
-    EARLIER_MINE = ("<span style='color:#b00000'><b>Changing your Paces changes how all your swims show "
-                    "in Swim Plot and the calendar, earlier ones too: they're read in the Paces in use. "
-                    "Your swim logs aren't changed; ↺ brings back how they were.</b></span><br>")
-    EARLIER_MASTER = ("<span style='color:#b00000'><b>Changing the Master Paces changes how all swims made "
-                      "without a USB stick show in Swim Plot and the calendar, earlier ones too: they're "
-                      "read in the Paces in use. The swim logs aren't changed; ↺ brings back how they "
-                      "were.</b></span><br>")
+    # (Bill, 2026-11-04: "The red header at the top should be made
+    # simpler")
+    EARLIER_MINE = ("<span style='color:#b00000'><b>Changing your Paces here changes all Paces and "
+                    "Pace calculations, past and present, as shown in Swim Plot and its "
+                    "calendar.</b></span><br>")
+    EARLIER_MASTER = ("<span style='color:#b00000'><b>Changing the Pool Default Paces here changes all "
+                      "Paces and Pace calculations, past and present, of swims without a USB stick, as "
+                      "shown in Swim Plot and its calendar.</b></span><br>")
+    # Short (Bill, 2026-11-04: "'Details' is way too long. The first
+    # paragraph covers most of it.")
     DETAILS = (
-        # First, Bill's scenario (2026-10-28: "Put that scenario titled as
-        # 'Scenario' as the first paragraph of the details box.")
-        "<p><b>Scenario</b></p>"
-        "<p>You're swimming and the Pace shown feels too slow. Step out of the swim area: your "
-        "zone is remembered and the jet winds down. Open <b>Pace correction</b> from the menu and "
-        "type the Pace it should be: Your pending Pace and the graph change, and the pool uses "
-        "them at once. "
-        "Swim again: with <b>Suspend</b> showing (there's a copy of the button at the top) the "
-        "swim counts as usual, and while you swim the big Pace display covers the instructions so "
-        "you can see your Pace. Step out, adjust again, and so on, as often as you like. "
-        "<b>Back</b> returns to the pool screen with your changes still in use; <b>Make "
-        "permanent</b> stores them. If you close PoolWind with changes "
-        "pending, it asks whether to keep them pending or make them permanent.</p>"
-        "<p><b>How Your pending Paces are worked out</b></p>"
-        "<p>Your new Paces stay exactly as typed, and so do the two ends, the bottom and top "
-        "zones' Paces set when the pool was calibrated (grey; they can't be changed). Every other "
-        "zone keeps its place on the stored curve: between two fixed Paces it sits the same part "
-        "of the way from one to the other as it does there. So the pending curve keeps the "
-        "stored one's shape and always gets faster zone by zone, however far your Paces are from "
-        "it, as long as each is faster than the one below it. One Pace "
-        "changes the zones on both sides of it, most near your Pace, less toward the ends. To "
-        "keep part of the table where it is, type a Pace there too.</p>"
-        "<p><b>bodyDrag and deltaBodyDrag</b> (after a PingPong)</p>"
-        "<p>PingPong times ping-pong balls, which ride on the surface of the water. A swimmer is "
-        "lower in the water, in slower water, and drags against it, so a swimmer's Pace is the "
-        "ball's pace times a factor. <b>bodyDrag</b> is that factor at the jet's fastest speed; "
-        "<b>deltaBodyDrag</b> is how much more it is at the slowest speed, at the back of the "
-        "pool: swimming slowly the legs sink, and further from the jet the flow spreads out and "
-        "down toward the return ducts. Between the two it changes evenly, zone by zone.</p>"
-        "<p>The numbers to start with (1.50 and 0.18) are an educated guess that works well in the "
-        "author's pool. Change them and watch Your pending Pace and the graph; <b>Defaults</b> puts them back. "
-        "Your typed Paces stay as they are.</p>"
-        # Bill, 2026-10-29: "'Tracking on' = normal swim."
-        "<p><b>Swimming with Pace correction open</b></p>"
-        "<p>PoolWind runs as usual under this box. With <b>Suspend</b> showing the jet follows you "
-        "and the swim counts toward distance and the log; with <b>Begin</b> or <b>Resume</b> "
-        "showing the jet stays wound down and nothing counts until you press the button (here or "
-        "on the pool screen). While this box is open PoolWind doesn't suspend the swim by itself. "
-        "When you swim with Suspend showing, the big Pace display takes the place of the "
-        "instructions; ▼ on it brings the instructions back, ▲ the Pace display.</p>"
-        "<p><b>Stored or pending</b></p>"
-        "<p>Your changes stay pending until you make them permanent, kept even if PoolWind is "
-        "closed or the power goes off. The pool uses Your pending Paces (shown bold, and "
-        "\"Pending Paces\" on the pool screen). The button <b>Now swimming with 'pending' "
-        "values</b> says which the pool swims; press it to swim your stored Paces, to compare, "
-        "and again to go back. The choice holds until PoolWind closes; it starts with "
-        "pending. While a value is red, the pool keeps your last good pending Paces. <b>Make permanent</b> writes your pending Paces into your stored ones and keeps "
-        "a copy of the file before; <b>Clear</b> drops the pending changes.</p>"
-        "<p><b>The pool's values</b> (with your USB stick in)</p>"
-        "<p><b>Copy Master values to \"Your pending\"</b> puts the pool's own Paces into Your "
-        "pending Pace and empties Your new Pace; the pool swims them at once. The button stays "
-        "down; <b>↺</b> beside it brings back your own pending Paces and the Paces you had "
-        "typed, as they were (Paces typed while it was down go). <b>Make permanent</b> while "
-        "it's down stores the pool's values as your own. You can also type Paces on the pool's "
-        "values to adjust them.</p>"
-        "<p><b>Whose table</b></p>"
-        "<p>With a swimmer's USB stick in, the table is that swimmer's own, kept on the stick (the "
-        "title shows the stick's name); with no stick, the Master data, the pool's own table. "
-        "<b>Make permanent</b> writes that table, and its question names it. The jet's steps and "
-        "limits are always the pool's.</p>")
+        "<p>You're swimming and the Pace shown feels too slow. Swim out of the swim area: your "
+        "zone is remembered and the jet keeps its speed. Type the Pace it should be; the pool "
+        "uses it at once. Swim again with <b>Suspend</b> showing (there's a copy of the button "
+        "at the top): the swim counts as usual, and the big Pace display shows your Pace. Step "
+        "out, adjust, and swim again as often as you like.</p>"
+        "<p>Your changes stay <b>pending</b>, even if PoolWind closes, until you press <b>Make "
+        "permanent</b>. The button <b>Now swimming with ...</b> says whether the pool swims your "
+        "pending or your stored Paces (the bold column); press it to compare.</p>"
+        "<p>The Paces you type stay exactly as typed; the zones between them follow the shape of "
+        "your stored Paces. The slowest and fastest zones (grey) are the pool's and can't be "
+        "changed.</p>"
+        "<p>With your USB stick in, <b>Copy Pool Default to \"Your pending\"</b> starts you from "
+        "the pool's Paces; ↺ beside it brings yours back. After a PingPong, <b>bodyDrag</b> and "
+        "<b>deltaBodyDrag</b> shift the whole table; <b>Defaults</b> puts them back.</p>")
     text_hidden = False                # ▲ / ▼: the instructions hidden (kept while PoolWind runs)
 
     def __init__(self, app, parent):
         super().__init__(parent)
         self.app = app
         app.pace_correcting = True             # no auto-suspend while open (close_panel)
-        lay = self._setup_frame(parent, f"Pace correction: {app.swimmer_name() or 'Master'}")
+        lay = self._setup_frame(parent, f"Pace correction: {app.swimmer_name() or 'Pool Default'}")
         self.setFixedWidth(parent.width() - 20)
         # ▲ in the top right corner hides the instructions, the table taking
         # their room; ▼ brings them back (Bill, 2026-10-28: "could there be a
@@ -8562,7 +8512,7 @@ class PaceCorrectionPanel(OverlayPanel):
         # columns 2) and 3). Some small text close to the button should say
         # 'entered data will not be lost'."). Only with a swimmer's stick in:
         # without one, Your stored Paces are the pool's.
-        self.copy_btn = QPushButton('Copy Master values\nto "Your pending"')
+        self.copy_btn = QPushButton('Copy Pool Default\nto "Your pending"')
         self.copy_btn.setCheckable(True)
         self.copy_btn.setMinimumHeight(44)
         self.copy_btn.setFocusPolicy(Qt.NoFocus)
@@ -8684,9 +8634,7 @@ class PaceCorrectionPanel(OverlayPanel):
         self.graph_w = max(120, self.width() - 20 - row_w - 30)
         head = QHBoxLayout()
         head.setSpacing(6)                      # as the rows': the headers over their columns
-        ends = PaceScale(ends=True)
-        ends.setFixedSize(self.graph_w, 22)
-        head.addWidget(ends, 0, Qt.AlignBottom)
+        head.addSpacing(self.graph_w)          # over the graph (Fast / Slow gone, Bill, 2026-11-04)
         self.heads = {}
         for text, w in cols:
             lab = QLabel(f"<b>{text}</b>")
@@ -9274,8 +9222,8 @@ class PaceCorrectionPanel(OverlayPanel):
         # table on it, never the pool's
         name = self.app.swimmer_name()
         which = (f"{name}'s stored Paces (on the USB stick)" if name else
-                 "the pool's Master Pace table (stored, in the calibration file)")
-        also = (" The pool's Master table is not changed." if name else
+                 "the Pool Default Paces (the pool's, in the calibration file)")
+        also = (" The Pool Default Paces are not changed." if name else
                 " Swimmers' own tables on their USB sticks are not changed.")
         if QMessageBox.question(self, "Make permanent",
                                 f"This will overwrite {which} with Your pending Paces."

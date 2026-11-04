@@ -207,7 +207,7 @@ faster than they can handle.
   own `poolwind_ind_calibration.txt` on the stick (`App._load_swimmer`,
   made from the pool's the first time; read onto the pool's jet steps if a
   scan moved them), only the Paces, never the voltages. No welcome screen
-  (dropped 2026-10-30): Pace correction's Copy Master values puts the pool's
+  (dropped 2026-10-30): Pace correction's Copy Pool Default puts the pool's
   table into the swimmer's pending one. `App.watch_stick` switches swimmer when a
   stick is plugged in or pulled while running (`switch_swimmer`).
   Pace correction's pending changes (`PacesPending`) live in whichever file

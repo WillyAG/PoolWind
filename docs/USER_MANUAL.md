@@ -256,15 +256,16 @@ correct them while you swim:
 
 **Whose Paces.** With your USB stick in, you correct **your own Pace
 table**, kept on your stick: other swimmers aren't affected. With no stick,
-you correct the pool's **Master** table, which everyone without a stick
-swims with. The box's title says whose, for example **Pace correction:
-Bill_G** or **Pace correction: Master**. Only the Paces shown change, never
+you correct the pool's **Pool Default** Paces (the Master data in Swim
+Plot), which everyone without a stick swims with. The box's title says
+whose, for example **Pace correction: Bill_G** or **Pace correction: Pool
+Default**. Only the Paces shown change, never
 the jet speeds or anyone's zones.
 
 <a id="pace-changes-and-earlier-swims"></a>**Your earlier swims change too.**
 Swim Plot and the calendar show every swim in the Paces **in use now** (see
 [Master vs Swimmer datasets](#master-vs-swimmer-datasets)). So as soon as you type a
-Pace, move a drag number or press **Copy Master values**, your earlier swims
+Pace, move a drag number or press **Copy Pool Default**, your earlier swims
 are shown in the new Paces as well. With your stick in, that's all your
 swims; with no stick, all swims made without a stick. Your swim logs
 themselves never change: **↺**, or putting the Paces back, shows them as
@@ -321,9 +322,9 @@ step until you swim back in.
 | **Back** | Back to the pool screen. Your changes stay in use, **pending** |
 | **Make permanent** | Writes your pending Paces into your stored ones. It asks first and names the table: yours on the stick, or the pool's Master table. A copy of the file before is kept. Greyed out until there's something pending, so after a save until you make another change |
 | **Now swimming with 'pending' values** / **'stored' values** | Says which Paces the pool is swimming with. Press it to swim the other ones, to compare, and again to go back. PoolWind starts with pending every time. Greyed out while nothing is pending |
-| **Copy Master values to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
+| **Copy Pool Default to "Your pending"** | With your stick in: puts the pool's own Paces into Your pending Pace and empties Your new Pace; the pool swims them at once. The button stays down; **↺** beside it brings back your own pending Paces and the Paces you typed. To make the pool's values your own, press **Make permanent** while it's down |
 | **Clear** | Drops the pending changes, after "Are you sure?": your pending Paces are your stored ones again |
-| **Details…** (a link at the end of the instructions) | A typical session, and how it all works |
+| **Details…** (a link at the end of the instructions) | A typical session, in short |
 
 **Pending changes** are kept on your stick (or with the Master table) even
 if PoolWind is closed or the power goes off; **"Pending Paces"** shows on the

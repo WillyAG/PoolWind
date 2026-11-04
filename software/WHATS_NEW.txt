@@ -30,7 +30,7 @@ For swimmers (user manual):
   time the stick is used. Pace correction changes yours; other swimmers
   aren't affected.
 - Pace correction redone: correct your Paces while you swim. Changes stay
-  pending until you press Make permanent. "Copy Master values" tries the
+  pending until you press Make permanent. "Copy Pool Default" tries the
   pool's own Paces.
 - A USB stick plugged in or pulled out while PoolWind runs is picked up.
   The stick is always ejected when PoolWind closes.
