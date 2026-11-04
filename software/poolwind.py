@@ -8002,8 +8002,7 @@ class PaceGraph(QWidget):
     90 degrees. It will be lined up with the entry boxes and scrolled with
     them. It makes visualizing the upside down nature of Pace easier to
     see."): the zones down the side, fastest at the top; Pace across, 1:00
-    at the left to 7:00 at the right (PaceScale: the minutes under
-    it); Now grey, New blue, the Paces typed as dots, New's zones not
+    at the left to 7:00 at the right (no scale: Bill, 2026-11-04); Now grey, New blue, the Paces typed as dots, New's zones not
     faster than the one below red, the swimmer's zones shaded, the lit one
     yellow, thin lines at the zone boundaries, the swimmer's fastest and
     slowest zones labelled (Bill, 2026-10-28: "in the highest blue zone could
@@ -8030,7 +8029,7 @@ class PaceGraph(QWidget):
 
     @classmethod
     def x(cls, pace, width):
-        """Where a Pace goes across a graph `width` wide (PaceScale too)."""
+        """Where a Pace goes across a graph `width` wide."""
         pace = min(cls.SLOW, max(cls.FAST, pace))
         return cls.PAD + (pace - cls.FAST) / (cls.SLOW - cls.FAST) * (width - 2 * cls.PAD)
 
@@ -8130,32 +8129,6 @@ class PaceGraph(QWidget):
             i = n - 1 - int(event.position().y() // self.row_h)
             self.on_pick(max(0, min(n - 1, i)))
         event.accept()
-
-
-class PaceScale(QWidget):
-    """The Pace graph's minutes, under the table (Bill, 2026-10-28: "Put
-    the Pace axis numbers under the plot"); they stay put while the table
-    scrolls. ("Fast" and "Slow" above it are gone, Bill, 2026-11-04.)"""
-
-    def paintEvent(self, event):
-        p = QPainter(self)
-        fm = p.fontMetrics()
-        p.setPen(QColor(90, 90, 90))
-        # The ends first, then the minutes between that fit: in a narrow
-        # window they wrote over each other (Bill, 2026-11-04: "Under the
-        # table there are numbers overwriting other numbers")
-        lo, hi = int(PaceGraph.FAST), int(PaceGraph.SLOW)
-        taken = []
-        for m in [lo, hi] + list(range(lo + 1, hi)):
-            text = f"{m}:00" if m in (lo, hi) else str(m)
-            cx = PaceGraph.x(m, self.width())
-            tw = fm.horizontalAdvance(text)
-            left = min(max(0, cx - tw / 2), self.width() - tw)
-            if any(left < r + 4 and left + tw + 4 > l for l, r in taken):
-                continue
-            taken.append((left, left + tw))
-            p.drawText(QtCore.QPointF(left, self.height() - fm.descent() - 2), text)
-        p.end()
 
 
 def poolwind_version():
@@ -8708,9 +8681,9 @@ class PaceCorrectionPanel(OverlayPanel):
         lay.addWidget(self.scroll)
         under = QHBoxLayout()
         under.setSpacing(gap)
-        scale = PaceScale()
-        scale.setFixedSize(self.graph_w, 20)
-        under.addWidget(scale, 0, Qt.AlignTop)
+        # No minutes under the graph (Bill, 2026-11-04: "Now I see what the
+        # numbers were for, the graph. Confusing, just get rid of them.")
+        under.addSpacing(self.graph_w)
         under.addSpacing(W["zone"])             # under Zone
         # Which table the pool uses (Bill, 2026-10-29: "A button directly
         # under the 'Now' and 'New' columns will say "Switch to 'Now' values"
