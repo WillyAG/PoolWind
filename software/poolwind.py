@@ -7795,10 +7795,7 @@ class SwimmerLimitsPanel(OverlayPanel):
     # do in Swimmer Limits. I think the instructions should be: ...")
     TEXT = {
         None: ("Sets the slowest and fastest zones for this swimmer in two ways:<br>"
-               "<b>Manual</b> (easiest): press + or - for Slowest and Fastest, then Save.<br>"
-               "<b>Auto</b>: press Start (Details for more).<br>"
-               "&nbsp;&nbsp;&nbsp;Swim at your slowest and press Low limit reached.<br>"
-               "&nbsp;&nbsp;&nbsp;Swim at your fastest and press High limit reached."),
+               "<b>Manual</b> (easiest): press + or - for Slowest and Fastest, then Save."),
         "low": ("Swim at your slowest: drift back until the jet is as slow as you want, then "
                 "press <b>Low limit reached</b> (or leave the swim area and press it yourself)."),
         "high": ("Now swim at your fastest, toward the jet. At the fastest speed you can hold, "
@@ -7806,6 +7803,12 @@ class SwimmerLimitsPanel(OverlayPanel):
         "review": ("Check the two limits and change them with + and - if needed, then "
                    "<b>Save</b>, or <b>Start over</b>."),
     }
+    # Auto's lines, with the small Details button on the first (Bill,
+    # 2026-11-06: "move the details button as a small button next to
+    # (Details for more)")
+    AUTO = "<b>Auto</b>: press Start (Details for more)."
+    AUTO_STEPS = ("&nbsp;&nbsp;&nbsp;Swim at your slowest and press Low limit reached.<br>"
+                  "&nbsp;&nbsp;&nbsp;Swim at your fastest and press High limit reached.")
     DETAILS = ("<p><b>Auto</b> is easiest when there are two people, the swimmer and the coach. "
                "After the coach presses <b>Start</b>, the swimmer swims at their slowest speed and "
                "the coach presses <b>Low limit reached</b>. Then the swimmer speeds up to their "
@@ -7828,6 +7831,21 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.active = 0                    # the limit the keyboard changes: 0 slowest, 1 fastest
 
         lay = self._setup_frame(parent, "Swimmer limits")
+        self.auto_row = QWidget()
+        row = QHBoxLayout(self.auto_row)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.addWidget(QLabel(self.AUTO))
+        self.details_btn = QPushButton("Details")
+        self.details_btn.setStyleSheet("font-size: 12px; padding: 1px 8px;")
+        self.details_btn.setFixedHeight(24)
+        self.details_btn.setFocusPolicy(Qt.NoFocus)
+        self.details_btn.clicked.connect(self._details)
+        row.addWidget(self.details_btn)
+        row.addStretch(1)
+        lay.addWidget(self.auto_row)
+        self.auto_steps = QLabel(self.AUTO_STEPS)
+        self.auto_steps.setWordWrap(True)
+        lay.addWidget(self.auto_steps)
         self.setStyleSheet(self.styleSheet() + " QSpinBox, QCheckBox { font-size: 15px; }"
                            " QGroupBox { font-size: 15px; font-weight: bold;"
                            " border: 1px solid #888; border-radius: 4px; margin-top: 18px;"
@@ -7873,7 +7891,7 @@ class SwimmerLimitsPanel(OverlayPanel):
         # Start; once started, Start over beside the limit button (Bill,
         # 2026-11-06: "There would need to be two buttons appear after
         # 'Start' is clicked. 'Start over' and the usual 'xx limit reached'
-        # button."); Details: Auto in more words
+        # button.")
         row = QHBoxLayout()
         self.over_btn = QPushButton("Start over")
         self.over_btn.clicked.connect(self._start_over)
@@ -7882,12 +7900,8 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.go_btn = QPushButton("Start")
         self.go_btn.clicked.connect(self._go)
         self.go_btn.setMinimumHeight(48)
-        self.details_btn = QPushButton("Details")
-        self.details_btn.clicked.connect(self._details)
-        self.details_btn.setMinimumHeight(48)
         row.addWidget(self.over_btn)
         row.addWidget(self.go_btn, 1)
-        row.addWidget(self.details_btn)
         lay.addLayout(row)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self._tick)
@@ -7927,6 +7941,21 @@ class SwimmerLimitsPanel(OverlayPanel):
 
         self._show()
         self._place()
+
+    def _place(self):
+        """Its height for its real width (the wrapped text at a narrower
+        width made it taller, the extra spread around the title and text),
+        and kept on the screen, Cancel and Save included (Bill, 2026-11-06:
+        "Raise everything in the bos so Swimmer Limits is at top and only
+        one line space between that and the test. Right now the Cancel and
+        Save buttons are truncated.")."""
+        h = self.layout().totalHeightForWidth(self.width())
+        if h > 0:
+            self.setFixedHeight(h)
+        else:
+            self._place()
+        par = self.parent()
+        self.move((par.width() - self.width()) // 2, max(0, min(48, par.height() - self.height())))
 
     def _manual(self):
         """The Manual Settings as they'd be saved."""
@@ -7974,6 +8003,8 @@ class SwimmerLimitsPanel(OverlayPanel):
     def _show(self):
         idle = self.stage in (None, "review")
         self.info.setText(self.TEXT[self.stage])
+        self.auto_row.setVisible(self.stage is None)
+        self.auto_steps.setVisible(self.stage is None)
         for which, (name, pick, minus, plus) in enumerate(self.rows):
             z = self.values[which]
             pace = Utils.DecimalToTime(self.app.zone_pace(z - 1))
@@ -8026,7 +8057,7 @@ class SwimmerLimitsPanel(OverlayPanel):
             self.stage = "review"
             self.swim_wait = False
         self._show()
-        self.adjustSize()
+        self._place()
 
     def _start_over(self):
         """Back to how it was before Start: the limits as they were, Manual
@@ -8039,7 +8070,7 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.stage = None
         self.swim_wait = False
         self._show()
-        self.adjustSize()
+        self._place()
 
     def _tick(self):
         """The "Start swimming" note goes once the swimmer is seen swimming."""
@@ -8048,7 +8079,7 @@ class SwimmerLimitsPanel(OverlayPanel):
                 and app.suspendButtonText == "Suspend"):
             self.swim_wait = False
             self._show()
-            self.adjustSize()
+            self._place()
 
     def _details(self):
         box = QMessageBox(self)
