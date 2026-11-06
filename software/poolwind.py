@@ -7955,7 +7955,15 @@ class SwimmerLimitsPanel(OverlayPanel):
         else:
             self._place()
         par = self.parent()
-        self.move((par.width() - self.width()) // 2, max(0, min(48, par.height() - self.height())))
+        if not getattr(self, "_placed", False):
+            self._placed = True
+            self.move((par.width() - self.width()) // 2, max(0, min(48, par.height() - self.height())))
+        else:
+            # Where it was dragged to, kept (Bill, 2026-11-06: "if I move the
+            # box to view the swimmer but still can press the button, the box
+            # moves back. Can you make it stay?"); only raised if it grew past
+            # the bottom
+            self.move(self.x(), max(0, min(self.y(), par.height() - self.height())))
 
     def _manual(self):
         """The Manual Settings as they'd be saved."""
