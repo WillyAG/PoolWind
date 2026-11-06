@@ -505,18 +505,25 @@ each.
 Slowest or Fastest, then press **+** or **-** (or the + and - keys on the
 keyboard). Press **Save**.
 
-**By swimming:**
+**By swimming (Auto)** (**Details** in the box says the same in short):
 
-1. Press **Start**. The zones open up to the pool's whole safe range.
-2. Swim near the back of the pool: the jet slows as you drift back. When
-   it is as slow as you want (almost treading water), leave the swim area
-   at once: the jet speed when you were last seen is recorded. Then press
-   **Low limit reached**. Or the coach presses it while you stay in the
-   swim area for the next step.
-3. Now swim as hard as you can toward the jet: it speeds up as you move
-   forward. At the fastest speed you can hold, leave the swim area, or the
-   coach presses **High limit reached**.
-4. Press **Save**.
+1. Press **Start**. The swim starts, counting toward your distance and
+   average Pace as usual; if the pool's pump is off, PoolWind offers to
+   turn it on first. The zones open up to the pool's whole safe range,
+   and **Start swimming** shows until you're swimming.
+2. Swim at your slowest: drift back until the jet is as slow as you want
+   (almost treading water). Then the coach presses **Low limit reached**;
+   swimming alone, leave the swim area at once (the zone is remembered)
+   and press it yourself.
+3. **Start swimming** shows again. Now swim at your fastest, toward the
+   jet: it speeds up as you move forward. At the fastest speed you can
+   hold, the coach presses **High limit reached**, or you leave the swim
+   area and press it yourself.
+4. Check the two zones, change them with **+** and **-** if needed, and
+   press **Save**.
+
+**Start over**, shown once you've pressed Start, puts the zones back as
+they were and brings back **Start**.
 
 **Manual Settings**, the lower section: your **height**, whether to
 **record training video**, and its **frames per second** (5 to 15: more

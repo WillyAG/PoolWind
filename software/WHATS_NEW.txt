@@ -1,4 +1,12 @@
-What's new in PoolWind v15.8 (since v15.5)
+What's new in PoolWind v15.9
+
+- Swimmer limits: plain instructions for Manual (+ and -) and Auto (by
+  swimming), and Details. Start starts the swim, which counts toward your
+  distance and average Pace, and offers to turn the pump on if it's off;
+  "Start swimming" shows until you are. Start over goes back to the
+  limits you had; after High limit reached, check the zones, then Save.
+
+What was new in PoolWind v15.8 (since v15.5)
 
 PoolWind now sees whether the pool's pump is running. This needs two
 resistors, R6 and R3, fitted on the interface board (build guide,

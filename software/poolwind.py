@@ -1,5 +1,27 @@
 
 if True:  # keep this here as an  easy way to skip over all this
+    # poolwindAI_v15.9   -- THE NEXT VERSION. Bill, 2026-11-04: "If this
+    #                       program ever gets popular, we shouldn't allow
+    #                       any more changes on this version. Once
+    #                       published it should stay the same. We should
+    #                       build a new version in the test repository
+    #                       only." v15.8 is published (Release v15.8);
+    #                       this version goes to PoolWindTest only until
+    #                       Bill publishes it, and then PoolWind's update
+    #                       notice offers it to v15.8 users. Starts as a
+    #                       copy of v15.8.
+    #                       - SWIMMER LIMITS (Bill, 2026-11-06: "Even I'm
+    #                         confused as to what to do in Swimmer
+    #                         Limits"): his instructions, Manual / Auto;
+    #                         Details (Auto with a coach, or alone); Start
+    #                         starts the swim (it counts; the pump asked
+    #                         for if off); "Start swimming" until the
+    #                         swimmer is seen, again after Low limit
+    #                         reached; Start over beside the limit button,
+    #                         back to the limits before Start; after High
+    #                         limit reached the zones stay to check with
+    #                         + / -, then Save or Start over.
+    #
     # poolwindAI_v15.8   -- PUMP SENSING. Bill, 2026-11-03:
     #                       "Such a major change. We should archive v15.7
     #                       and put the new work in v15.8". R6 (72.1 k) and
@@ -56,6 +78,17 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         The published version stays as it is; new
     #                         work goes to PoolWindTest until published
     #                         (Bill, 2026-11-04).
+    #                       - Also: the Claude icon keeps conversations in
+    #                         step with a stick's PoolWind_Claude (never
+    #                         offered for formatting); Pace correction for
+    #                         a swimmer standing wet (three steps, short
+    #                         Details, Pool Default, a tapped zone moves
+    #                         the jet, "Now swimming with ..." and bold as
+    #                         the pool really uses them, the graph kept in
+    #                         a narrow window).
+    #                       Published 2026-11-04 (Release v15.8). Archived
+    #                       2026-11-04; v15.9 for the next version (Bill:
+    #                       "1) start v15.9").
     #
     # poolwindAI_v15.7  -- A PACE TABLE PER SWIMMER. Bill,
     #                       2026-10-29: "Such a major change, let's archive
@@ -7758,23 +7791,37 @@ class SwimmerLimitsPanel(OverlayPanel):
     when they were last seen is the limit. Save writes 'zoneMin, Max' to
     the swimmer's USB stick (no stick: the main defaults file).
     """
+    # The instructions (Bill, 2026-11-06: "Even I'm confused as to what to
+    # do in Swimmer Limits. I think the instructions should be: ...")
     TEXT = {
-        None: ("Slowest and fastest zones for this swimmer. Change them with + and - "
-               "(or the keyboard), or press Start to find them by swimming. Save writes "
-               "both sections to the swimmer's USB stick (no stick: the main settings "
-               "file). Drag this box to move it."),
-        "low": ("Swim near the back of the pool: the jet slows as you drift back. When it "
-                "is as slow as you want (almost treading water), leave the swim area, or "
-                "the coach presses Low limit reached."),
-        "high": ("Now swim as hard as you can toward the jet: it speeds up as you move "
-                 "forward. At the fastest speed you can hold, leave the swim area, or the "
-                 "coach presses High limit reached."),
+        None: ("Sets the slowest and fastest zones for this swimmer in two ways:<br>"
+               "<b>Manual</b> (easiest): press + or - for Slowest and Fastest, then Save.<br>"
+               "<b>Auto</b>: press Start (Details for more).<br>"
+               "&nbsp;&nbsp;&nbsp;Swim at your slowest and press Low limit reached.<br>"
+               "&nbsp;&nbsp;&nbsp;Swim at your fastest and press High limit reached."),
+        "low": ("Swim at your slowest: drift back until the jet is as slow as you want, then "
+                "press <b>Low limit reached</b> (or leave the swim area and press it yourself)."),
+        "high": ("Now swim at your fastest, toward the jet. At the fastest speed you can hold, "
+                 "press <b>High limit reached</b> (or leave the swim area and press it yourself)."),
+        "review": ("Check the two limits and change them with + and - if needed, then "
+                   "<b>Save</b>, or <b>Start over</b>."),
     }
+    DETAILS = ("<p><b>Auto</b> is easiest when there are two people, the swimmer and the coach. "
+               "After the coach presses <b>Start</b>, the swimmer swims at their slowest speed and "
+               "the coach presses <b>Low limit reached</b>. Then the swimmer speeds up to their "
+               "fastest speed and the coach presses <b>High limit reached</b>. The coach then "
+               "reviews the settings, adjusts them if needed, then presses <b>Start over</b> or "
+               "<b>Save</b>.</p>"
+               "<p>If the swimmer alone is setting the limits, they leave the swim area at their "
+               "slowest and fastest points. The zone is remembered and the swimmer can press the "
+               "buttons themselves.</p>")
 
     def __init__(self, app, parent):
         super().__init__(parent)
         self.app = app
-        self.stage = None                  # None, "low", "high"
+        self.stage = None                  # None, "low", "high", "review" (after High limit reached)
+        self.before = None                 # the limits before Start (Start over)
+        self.swim_wait = False             # "Start swimming" until the swimmer is seen swimming
         steps = app.controller._zone_steps()
         self.values = [steps[0] + 1, steps[-1] + 1]
         self.saved = list(self.values)
@@ -7814,10 +7861,37 @@ class SwimmerLimitsPanel(OverlayPanel):
             lay.addLayout(row)
             self.rows.append((name, pick, minus, plus))
 
+        # "Start swimming" until they are (Bill, 2026-11-06: "a small message
+        # to start swimming would appear until swimming starts. That message
+        # would not re-appear until 'Low limit reached' is pressed.")
+        self.swim_note = QLabel("Start swimming")
+        self.swim_note.setAlignment(Qt.AlignCenter)
+        self.swim_note.setStyleSheet("background-color: #fff2a0; font-size: 15px; font-weight: bold;"
+                                     " padding: 4px; border-radius: 4px;")
+        self.swim_note.hide()
+        lay.addWidget(self.swim_note)
+        # Start; once started, Start over beside the limit button (Bill,
+        # 2026-11-06: "There would need to be two buttons appear after
+        # 'Start' is clicked. 'Start over' and the usual 'xx limit reached'
+        # button."); Details: Auto in more words
+        row = QHBoxLayout()
+        self.over_btn = QPushButton("Start over")
+        self.over_btn.clicked.connect(self._start_over)
+        self.over_btn.setMinimumHeight(48)
+        self.over_btn.hide()
         self.go_btn = QPushButton("Start")
         self.go_btn.clicked.connect(self._go)
         self.go_btn.setMinimumHeight(48)
-        lay.addWidget(self.go_btn)
+        self.details_btn = QPushButton("Details")
+        self.details_btn.clicked.connect(self._details)
+        self.details_btn.setMinimumHeight(48)
+        row.addWidget(self.over_btn)
+        row.addWidget(self.go_btn, 1)
+        row.addWidget(self.details_btn)
+        lay.addLayout(row)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._tick)
+        self.timer.start(250)
 
         app_d = app.REPdefaults
         manual_box = QtWidgets.QGroupBox("Manual Settings")
@@ -7874,7 +7948,7 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.setFocus()
 
     def _bump(self, which, d):
-        if self.stage is not None:
+        if self.stage in ("low", "high"):
             return
         lo, hi = self._bounds()
         v = max(lo, min(hi, self.values[which] + d))
@@ -7898,7 +7972,7 @@ class SwimmerLimitsPanel(OverlayPanel):
             super().keyPressEvent(event)
 
     def _show(self):
-        idle = self.stage is None
+        idle = self.stage in (None, "review")
         self.info.setText(self.TEXT[self.stage])
         for which, (name, pick, minus, plus) in enumerate(self.rows):
             z = self.values[which]
@@ -7909,7 +7983,10 @@ class SwimmerLimitsPanel(OverlayPanel):
             minus.setEnabled(idle)
             plus.setEnabled(idle)
         self.go_btn.setText({None: "Start", "low": "Low limit reached",
-                             "high": "High limit reached"}[self.stage])
+                             "high": "High limit reached", "review": ""}[self.stage])
+        self.go_btn.setVisible(self.stage != "review")
+        self.over_btn.setVisible(self.stage is not None)
+        self.swim_note.setVisible(self.stage in ("low", "high") and self.swim_wait)
         manual = getattr(self, "manual_saved", None)
         changed = self.values != self.saved or (manual is not None and self._manual() != manual)
         self.save_btn.setEnabled(idle and changed)
@@ -7917,13 +7994,25 @@ class SwimmerLimitsPanel(OverlayPanel):
     def _go(self):
         app = self.app
         if self.stage is None:
+            # The swim runs and counts, as with Begin / Resume, the pump
+            # asked for if it's off (Bill, 2026-11-06: "If the pool isn't
+            # turned on, when 'Start' is pressed, the 'turn on pump' message
+            # would appear." ... "The swim should count toward distance and
+            # avgPace."); the pump left off: not started
+            if app.suspendButtonText != "Suspend":
+                app.window.handle_button(app.suspendButtonText)
+                if app.suspendButtonText != "Suspend" and not app._resume_when_pump_on:
+                    return
             if app.hold_mode:
                 app.Hold_btn_press()          # the jet must follow the swimmer
+            self.before = list(self.values)
             app.limits_procedure = True
             self.stage = "low"
+            self.swim_wait = True
         elif self.stage == "low":
             self.values[0] = app.limit_zone_now()
             self.stage = "high"
+            self.swim_wait = True
         else:
             z = app.limit_zone_now()
             if z <= self.values[0]:
@@ -7934,9 +8023,39 @@ class SwimmerLimitsPanel(OverlayPanel):
                 return
             self.values[1] = z
             app.limits_procedure = False
-            self.stage = None
+            self.stage = "review"
+            self.swim_wait = False
         self._show()
         self.adjustSize()
+
+    def _start_over(self):
+        """Back to how it was before Start: the limits as they were, Manual
+        or Start (Bill, 2026-11-06: "'Start over' would revert back to
+        original conditions where user could select manual or auto and the
+        large 'Start' would return.")."""
+        if self.before is not None:
+            self.values = list(self.before)
+        self.app.limits_procedure = False
+        self.stage = None
+        self.swim_wait = False
+        self._show()
+        self.adjustSize()
+
+    def _tick(self):
+        """The "Start swimming" note goes once the swimmer is seen swimming."""
+        app = self.app
+        if (self.swim_wait and getattr(app, "window", None) is not None and app.window.swimmerFound
+                and app.suspendButtonText == "Suspend"):
+            self.swim_wait = False
+            self._show()
+            self.adjustSize()
+
+    def _details(self):
+        box = QMessageBox(self)
+        box.setWindowTitle("Swimmer limits: Auto")
+        box.setTextFormat(Qt.RichText)
+        box.setText(self.DETAILS)
+        box.exec()
 
     def _save(self):
         values = {self.app.KEY_ZONES: (int(self.values[0]), int(self.values[1]))}
@@ -7953,6 +8072,7 @@ class SwimmerLimitsPanel(OverlayPanel):
         self.close_panel()
 
     def close_panel(self):
+        self.timer.stop()
         self.app.limits_procedure = False
         self.stage = None
         super().close_panel()
