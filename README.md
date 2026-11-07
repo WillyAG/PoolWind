@@ -109,6 +109,7 @@ The program will probably need modifications. You do not need to be a programmer
 - Settings files (poolwind_defaults.txt, poolwind_calibration.txt) 
 - Install scripts: install.sh for the Raspberry Pi, and install_windows.bat for the demo on a Windows PC
 - CLAUDE.md: PoolWind's background for an AI assistant such as Claude Code
+- Outdoor test tools ([tools/outdoor_test](tools/outdoor_test)): compare PoolWind's swimmer detection with a tracker prototype on your own recordings
 - Schematics, layout, and PCB Gerber files for the interface board in a [Fritzing](https://fritzing.org) file (a free circuit design program)
 - Parts and source list
 - Build guide, setup and calibration, user manual

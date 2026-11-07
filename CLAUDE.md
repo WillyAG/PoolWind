@@ -133,6 +133,9 @@ faster than they can handle.
   `.gitattributes`.
 - `docs/`: build guide, setup and calibration guide, user manual.
   `hardware/`: interface board (Fritzing file, Gerbers), parts list.
+  `tools/outdoor_test/`: the swimmer tracker prototype and the script that
+  compares it with PoolWind's detection on recordings ("Outdoor pools",
+  below).
 - Settings files are Python dict literals read with `ast.literal_eval`, and
   must sit next to the program and start with its name. They are layered:
   the built-in values (`BUILT_IN_DEFAULTS` near the top of `poolwind.py`),
@@ -408,13 +411,17 @@ PoolWind put it on the clean video.
    Play it back at a desk with the `'video file, start (sec), corners'`
    setting (setup guide, section 8) to see what PoolWind does.
 2. **Measure, don't guess.** Run `F_mask` and `get_auto_CoM` on the
-   recording's frames outside PoolWind (import them from `poolwind.py`; the
-   frame is the camera picture resized to 640x480, turned upright, then
-   straightened with the swim area's corners to 480x640, as
-   `MyVideoCapture.getImages` does). Mark where they go wrong.
+   recording's frames outside PoolWind (`tools/outdoor_test/compare.py`
+   does: it imports them from `poolwind.py`; the frame is the camera
+   picture resized to 640x480, turned upright, then straightened with the
+   swim area's corners to 480x640, as `MyVideoCapture.getImages` does).
+   Mark where they go wrong.
 3. **Use the swimmer's behaviour.** The prototype the table above comes
-   from tracked one swimmer from frame to frame instead of picking a blob
-   in each frame:
+   from is in `tools/outdoor_test/` (`tracker.py`; `compare.py` runs it
+   and PoolWind's own detection side by side on recordings, with the
+   painted distractors, and saves pictures of the frames where they
+   disagree; its README says how). It tracks one swimmer from frame to
+   frame instead of picking a blob in each frame:
    - **pick-up**: a blob nearest the centre line, the same blob 8 frames
      running, with at least 10 % of its pixels changing from frame to
      frame (a swimmer churns the water; a shadow or glare doesn't);
