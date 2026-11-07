@@ -12,6 +12,10 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         the calibration stop there, as leaving the swim
     #                         zone does; only turning the pump on still goes
     #                         to the jet's lowest step.
+    #                       - SWIM PLOT CLOSED: the pool screen takes the
+    #                         focus back (take_screen_back), so the Pi's
+    #                         header bar doesn't cover its top (Bill,
+    #                         2026-11-07).
     #
     # poolwindAI_v15.9   -- THE NEXT VERSION. Bill, 2026-11-04: "If this
     #                       program ever gets popular, we shouldn't allow
@@ -5768,6 +5772,23 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         self.app.return_to_main_screen()
         self.app.pause_update_loop = False
         QTimer.singleShot(0, self.qt_update_loop)   # <-- restart
+        # The pool screen given the focus back: after the date screen and
+        # the plot, nothing had it, and the Pi's header bar came up over
+        # its top (Bill, 2026-11-07: "on return to main screen, the Pi menu
+        # header comes up overwriting the top of Poolwind. Of all the
+        # screens, that's the only one that does that."); again a moment
+        # later, once the window manager has taken the plot away
+        self.take_screen_back()
+        QTimer.singleShot(300, self.take_screen_back)
+
+    def take_screen_back(self):
+        """The pool screen on top with the focus, full screen again, so
+        it's over the Pi's header bar (pool_fullscreen)."""
+        if not self.isVisible():
+            return
+        pool_fullscreen(self, self.app)
+        self.raise_()
+        self.activateWindow()
 
     def place_mask_in_workspace(self, mask):
         """

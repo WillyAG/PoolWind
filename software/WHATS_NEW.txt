@@ -4,6 +4,8 @@ What's new in PoolWind v15.10
   when Swim Plot or the calibration opens) stop at the swimmer's slowest
   zone, as leaving the swim zone does. Only before turning the pump on
   does the jet still go down to its lowest setting.
+- Closing Swim Plot, the Pi's header bar no longer covers the top of the
+  pool screen.
 
 What was new in PoolWind v15.9
 
