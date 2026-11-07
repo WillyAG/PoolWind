@@ -241,7 +241,8 @@ pump, never starts it.
 
 **No swimmer for 5 minutes:** with the pump running and nobody in sight,
 PoolWind shows a box for 30 seconds, then turns the pump off and closes.
-Press **Keep swimming** in the box to carry on.
+Press **Keep swimming** in the box to carry on. (Not while Set Swim Area
+is open.)
 
 ### Pace correction: when the Paces don't feel right
 
@@ -505,7 +506,8 @@ each.
 Slowest or Fastest, then press **+** or **-** (or the + and - keys on the
 keyboard). Press **Save**.
 
-**By swimming (Auto)** (**Details** in the box says the same in short):
+**By swimming (Auto)** (**Details**, next to Auto in the box, says how a
+coach does it, or a swimmer alone):
 
 1. Press **Start**. The swim starts, counting toward your distance and
    average Pace as usual; if the pool's pump is off, PoolWind offers to

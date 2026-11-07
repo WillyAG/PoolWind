@@ -7961,7 +7961,7 @@ class SwimmerLimitsPanel(OverlayPanel):
         if h > 0:
             self.setFixedHeight(h)
         else:
-            self._place()
+            self.adjustSize()
         par = self.parent()
         if not getattr(self, "_placed", False):
             self._placed = True
