@@ -1,4 +1,11 @@
-What's new in PoolWind v15.9
+What's new in PoolWind v15.10
+
+- The jet's wind-downs (at start and close, before turning the pump off,
+  when Swim Plot or the calibration opens) stop at the swimmer's slowest
+  zone, as leaving the swim zone does. Only before turning the pump on
+  does the jet still go down to its lowest setting.
+
+What was new in PoolWind v15.9
 
 - Swimmer limits: plain instructions for Manual (+ and -) and Auto (by
   swimming), and Details. Start starts the swim, which counts toward your

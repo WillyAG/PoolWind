@@ -91,7 +91,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Jet speed limits: the jet never goes faster than the top the builder chose during calibration
 
-- Jet flow winds down to its lowest level when PoolWind starts and closes, and before it turns the pump on or off, to save wear on the equipment
+- Jet flow winds down to the swimmer's slowest zone when PoolWind starts and closes and before it turns the pump off, and to its lowest level before it turns the pump on, to save wear on the equipment
 
 - Pump sensing: the OnOff button shows whether the pump is running and checks that a press worked, retrying to turn it off. The swim pauses while the pump is off. With no swimmer in sight for 5 minutes, PoolWind turns the pump off and closes. Closing PoolWind with the pump running asks whether to turn it off
 

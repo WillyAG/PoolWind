@@ -48,12 +48,14 @@ for the full disclaimer.
   this either. The pool also can't receive two remotes at the same time.
   When PoolWind is closed, it releases all its relays and the pool works
   exactly as manufactured with its own remote. 
-- **The jet winds down to its slowest setting** when:
+- **The jet winds down to the swimmer's slowest zone** when:
   - PoolWind opens or closes
-  - **OnOff** is pressed
+  - **OnOff** is pressed to turn the pump off
   - Calibration routines are opened (not **Set Swim Area**: a swim goes
     on while it's open, the jet and pump as they are)
-  - **Swim Plot** is opened (except the jet winds down to the slowest swimmer setting)
+  - **Swim Plot** is opened
+- **Before the pump is turned on,** the jet winds down to its slowest
+  setting, so it always starts slow.
 - **In an emergency, press OnOff, then Stop pump now** and the jet motor 
   pump turns off at once, without waiting for the jet to wind down. It can
   only stop the pump, never start it.

@@ -146,7 +146,8 @@ starting:
   appears. If it doesn't, double-click **Monitor Toggle**. 
 
 Double-click the **PoolWind** icon. The pool screen appears, showing the
-camera's view from above, and a box winds the jet down to its lowest step.
+camera's view from above, and a box winds the jet down to the swimmer's
+slowest zone.
 If a box says the voltage sensor isn't found, check the interface board
 (build guide, section 9). If it says the pump sensing line isn't connected,
 fit R6 and R3 on the interface board (build guide, section 4).
@@ -160,9 +161,10 @@ Check that:
 - **OnOff shows the pump.** The button (the power symbol) is red while the
   pool's pump runs and grey while it's off: turn the pump off and on with
   the pool's remote and watch it follow.
-- **OnOff winds the jet down.** Press **OnOff**: the jet winds down to its
-  lowest setting first, then the pump turns off and the button turns grey.
-  Press it again to turn the pump back on. While it winds down before
+- **OnOff winds the jet down.** Press **OnOff**: the jet winds down to the
+  swimmer's slowest zone first, then the pump turns off and the button
+  turns grey. Press it again to turn the pump back on: the jet winds down
+  to its lowest step first. While it winds down before
   turning off, **Stop pump now** in the message turns the pump off at once,
   for emergencies: try it once.
 
@@ -416,8 +418,10 @@ There is no separate limits setting: the **Pace table's first and last
 rows** are the jet's limits.
 
 - The **first** row's voltage is the jet's lowest. PoolWind winds the jet
-  down to it when it starts and closes, when **OnOff** is pressed (before
-  it switches the pump), and when the calibration opens.
+  down to it before it turns the pump on. Other wind-downs (start and
+  close, before turning the pump off, when the calibration or Swim Plot
+  opens) stop at the swimmer's slowest zone, as leaving the swim zone
+  does.
 - The **last** row's voltage is the highest PoolWind ever drives the jet
   to, whatever any swimmer's setting says.
 

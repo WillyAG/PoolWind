@@ -75,12 +75,13 @@ faster than they can handle.
   a new start clears it (`clear_pump_running_box`, SIGTERM via a pid
   file). Keep all of these.
 - **PoolWind winds the jet down** (`initial_voltage_winddown`, a box with
-  the voltage) to the lowest step at start and close (`App.shutdown`),
-  when OnOff is pressed, before it presses the pump relay
-  (`switch_pump`), and when leaving the pool screen for the calibration
-  (Set Swim Area leaves the swim running: the new corners count once
-  saved); for Swim Plot only to the swimmer's slowest zone
-  (`to_swimmer`). It never drives up. Turning the pump off, the box's
+  the voltage) at start and close (`App.shutdown`), when OnOff is pressed,
+  before it presses the pump relay (`switch_pump`), and when leaving the
+  pool screen for the calibration or Swim Plot (Set Swim Area leaves the
+  swim running: the new corners count once saved). Since v15.10 it stops
+  at the swimmer's slowest zone (`to_swimmer`), as leaving the swim zone
+  does; only before turning the pump on (`pump_on=True`) does it go to
+  the jet's lowest step. It never drives up. Turning the pump off, the box's
   **Stop pump now** button stops it so the pump turns off at once, for
   emergencies; it can never start the pump. Any
   change you make must keep these, along with the relay watchdog

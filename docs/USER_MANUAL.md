@@ -31,7 +31,7 @@ pool are covered in the build guide and the setup and calibration guide.
 - **Know how to take manual control:** press **OnOff** to wind the jet down
   and stop the pump, or close PoolWind (see
   [Finishing a swim](#5-finishing-a-swim)) and use the pool's own remote.
-  Closing PoolWind winds the jet down to its slowest setting. While
+  Closing PoolWind winds the jet down to your slowest zone. While
   PoolWind runs, it fights
   against any change the pool's own remote makes.
 - **Take any pool cover off before starting PoolWind,** and close PoolWind
@@ -221,9 +221,10 @@ pool's remote. PoolWind sees whether the pump is running: the button is
 **red and pressed in** while it runs, and **grey** while it's off. It
 changes as soon as you press it.
 
-PoolWind first winds the jet down to its lowest setting (**"Winding the
-jet down before turning the pump off…"**, or **on**), then presses the
-pool's On/Off, so you feel the jet slow down before it stops, and it always
+PoolWind first winds the jet down (**"Winding the jet down before turning
+the pump off…"**, or **on**), then presses the pool's On/Off, so you feel
+the jet slow down before it stops: to your slowest zone before turning it
+off, and to the jet's lowest setting before turning it on, so it always
 starts slow. PoolWind stops adjusting the speed while it does this, giving
 OnOff top priority.
 
@@ -398,7 +399,7 @@ about 923 yd at Paces 8% slower. The log file itself never changes.
 Press **OnOff** to turn the pump off: the jet winds down first. Then press
 **X** at the top right of the screen to close PoolWind. It then:
 
-1. winds the jet down to its slowest setting and releases its control of
+1. winds the jet down to your slowest zone and releases its control of
    the pool's remote (if the pump is still running, a box asks **Shut
    Down**, to turn it off, or **Exit**, to leave it running; starting
    PoolWind again also clears that box),

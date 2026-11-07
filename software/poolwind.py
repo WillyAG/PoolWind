@@ -1,5 +1,18 @@
 
 if True:  # keep this here as an  easy way to skip over all this
+    # poolwindAI_v15.10  -- THE NEXT VERSION. Bill, 2026-11-07: "archive
+    #                       v15.8 and start v15.10" (v15.9 meant: published
+    #                       that day, Release v15.9). Starts as a copy of
+    #                       v15.9; PoolWindTest only until Bill publishes
+    #                       it, then the update notice offers it to v15.9
+    #                       users (version_tuple: (15, 10) > (15, 9)).
+    #                       - WIND-DOWNS TO THE SWIMMER'S SLOWEST ZONE (Bill,
+    #                         2026-11-07, at the pool: "The jet wind down is
+    #                         annoying."): start, close, pump off, Swim Plot,
+    #                         the calibration stop there, as leaving the swim
+    #                         zone does; only turning the pump on still goes
+    #                         to the jet's lowest step.
+    #
     # poolwindAI_v15.9   -- THE NEXT VERSION. Bill, 2026-11-04: "If this
     #                       program ever gets popular, we shouldn't allow
     #                       any more changes on this version. Once
@@ -25,6 +38,9 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         goes on underneath (no wind-down, pump and
     #                         jet as they are); the new corners count only
     #                         once saved.
+    #                       Published 2026-11-07 (Release v15.9). Archived
+    #                       2026-11-07; v15.10 for the next version (Bill:
+    #                       "archive v15.8 and start v15.10", v15.9 meant).
     #
     # poolwindAI_v15.8   -- PUMP SENSING. Bill, 2026-11-03:
     #                       "Such a major change. We should archive v15.7
@@ -3698,7 +3714,7 @@ class App:
         self._apply_individual_defaults(ind_defaults)
         print("USB stick settings reloaded.")
 
-    def initial_voltage_winddown(self, title="Starting Up", now_button=False, to_swimmer=False,
+    def initial_voltage_winddown(self, title="Starting Up", now_button=False, to_swimmer=None,
                                  pump_on=None):
         """
         Force the valve DOWN until voltage < minV: at start and close, when
@@ -3714,7 +3730,15 @@ class App:
         immediately (v15.8: only ever to stop it, Bill 2026-11-02).
         pump_on: True / False, the pump is about to be turned on / off.
         Nothing while the other-remote box is open (no signals to the pool).
+        Since v15.10 (to_swimmer None) every wind-down stops at the
+        swimmer's slowest zone, as leaving the swim zone does; only turning
+        the pump on goes to the jet's lowest step (Bill, 2026-11-07: "I'd
+        like to make all winddown go to the lowest swimmer limit (like out
+        of swim zone winddown) except one: the pool turn-on winddown which
+        would still go to lowest possible.").
         """
+        if to_swimmer is None:
+            to_swimmer = pump_on is not True
         if self.valveOption != "real" or self._remote_locked:
             return
 
@@ -3815,7 +3839,7 @@ class App:
     def toggle_zone_highlight(self):
         self._zone_highlight = not self.zone_highlight_on()
 
-    def leave_main_screen(self, to_swimmer=False):
+    def leave_main_screen(self, to_swimmer=None):
         self.hold_mode = False                  # no held speed to come back to
         self.initial_voltage_winddown("Leaving the pool screen", to_swimmer=to_swimmer)
         self.relay_off()
