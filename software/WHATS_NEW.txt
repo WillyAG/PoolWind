@@ -5,6 +5,8 @@ What's new in PoolWind v15.9
   distance and average Pace, and offers to turn the pump on if it's off;
   "Start swimming" shows until you are. Start over goes back to the
   limits you had; after High limit reached, check the zones, then Save.
+- Set Swim Area: a swim goes on while it's open (no wind-down, the pump
+  and jet as they are); the new corners count only once saved.
 
 What was new in PoolWind v15.8 (since v15.5)
 

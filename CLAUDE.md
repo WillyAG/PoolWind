@@ -77,8 +77,9 @@ faster than they can handle.
 - **PoolWind winds the jet down** (`initial_voltage_winddown`, a box with
   the voltage) to the lowest step at start and close (`App.shutdown`),
   when OnOff is pressed, before it presses the pump relay
-  (`switch_pump`), and when leaving the pool screen for Set Swim Area
-  or the calibration; for Swim Plot only to the swimmer's slowest zone
+  (`switch_pump`), and when leaving the pool screen for the calibration
+  (Set Swim Area leaves the swim running: the new corners count once
+  saved); for Swim Plot only to the swimmer's slowest zone
   (`to_swimmer`). It never drives up. Turning the pump off, the box's
   **Stop pump now** button stops it so the pump turns off at once, for
   emergencies; it can never start the pump. Any

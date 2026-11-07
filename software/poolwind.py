@@ -21,6 +21,10 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         back to the limits before Start; after High
     #                         limit reached the zones stay to check with
     #                         + / -, then Save or Start over.
+    #                       - SET SWIM AREA (Bill, 2026-11-07): the swim
+    #                         goes on underneath (no wind-down, pump and
+    #                         jet as they are); the new corners count only
+    #                         once saved.
     #
     # poolwindAI_v15.8   -- PUMP SENSING. Bill, 2026-11-03:
     #                       "Such a major change. We should archive v15.7
@@ -3121,7 +3125,8 @@ class App:
                     and not self._pump_hands_off and not self.pump_switch.busy
                     and not getattr(self, "_pump_pulsing", False)
                     and not self.pause_update_loop and not getattr(self, "_winding_down", False)
-                    and not getattr(self, "_calibrating", False))
+                    and not getattr(self, "_calibrating", False)
+                    and not getattr(self, "_setting_swim_area", False))
         if not watching or getattr(w, "swimmerFound", False):
             self._no_swimmer_since = now
             self._close_pump_warning()
@@ -5618,15 +5623,18 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         QTimer.singleShot(0, self.qt_update_loop)
 
     def openPlacePoints(self):
-        self.app.pause_update_loop = True
-        self.app.leave_main_screen()
-        self._enter_submenu()
-        dlg = PlacePointsWindow(self.app, self)
-        dlg.exec()
-        self._exit_submenu()
-        self.app.return_to_main_screen()
-        self.app.pause_update_loop = False
-        QTimer.singleShot(0, self.qt_update_loop)   # <-- restart
+        # The swim goes on underneath: no wind-down, no pause, the pump and
+        # the jet left as they are; the new corners count only once saved
+        # (on_save). (Bill, 2026-11-07: "Set Swim Area shouldn't care if
+        # pump is running or what the voltage is. ... A swimmer could be
+        # swimming and that should keep going even if the coach decides to
+        # change the swim area.")
+        self.app._setting_swim_area = True      # no pump auto-off box hidden behind it
+        try:
+            dlg = PlacePointsWindow(self.app, self)
+            dlg.exec()
+        finally:
+            self.app._setting_swim_area = False
 
     def openSwimPlot(self):
         self.app.pause_update_loop = True

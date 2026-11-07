@@ -223,6 +223,9 @@ This tells PoolWind where the pool is in the camera's picture.
 4. Press **Save**. The swim area is saved to the calibration file
    immediately.
 
+A swim goes on while the swim area is set: the jet and the pump stay as
+they are, and the new corners count only once saved.
+
 Do this again if the camera is ever moved.
 
 **The camera check.** Saving the swim area also saves the camera's
@@ -414,7 +417,7 @@ rows** are the jet's limits.
 
 - The **first** row's voltage is the jet's lowest. PoolWind winds the jet
   down to it when it starts and closes, when **OnOff** is pressed (before
-  it switches the pump), and when Set Swim Area or the calibration opens.
+  it switches the pump), and when the calibration opens.
 - The **last** row's voltage is the highest PoolWind ever drives the jet
   to, whatever any swimmer's setting says.
 
