@@ -132,6 +132,9 @@ faster than they can handle.
   `.gitattributes`.
 - `docs/`: build guide, setup and calibration guide, user manual.
   `hardware/`: interface board (Fritzing file, Gerbers), parts list.
+  `tools/outdoor_test/`: the swimmer tracker prototype and the script that
+  compares it with PoolWind's detection on recordings ("Outdoor pools",
+  below).
 - Settings files are Python dict literals read with `ast.literal_eval`, and
   must sit next to the program and start with its name. They are layered:
   the built-in values (`BUILT_IN_DEFAULTS` near the top of `poolwind.py`),
@@ -282,8 +285,7 @@ faster than they can handle.
   short timing loop around `vidSrc.read()`.
 - **Swimmer not found / jet not following.** Usually the swim area (setup
   guide 5.2: corners on the water surface, redo it if the camera moved),
-  lighting (outdoor sun, glare and sharp shadows are untested), or the
-  swim zone width (`middleSwimZone %`). The zone highlight and the
+  lighting (outdoors: see "Outdoor pools" below), or the swim zone width (`middleSwimZone %`). The zone highlight and the
   developer readouts show what PoolWind sees.
 - **DEMO on the screen, the jet doesn't respond.** A `'Demo'` line other
   than `False` in `poolwind_defaults.txt` (a developer option): remove it.
@@ -352,3 +354,89 @@ faster than they can handle.
   Everything else uses only the table's voltages and should work as it is:
   zones, Swimmer limits, Pace correction, the zone highlight, OnOff's
   wind-down and Swim Plot.
+
+## Outdoor pools: what has been checked, and where to carry on
+
+PoolWind was developed under a tent roof with daylight coming through (and
+lamps at night). Nobody has swum with it outdoors yet. In November 2026 the
+author asked Claude to look at the outdoor case, and the analysis below is
+the starting point for anyone whose pool is outdoors. If the detection
+needs changing for your pool, make the change in your own copy, test it as
+described here, and please share it in Discussions.
+
+**How the swimmer is found** (`QtMainWindow.F_mask`, then `get_auto_CoM`):
+each pixel's HSV distance from the **whole frame's average** colour,
+a fixed threshold (110), then blobs of at least `Sensitivity` (5000 px)
+and at most 20 % of the picture. The blob is chosen by a score: nearness
+to the centre line, size, and nearness to the last frame's blob. The
+largest blob's thin centre strip (1 % of the width) gives the CoM. After
+that: up to 3 missed frames are held (`DROPOUT_HOLD_FRAMES`), a stillness
+check (`stillMotion`, `stillSeconds`) decides when a still blob stops
+counting as a swimmer, and an EMA smooths the CoM. So each frame is judged
+almost on its own; little of the swimmer's behaviour is used.
+
+**What was tested** (offline, on six of the author's raw camera
+recordings, 30 s each at 15 fps; PoolWind's own `F_mask` and
+`get_auto_CoM` against a tracker prototype; distractors painted onto the
+frames). "Wrong place": the CoM more than a tenth of the pool from where
+PoolWind put it on the clean video.
+
+| Painted in | Current detection: wrong place | Tracker: wrong place |
+|---|---|---|
+| Nothing | 0 % | 0 % |
+| A still, swimmer-sized shadow over the swim zone | 0 % | 0 % |
+| Bright glare patches coming and going | 1.4 % | 3.3 % |
+| Dappled light (through trees) drifting across the pool | 0.2 % | 0 % |
+| 25 single leaves (about 4 x 2 in) drifting through, many across the swimmer | 0.0 % | 0.0 % |
+| Swimmer-sized clumps (leaves, a toy) drifting through | 29 % | 15 % (plus 10 % not found) |
+
+**What that says:**
+- Changing light mostly cancels out, because the threshold is against the
+  frame's own average: shade, dappled light and a shadow hardly moved it.
+- A single leaf is about 130 px, far below `Sensitivity`, and touching the
+  swimmer it changes the blob by about 1 %.
+- The weakness is **anything swimmer-sized that isn't the swimmer**. The
+  author's view: a swimmer wouldn't swim with a clump of anything in the
+  pool, and would wait until it's cleared. So no tracker was added.
+- Still untested, and the likely trouble outdoors: **direct sun** (sharp
+  shadows, including the swimmer's own, which is a second blob of the same
+  size moving with them), strong surface reflections of sky and trees, and
+  the light changing fast (clouds). Shade over the pool and a polarizing
+  filter on the camera should help.
+
+**If an outdoor pool has trouble, start here:**
+1. **Record it.** `'recordRawVideo': True` (with `'developerMode': True`)
+   records the camera's full picture. Swim in the conditions that fail.
+   Play it back at a desk with the `'video file, start (sec), corners'`
+   setting (setup guide, section 8) to see what PoolWind does.
+2. **Measure, don't guess.** Run `F_mask` and `get_auto_CoM` on the
+   recording's frames outside PoolWind (`tools/outdoor_test/compare.py`
+   does: it imports them from `poolwind.py`; the frame is the camera
+   picture resized to 640x480, turned upright, then straightened with the
+   swim area's corners to 480x640, as `MyVideoCapture.getImages` does).
+   Mark where they go wrong.
+3. **Use the swimmer's behaviour.** The prototype the table above comes
+   from is in `tools/outdoor_test/` (`tracker.py`; `compare.py` runs it
+   and PoolWind's own detection side by side on recordings, with the
+   painted distractors, and saves pictures of the frames where they
+   disagree; its README says how). It tracks one swimmer from frame to
+   frame instead of picking a blob in each frame:
+   - **pick-up**: a blob nearest the centre line, the same blob 8 frames
+     running, with at least 10 % of its pixels changing from frame to
+     frame (a swimmer churns the water; a shadow or glare doesn't);
+   - **follow**: predict the next position from the last movement, look
+     only in a window around it (so anything joined to the swimmer far
+     away is cut off), and accept a blob only if it is near the
+     prediction, its area within about a factor of 2.5 of the swimmer's,
+     and its colour close to theirs (both learned slowly while tracking);
+   - **lose**: after 20 frames without a match (under a second), back to
+     pick-up; the last position is held for 3 frames, as PoolWind does.
+   Its cost: about half a second to pick up a swimmer. Other ideas not yet
+   tried: a slowly learned picture of the empty pool (so still shadows and
+   glare fade into the background), rejecting jumps no swimmer could make,
+   and the swimmer's own shadow (same size and movement, offset in the
+   sun's direction, darker and without churn).
+4. **Keep the jet safe while testing**: desk tests with the recording and
+   the simulated valve first, then at the pool with nobody in it, watching
+   the jet (the safety rules above).
+

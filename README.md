@@ -36,7 +36,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
 
-- Outdoor use: Untested, especially in direct sun. Surface glare, moving light patterns on the pool floor, and sharp shadows (including the swimmer's own) can confuse the camera's swimmer detection. Shade over the pool and a polarizing filter on the camera should help; full outdoor support may need further development.
+- Outdoor use: Not yet tried at a real outdoor pool. Claude tested the swimmer detection on the author's recorded swims with shade, dappled light through trees, glare and floating leaves painted in, and it held up well as it is: it compares each part of the picture with the picture's own average, so changing light mostly cancels out, and a single leaf is far too small to be taken for a swimmer. The unknowns are direct sun, with its sharp shadows (including the swimmer's own), and strong reflections on the water. Shade over the pool and a polarizing filter on the camera should help. If your outdoor pool gives trouble, Claude Code knows what was tested and how to carry on from there ([CLAUDE.md](CLAUDE.md), "Outdoor pools"); if you get PoolWind working outdoors, please share how in [Discussions](https://github.com/WillyAG/PoolWind/discussions).
 
 
 
@@ -109,6 +109,7 @@ The program will probably need modifications. You do not need to be a programmer
 - Settings files (poolwind_defaults.txt, poolwind_calibration.txt) 
 - Install scripts: install.sh for the Raspberry Pi, and install_windows.bat for the demo on a Windows PC
 - CLAUDE.md: PoolWind's background for an AI assistant such as Claude Code
+- Outdoor test tools ([tools/outdoor_test](tools/outdoor_test)): compare PoolWind's swimmer detection with a tracker prototype on your own recordings
 - Schematics, layout, and PCB Gerber files for the interface board in a [Fritzing](https://fritzing.org) file (a free circuit design program)
 - Parts and source list
 - Build guide, setup and calibration, user manual
