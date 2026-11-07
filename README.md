@@ -36,7 +36,7 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Lighting: PoolWind is developed and tested in an indoor installation with outdoor light coming through. Using artificial lights (tested at night) also works well.
 
-- Outdoor use: Untested, especially in direct sun. Surface glare, moving light patterns on the pool floor, and sharp shadows (including the swimmer's own) can confuse the camera's swimmer detection. Shade over the pool and a polarizing filter on the camera should help; full outdoor support may need further development.
+- Outdoor use: Not yet tried at a real outdoor pool. Claude tested the swimmer detection on the author's recorded swims with shade, dappled light through trees, glare and floating leaves painted in, and it held up well as it is: it compares each part of the picture with the picture's own average, so changing light mostly cancels out, and a single leaf is far too small to be taken for a swimmer. The unknowns are direct sun, with its sharp shadows (including the swimmer's own), and strong reflections on the water. Shade over the pool and a polarizing filter on the camera should help. If your outdoor pool gives trouble, Claude Code knows what was tested and how to carry on from there ([CLAUDE.md](CLAUDE.md), "Outdoor pools"); if you get PoolWind working outdoors, please share how in [Discussions](https://github.com/WillyAG/PoolWind/discussions).
 
 
 
