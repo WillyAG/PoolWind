@@ -16,6 +16,12 @@ if True:  # keep this here as an  easy way to skip over all this
     #                         focus back (take_screen_back), so the Pi's
     #                         header bar doesn't cover its top (Bill,
     #                         2026-11-07).
+    #                       - SWIM PLOT'S CALENDAR: "Use:" stacked on the
+    #                         left, "Show: Avg Pace (blue) / Distance (mi)
+    #                         (mild red)" on the right; each day's distance
+    #                         in today's table, e.g. "0.111 mi"; Avg Pace
+    #                         at first, kept until PoolWind restarts (Bill,
+    #                         2026-11-07).
     #
     # poolwindAI_v15.9   -- THE NEXT VERSION. Bill, 2026-11-04: "If this
     #                       program ever gets popular, we shouldn't allow
@@ -7621,7 +7627,8 @@ class _MonthOnlyCalendar(QCalendarWidget):
             return None
         avg_rate = final_distance / total_swimtime_min          # miles/min
         avg_pace = (100.0 / YARDS_PER_MILE) / avg_rate          # min per 100yd
-        return Utils.DecimalToTime(avg_pace), redone
+        # the day's distance too, in the same table (Show: Distance)
+        return Utils.DecimalToTime(avg_pace), redone, final_distance
 
     def paintCell(self, painter, rect, qdate):
         if qdate.month() == self.monthShown() and qdate.year() == self.yearShown():
@@ -7647,9 +7654,16 @@ class _MonthOnlyCalendar(QCalendarWidget):
         pace_txt = getattr(self, "_avg_pace_cache", {}).get(
             date(qdate.year(), qdate.month(), qdate.day())
         )
-        redone = True
-        if isinstance(pace_txt, tuple):     # (text, in today's calibration?)
-            pace_txt, redone = pace_txt
+        redone, miles = True, None
+        if isinstance(pace_txt, tuple):     # (text, in today's calibration?, miles)
+            pace_txt, redone, miles = (pace_txt + (None,))[:3]
+        # Show: Avg Pace (blue) or Distance (mild red, "0.111 mi") (Bill,
+        # 2026-11-07: "on each day keep the avgPace the same but if
+        # distance is selected, then it would be the mild red and say
+        # 0.111 mi. Default avgPace.")
+        show_distance = getattr(self, "show_distance", False)
+        if pace_txt and show_distance and miles is not None:
+            pace_txt = f"{miles:.3f} mi"
         if pace_txt:
             painter.save()
             font = painter.font()
@@ -7657,7 +7671,10 @@ class _MonthOnlyCalendar(QCalendarWidget):
             font.setPointSize(max(6, font.pointSize() - 3))
             painter.setFont(font)
             # grey: a day logged before v15.7, shown as swum (can't be redone)
-            painter.setPen(QColor("blue") if redone else QColor(150, 150, 150))
+            colour = DISTANCE_COLOUR if show_distance else PACE_COLOUR
+            if qdate == self.selectedDate():
+                colour = "#ffffff"          # readable on the selected day's blue
+            painter.setPen(QColor(colour) if redone or qdate == self.selectedDate() else QColor(150, 150, 150))
             # Bottom-aligned, inside the cell: Qt 6 (PySide6) clips each
             # cell's painting to its rect, so the old nudge below the
             # bottom edge cut the numbers off. The cell is tall enough
@@ -9824,31 +9841,42 @@ class SwimDateRangeDialog(QDialog):
         # and two selector dots underneath, one or the other. Swimmer
         # dataset as the default."). With no stick both are the Master's:
         # greyed.
-        grid = QtWidgets.QGridLayout()
-        grid.setContentsMargins(0, 0, 0, 0)     # (its room to the calendars: reserved_v)
-        grid.setHorizontalSpacing(24)
-        grid.setVerticalSpacing(2)
-        grid.addWidget(QLabel("Use:"), 0, 0, Qt.AlignCenter)
-        self.dataset_btns = QtWidgets.QButtonGroup(self)
-        for col, text in ((1, "Swimmer dataset"), (2, "Master dataset (coach)")):
-            grid.addWidget(QLabel(text), 0, col, Qt.AlignCenter)
-            dot = QtWidgets.QRadioButton()
-            dot.setStyleSheet("QRadioButton::indicator { width: 22px; height: 22px; }")
-            self.dataset_btns.addButton(dot, col - 1)
-            grid.addWidget(dot, 1, col, Qt.AlignCenter)
+        # Since v15.10 on the left, stacked, each dot beside its text; on
+        # the right the same for what the days show (Bill, 2026-11-07: "If
+        # you could move that to the left stacked with text and selector on
+        # same line, there would be room for the same type of selector for
+        # Avg Pace or distance (mi) on the right side.").
+        def stack(title, texts, colours=(None, None)):
+            box = QWidget()
+            grid = QtWidgets.QGridLayout(box)
+            grid.setContentsMargins(0, 0, 0, 0)     # (its room to the calendars: reserved_v)
+            grid.setHorizontalSpacing(8)
+            grid.setVerticalSpacing(2)
+            grid.addWidget(QLabel(title), 0, 0, Qt.AlignTop)
+            group = QtWidgets.QButtonGroup(self)
+            for row, (text, colour) in enumerate(zip(texts, colours)):
+                dot = QtWidgets.QRadioButton(text)
+                dot.setStyleSheet("QRadioButton::indicator { width: 22px; height: 22px; }"
+                                  + (f" QRadioButton {{ color: {colour}; }}" if colour else ""))
+                group.addButton(dot, row)
+                grid.addWidget(dot, row, 1)
+            return box, group
+        self.dataset_box, self.dataset_btns = stack("Use:", ("Swimmer dataset", "Master dataset (coach)"))
         self.dataset_btns.button(1 if getattr(self.app, "plot_master", False) else 0).setChecked(True)
         self.dataset_btns.idToggled.connect(self._dataset_chosen)
-        self.dataset_box = QWidget()
-        self.dataset_box.setLayout(grid)
         self.dataset_box.setEnabled(self.app.swimmer_name() is not None)
+        self.show_box, self.show_btns = stack("Show:", ("Avg Pace", "Distance (mi)"),
+                                              (PACE_COLOUR, DISTANCE_COLOUR))
+        self.show_btns.button(1 if getattr(self.app, "plot_show_distance", False) else 0).setChecked(True)
+        self.show_btns.idToggled.connect(self._show_chosen)
         top = QHBoxLayout()
-        top.addStretch(1)
         top.addWidget(self.dataset_box)
         top.addStretch(1)
+        top.addWidget(self.show_box)
         layout.addLayout(top)
 
         from_col = QVBoxLayout()
-        from_col.addWidget(QLabel("From                        Average Pace (blue)"))
+        from_col.addWidget(QLabel("From"))
         self.from_cal = _MonthOnlyCalendar()
         self.from_cal.setSelectedDate(from_qdate)
         self.from_cal.setMinimumWidth(cal_width)
@@ -9857,6 +9885,7 @@ class SwimDateRangeDialog(QDialog):
         self.from_cal.setDataDates(data_dates)
         self._keep_highlight_visible(self.from_cal)
         self._style_calendar_dates(self.from_cal, data_dates)
+        self.from_cal.show_distance = getattr(self.app, "plot_show_distance", False)
         self.from_cal.setAvgPaceSource(self.app.data_dir, self._avg_pace_cache, self._avg_pace_months_loaded,
                                        self.app.plot_pace_from_voltage(), self._avg_read_times)
         from_col.addWidget(self.from_cal)
@@ -9872,6 +9901,7 @@ class SwimDateRangeDialog(QDialog):
         self.to_cal.setDataDates(data_dates)
         self._keep_highlight_visible(self.to_cal)
         self._style_calendar_dates(self.to_cal, data_dates)
+        self.to_cal.show_distance = getattr(self.app, "plot_show_distance", False)
         self.to_cal.setAvgPaceSource(self.app.data_dir, self._avg_pace_cache, self._avg_pace_months_loaded,
                                      self.app.plot_pace_from_voltage(), self._avg_read_times)
         to_col.addWidget(self.to_cal)
@@ -9923,6 +9953,16 @@ class SwimDateRangeDialog(QDialog):
         # QCalendarWidget's internal QTableView (undocumented but stable
         # across Qt5) — if it ever fails, we just skip the cursor move.
         QTimer.singleShot(0, lambda: self._position_cursor_on_today(self.from_cal))
+
+    def _show_chosen(self, which, checked):
+        """Show: Avg Pace / Distance (mi) on the days; kept until PoolWind
+        restarts, Avg Pace at first."""
+        if not checked:
+            return
+        self.app.plot_show_distance = which == 1
+        for cal in (self.from_cal, self.to_cal):
+            cal.show_distance = self.app.plot_show_distance
+            cal.updateCells()
 
     def _dataset_chosen(self, which, checked):
         """Swimmer / Master dataset: the averages worked out again in it
@@ -11611,6 +11651,12 @@ def redo_in_today(pace, dist, volts, table_pace, today):
         acc = d / f[0] if i == 0 else acc + max(0.0, d - dist[i - 1]) * (1 / f[i - 1] + 1 / f[i]) / 2
         dists.append(acc)
     return paces, dists, redone
+
+
+# The calendar's day readouts (Bill, 2026-11-07: "make the "Avg Pace"
+# selector text blue and distance a mild red")
+PACE_COLOUR = "#0000ff"
+DISTANCE_COLOUR = "#c85a5a"
 
 
 def pace_text(p):

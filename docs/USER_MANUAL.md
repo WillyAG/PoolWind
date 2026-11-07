@@ -544,7 +544,7 @@ Open the menu (**≡**, top left) and choose **Swim Plot...**. When Swim
 Plot opens, the jet winds down to your slowest zone.
 
 **Selecting dates to review:**\
-The "Select Swim Date(s)" screen shows up with "Use .. dataset" selector (see **Master vs Swimmer datasets** below) and a "From" calendar and a "To" calendar. After a short "Please wait" popup, the current month shows in both calendars and each day having a swimming session shows up in green font with the daily average Pace underneath. 
+The "Select Swim Date(s)" screen shows up with "Use .. dataset" selector (see **Master vs Swimmer datasets** below) and a "From" calendar and a "To" calendar. After a short "Please wait" popup, the current month shows in both calendars and each day having a swimming session shows up in green font with the daily average Pace underneath. **Show:** at the top right picks what's under each day: **Avg Pace** (blue, the default) or **Distance (mi)**, the day's distance (red, for example 0.659 mi). Both are worked out in the Paces in use now.
 
 Today's date in both is selected and is generally the most picked date range, so you can go directly to **OK** to bring up the plot and video.
 

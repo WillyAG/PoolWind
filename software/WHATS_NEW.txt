@@ -6,6 +6,9 @@ What's new in PoolWind v15.10
   does the jet still go down to its lowest setting.
 - Closing Swim Plot, the Pi's header bar no longer covers the top of the
   pool screen.
+- Swim Plot's calendar: "Show: Avg Pace / Distance (mi)" at the top right
+  shows each day's average Pace or its distance; the dataset choice is now
+  on the left.
 - Outdoor pools: what has been tested and where to carry on, in the
   README and CLAUDE.md.
 
