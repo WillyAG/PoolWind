@@ -6025,7 +6025,8 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # "Use:..." words to "Swimmer Pace-Volt" and "Master Pace-Volt"");
         # Ocean Swim: the dataset read
         if recorded is None:
-            self.setWindowTitle("Using Master Pace-Volt" if self.app.plot_master else "Using Swimmer Pace-Volt")
+            master = self.app.plot_master or self.app.swimmer_name() is None
+            self.setWindowTitle("Using Master Pace-Volt" if master else "Using Swimmer Pace-Volt")
         else:
             self.setWindowTitle("Using Master dataset" if self.app.is_master_dir(self.app.data_dir)
                                 else "Using Swimmer dataset")
@@ -10493,7 +10494,11 @@ class SwimDateRangeDialog(QDialog):
             self.dataset_btns.button(1 if self.app.is_master_dir(self.app.data_dir) else 0).setChecked(True)
         else:
             self.dataset_box, self.dataset_btns = stack("Use:", ("Swimmer Pace-Volt", "Master Pace-Volt"))
-            self.dataset_btns.button(1 if getattr(self.app, "plot_master", False) else 0).setChecked(True)
+            # with no stick the swimmer's table is the Master's (_load_swimmer):
+            # say so (Bill, 2026-11-17: "With stick pulled out ... default
+            # shows "Swimmer Pace-Volt" instead of "Master Pace-Volt".")
+            master = getattr(self.app, "plot_master", False) or self.app.swimmer_name() is None
+            self.dataset_btns.button(1 if master else 0).setChecked(True)
         self.dataset_btns.idToggled.connect(self._dataset_chosen)
         self.dataset_box.setEnabled(self.app.swimmer_name() is not None)
         self.show_box, self.show_btns = stack("Show:", ("Avg Pace", "Distance (mi)"),
