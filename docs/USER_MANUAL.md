@@ -11,6 +11,7 @@ pool are covered in the build guide and the setup and calibration guide.
 2. [Starting PoolWind](#2-starting-poolwind)
 3. [The pool screen](#3-the-pool-screen)
 4. [Swimming with PoolWind](#4-swimming-with-poolwind)
+   - [Ocean Swim: swimming a recorded swim](#ocean-swim-swimming-a-recorded-swim)
 5. [Finishing a swim](#5-finishing-a-swim)
 6. [Your USB stick](#6-your-usb-stick)
 7. [Reviewing your swims: Swim Plot](#7-reviewing-your-swims-swim-plot)
