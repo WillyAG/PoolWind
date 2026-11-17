@@ -79,6 +79,8 @@ The program will probably need modifications. You do not need to be a programmer
 
 - Hold mode: freeze the current speed, vary it with the UP and DN screen buttons
 
+- Lake Swim and Ocean Swim: the jet follows the swimmer (Lake), or plays back a recorded part of an earlier swim, moment by moment (Ocean), for training routines a coach or swimmer records; Repeat, and a Speed zone offset to swim it faster or slower
+
 - Built-in calibration: a voltage scan fits PoolWind to your pool, then Pace Entry (read from a Pace Display) or PingPong (ping-pong balls timed by the camera); Pace correction while swimming, for each swimmer's own Paces; old swims shown in today's Paces
 
 - Zone highlight: the jet's zone as a light band, with thin lines between the zones

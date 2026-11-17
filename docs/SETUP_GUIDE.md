@@ -116,7 +116,10 @@ The install script:
   [working from home](#9-working-from-home) and **Claude**
   ([getting help](#12-getting-help));
 - turns the monitor to **portrait** (taller than wide) every time the Pi
-  starts, ready for swimming.
+  starts, ready for swimming;
+- turns off the desktop's **"Removable medium is inserted"** box: PoolWind
+  mounts a swimmer's USB stick again each time it starts, which the desktop
+  would otherwise take for a stick just plugged in.
 
 It writes everything it does to a log file, `install.log`, in the
 `PoolWind` folder. If something goes wrong, that's the place to look.
@@ -211,6 +214,11 @@ This is a good time to talk about what these terms mean.
      Pace-volt data and Swimmer dataset from the USB stick takes precedence over the corresponding subset of the Master data on the SD card.\
      **Pace correction** in this case, will edit the Swimmer dataset, not the Master dataset. This gives swimmers the
      ability to keep their individual Pace-volt settings, swim data, and swim videos. They access them by simply plugging in the USB stick.
+
+4. Ocean Swim's recorded swims (see the [user manual](USER_MANUAL.md#ocean-swim-swimming-a-recorded-swim))
+   are kept with the swims they come from: a coach's, made with no USB stick
+   in, in the Master dataset, where every swimmer can find and swim them; a
+   swimmer's own on their stick.
 
 ### 5.2 Set swim area
 
@@ -464,6 +472,8 @@ starting with the program's name:
 | `poolwind_calibration_camera.png` | The camera picture the swim area was set on (the camera check, 5.2) | PoolWind, when the swim area is saved |
 | `poolwind_ind_defaults.txt` (on each USB stick) | One swimmer's own settings | Swimmer limits, and a new stick's setup |
 | `poolwind_ind_calibration.txt` (on each USB stick) | One swimmer's own Pace table, their Pace correction's pending changes and drag numbers. Made from the pool's table the first time the stick is used | Pace correction |
+| `recorded_swims.txt` (in each `CSV Vault`) | The Ocean Swim list: each recorded swim's jet steps, swim type and Speed zone offset, and the swims done to it | Ocean Swim |
+| `poolwind_pump_log.txt` | How long the pump line took to follow each On/Off press, a line per press. Delete it any time | PoolWind |
 | `temp` folder (next to the program, and on each USB stick) | Files PoolWind never needs to run: the backups made before a table is replaced (`..._before_<date>.txt`), the calibration's records (`calibration_scan_`, `calibration_session_`, `calibration_drops_`, `calibration_correction_<date>.csv`) and developer traces. Delete it any time; PoolWind makes it again when needed | PoolWind |
 
 The swimmer settings use **the same names** in the defaults file and on
@@ -634,7 +644,8 @@ isn't found, PoolWind says so and uses the camera.
 Before swimming, delete these lines or set `'developerMode': False`.
 
 With `'work'`, PoolWind's window keeps its title bar. While Swim Plot is
-open it says **Using Swimmer dataset** or **Using Master dataset**, and its
+open it says **Using Swimmer Pace-Volt** or **Using Master Pace-Volt** (from
+Ocean Swim, **Using Swimmer dataset** or **Using Master dataset**), and its
 **×** closes Swim Plot, not PoolWind.
 
 **The calibration** has no simulation: it always drives the real jet. With
@@ -737,7 +748,8 @@ rebuild is yours, so back it up:
 
 - `poolwind_calibration.txt`: your pool's measurements;
 - `poolwind_defaults.txt`: your settings;
-- the `CSV Vault` folder next to the program, for swimmers without a stick;
+- the `CSV Vault` folder next to the program, for swimmers without a stick
+  (with the coach's Ocean Swim recordings);
 - each swimmer's USB stick, which holds their swims and videos.
 
 Copy them to a PC or another USB stick now and then, and always before

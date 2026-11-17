@@ -59,7 +59,7 @@ for the full disclaimer.
 - **In an emergency, press OnOff, then Stop pump now** and the jet motor 
   pump turns off at once, without waiting for the jet to wind down. It can
   only stop the pump, never start it.
-- **If the pump doesn't turn off,** PoolWind presses again for 30 seconds,
+- **If the pump doesn't turn off** within 5 seconds, PoolWind presses again, for up to 30 seconds,
   then asks you to turn it off with the pool's other remote. While that
   box is open, PoolWind sends nothing to the pool.
 - **With no swimmer in sight for 5 minutes,** PoolWind warns for 30 seconds
