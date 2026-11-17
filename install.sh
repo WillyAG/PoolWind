@@ -509,6 +509,31 @@ Terminal=false
 EOF
 say "   the monitor turns to portrait each time the Pi starts"
 
+# No "Removable medium is inserted" box from the desktop's file manager:
+# PoolWind unmounts the swimmer's USB stick when it closes and mounts it
+# again when it starts, which the desktop took for a stick just plugged in
+# (Bill, 2026-11-17: "Every once in awhile a system popup shows saying the
+# USB drive had been connected and what do I want to do with it."). Sticks
+# are still mounted as before. For each file manager profile (Raspberry Pi
+# OS: 'default', older: 'LXDE-pi'), in the user's own copy of its settings.
+for sys_conf in /etc/xdg/pcmanfm/*/pcmanfm.conf; do
+    [ -f "$sys_conf" ] || continue
+    profile="$(basename "$(dirname "$sys_conf")")"
+    user_conf="$HOME/.config/pcmanfm/$profile/pcmanfm.conf"
+    if [ ! -f "$user_conf" ]; then
+        run mkdir -p "$(dirname "$user_conf")"
+        run cp "$sys_conf" "$user_conf"
+    fi
+    if grep -q '^autorun=' "$user_conf"; then
+        run sed -i 's/^autorun=.*/autorun=0/' "$user_conf"
+    elif grep -q '^\[volume\]' "$user_conf"; then
+        run sed -i '/^\[volume\]/a autorun=0' "$user_conf"
+    else
+        printf '\n[volume]\nautorun=0\n' >> "$user_conf"
+    fi
+done
+say "   no desktop box when PoolWind mounts a USB stick again"
+
 # --------------------------------------------------------------------------
 step "Done"
 if [ -n "$OLD_VER" ]; then
