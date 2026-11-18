@@ -63,7 +63,7 @@ faster than they can handle.
   at start with the Pi's pull-up and pull-down; a floating pin (R6/R3 not
   fitted) stops PoolWind and the calibration with a box. `PumpSwitch`
   presses On/Off until the line follows, watching it for up to
-  `PUMP_SETTLE_S` (5 s) after each press before deciding (since v15.11: a
+  `PUMP_SETTLE_S` (5 s) after each press before deciding (since v15.12: a
   line read once at 0.5 s was sometimes still high while the pump stopped,
   and the second press turned it back on; `poolwind_pump_log.txt` records
   the times): on, one press (the button goes back if it didn't start);
@@ -229,21 +229,9 @@ faster than they can handle.
   over the pool screen (menu). `QtMainWindow.check_camera_moved`: the
   camera check a few seconds after start, against
   `poolwind_calibration_camera.png`.
-- Ocean Swim (v15.11; menu **Lake Swim** / **Ocean Swim...**):
-  `RecordedSwims` (`recorded_swims.txt` in a CSV Vault: each recorded
-  swim's `program`, `[(seconds, volts)]` from the log, and the swims done
-  to it), `RecordedSwimsDialog` (the list), `PlaybackSwim` (in
-  `UpdateLoop` after `runAlgorithm`: replaces `desiredIndex` with the
-  recording's step at its clock + 1 s, plus the Speed zone offset, inside
-  the swimmer's zones; the clock runs only while swimming with Suspend
-  showing; wind-downs win). New / View go through `SwimPlotWindow` with
-  `recorded` set (`_recorded_header`). From Ocean Swim's New the date
-  screen's Use: switches `app.data_dir` to the Master's CSV Vault and back
-  (`datasets`); from Swim Plot it only picks the Pace-Volt curve
-  (`plot_master`). A Master recording swum with a stick in is copied to
-  the stick's list first (`RecordedSwims.copy_from`, `from_master`). Jet
-  speed safety is unchanged: steps stay inside the swimmer's zones and the
-  pool's table.
+- Ocean Swim (Lake Swim / Ocean Swim, recorded swims played back) was
+  built in v15.11 and shelved: v15.12 doesn't have it. It is in the git
+  history (commit cba7152, tag `v15.11-shelved`).
 - The calibration (`CalibrateWindow`, the voltage scan, Pace Entry with its
   Edit / Scan / Finish screens, PingPong) is a section of the same file: menu **Calibrate pool...**
   (real valve only; greyed with a stick in and the builder's password

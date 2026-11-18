@@ -1,15 +1,8 @@
-What's new in PoolWind v15.11
+What's new in PoolWind v15.12
 
-- Lake Swim and Ocean Swim, in the menu. Lake Swim is the normal swim:
-  the jet follows you. Ocean Swim plays back a recorded swim, a part of
-  an earlier swim chosen in Swim Plot (Start here / End here), moment by
-  moment, with its swim type; the clock runs only while you swim. Swim it
-  once, or Repeat it; + and - (the Speed zone offset) swim it faster or
-  slower. Each swim done to it is listed and shaded green in Swim Plot.
-  A coach's recordings (made with no stick in) show in every swimmer's
-  list. See the user manual, "Ocean Swim".
 - Swim Plot's date screen: "Use: Swimmer Pace-Volt / Master Pace-Volt"
-  (was "dataset"): it picks the Paces the swims are shown in.
+  (was "dataset"): it picks the Paces the swims are shown in. With no
+  stick in it's greyed and shows Master, the Paces used then.
 - Pump: after each On/Off press PoolWind gives the pump up to 5 seconds
   to stop before pressing again. A pump slow to stop was sometimes turned
   back on by a second press.

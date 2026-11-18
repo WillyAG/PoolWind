@@ -13,7 +13,7 @@ Read them in this order:
    limits), the settings files, built-in settings and
    desk testing.
 3. **[User manual](USER_MANUAL.md):** the screen and buttons, Hold mode,
-   Ocean Swim, Suspend and Resume, Pace correction, the swim plot and video review,
+   Suspend and Resume, Pace correction, the swim plot and video review,
    per-swimmer USB sticks and Swimmer limits.
 
 The pictures used in these documents are in `images/`.

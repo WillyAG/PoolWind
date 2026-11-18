@@ -11,7 +11,6 @@ pool are covered in the build guide and the setup and calibration guide.
 2. [Starting PoolWind](#2-starting-poolwind)
 3. [The pool screen](#3-the-pool-screen)
 4. [Swimming with PoolWind](#4-swimming-with-poolwind)
-   - [Ocean Swim: swimming a recorded swim](#ocean-swim-swimming-a-recorded-swim)
 5. [Finishing a swim](#5-finishing-a-swim)
 6. [Your USB stick](#6-your-usb-stick)
 7. [Reviewing your swims: Swim Plot](#7-reviewing-your-swims-swim-plot)
@@ -99,14 +98,10 @@ them also change color to warn you that PoolWind isn't running normally:
 | **View** | Switches between the camera view and three detection views (see below) |
 | **UP / DN** | In Hold mode, raise or lower the held speed, one jet step per press |
 | **OnOff** (the power symbol) | Turns the pool's pump on or off, at one touch. Red and pressed in while the pump runs, grey while it's off. The jet winds down first (see [OnOff](#onoff-the-pump)) |
-| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the builder), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...** (your zones, height and video settings), then **Lake Swim** and **Ocean Swim...** (the jet following you, or playing back a recorded swim, see [Ocean Swim](#ocean-swim-swimming-a-recorded-swim)), then **Swim Plot...** |
+| **≡** (top left) | Menu, in the order things are set up: **Set Swim Area...** and **Calibrate pool...** (the pool's calibration, for the builder), **Pace correction...** (your Paces, see [Pace correction](#pace-correction-when-the-paces-dont-feel-right)), **Swimmer limits...** (your zones, height and video settings), then **Swim Plot...** |
 | **X** (top right) | Closes PoolWind |
 
 A button looks pressed in while you touch it.
-
-During an [Ocean Swim](#ocean-swim-swimming-a-recorded-swim), an orange
-line on the pool screen shows how far the recorded swim has played, and
-**Hold**, **UP** and **DN** are greyed out.
 
 **The View button** cycles through four views. The first is the normal
 camera view. The other three show what the camera's swimmer detection
@@ -250,63 +245,6 @@ pump, never starts it.
 PoolWind shows a box for 30 seconds, then turns the pump off and closes.
 Press **Keep swimming** in the box to carry on. (Not while Set Swim Area
 is open.)
-
-### Ocean Swim: swimming a recorded swim
-
-PoolWind has two ways to swim, in the menu (**≡**):
-
-- **Lake Swim**, the normal way: the jet follows you. Easy, no stress: your
-  muscles decide how hard to work.
-- **Ocean Swim...**: the jet plays back a **recorded swim**, a part of an
-  earlier swim chosen in Swim Plot, moment by moment, as if in Hold with
-  someone else pressing UP and DN. The changes come like waves, and you
-  have to keep up. You have no control of the speed until it's done: it's
-  for a training routine, swum on purpose for the recording and improved
-  over time.
-
-**Ocean Swim...** opens the list of recorded swims, newest first. Each
-shows its date, average Pace, distance and swim time, and its **swim type**
-underneath (tap it, by the pencil ✎, to change it). Under it, each time it
-was swum, a line of its own, with **View** and **Delete**.
-
-| Button | What it does |
-|---|---|
-| **Swim it** | Back to the pool screen; the recording plays once you swim |
-| **Repeat** | The same, over and over until you choose **Lake Swim**. At each new start the jet changes more gently, one step every 3 seconds |
-| **View** | The recorded swim (or a swim done to it) in Swim Plot, between two green lines. A "Please wait" shows while it's prepared. **Close** comes back to the list |
-| **Delete** | Takes it off the list, after asking. Your swim logs and videos stay |
-| **+ / −** (the box between them) | The **Speed zone offset**: the whole recording that many zones faster (+) or slower (−), to try to beat it. It's kept with the recorded swim and limited to your slowest and fastest zone |
-| **New** | A new recorded swim (below) |
-| **Close** | Back to the pool screen, nothing changed |
-
-**While it plays:** the pool screen shows, for example, **Playback 1:10 /
-3:00 +2 Repeat 1**: how far it has played, its length, the Speed zone
-offset and the number of repeats (**Playback done** at the end). The recording's clock runs only while
-you swim with **Suspend** showing: leave the swim zone and it stops, and
-the jet winds down to your slowest zone as usual; come back and it goes
-on. At the end the jet goes to your slowest zone, and once you leave the
-swim zone PoolWind is back to Lake Swim. Each swim done to a recording is
-added to the list as a new line, with any offset or repeats, and is shaded
-green in Swim Plot.
-
-**Making a recorded swim:** press **New** in the list. The **Select Swim
-Date(s)** screen opens: its **Use:** chooses whose swims to pick from,
-**Master dataset (coach)** (the swims made without a USB stick, ticked at
-first) or **Swimmer dataset** (yours, on your stick). Pick the day, then in
-Swim Plot move the cursor and press **Start here** and **End here** at the
-top: green lines mark the part. Type its **swim type** (for example
-"Intervals: 2 hard, 1 easy") and press **Save**. It needs at least half a
-minute of swimming from one day. It goes into the list of the dataset you
-chose. Your swims still go to your stick.
-
-**A coach's recorded swims:** a coach makes them with no USB stick in, so
-they're in the Master's list. With your stick in, the list shows yours
-first, under your name, then the coach's under **Master (coach)**, with
-**View**, **Swim it** and **Repeat**. The first time you swim one, a copy
-goes into your own list, marked **(from Master)**: your swims to it, its
-offset and its swim type stay on your stick, and the coach's is never
-changed. To get a coach's newer version, delete your copy and press **Swim
-it** on theirs again.
 
 ### Pace correction: when the Paces don't feel right
 
@@ -501,8 +439,7 @@ Each swimmer has their own USB stick. It holds:
   with [Pace correction](#pace-correction-when-the-paces-dont-feel-right).
   The jet's speeds and limits are always the pool's;
 - **your swims**: a log of every swim and its training video, in a folder
-  called `CSV Vault`, with your [Ocean Swim](#ocean-swim-swimming-a-recorded-swim)
-  list (`recorded_swims.txt`).
+  called `CSV Vault`.
 
 Swimmers without a stick all share one log and the pool's Master Pace table
 on the Pi, so their swims can't be told apart.
@@ -633,7 +570,6 @@ The swim's training video plays together with a plot of your swim:
 - **Distance (miles) overall** is the whole range's distance.
 - The **zone highlight** shows the zones and the moving current zone band when it's on: click the video to turn it on or off.
 - The **plot window** can be moved out of the way by click and drag on the top header.
-- Swims done to an [Ocean Swim](#ocean-swim-swimming-a-recorded-swim) recording are **shaded green**.
 - Note the **Avg** (average Pace of swim to the moment), **Pace** (the current pace at the moment) and **Dist** (total distance to the moment) are part of the video written at the moment. If pool calibration had changed (or **Master vs Swimmer Pace-Volt** had switched, see below) since then, their values may be different than their corresponding values in the plot box. 
 
 **Controls:**
@@ -654,6 +590,8 @@ The swim's training video plays together with a plot of your swim:
 Any swimmer can change the Pace values in the Pace-volt table with the **Pace correction...** menu selection. The new values go into the Swimmer dataset on their own USB stick and will apply to their entire Swimmer dataset, even prior swims. That makes their Pace-volt table different from the Master dataset. The swimmer would usually select **Swimmer Pace-Volt** in the calendar screen.
 
 A coach who wants to compare swims from different swimmers can select **Master Pace-Volt** in the calendar screen to even the playing field. The pool had been calibrated by the builder and all swimmers would be evaluated against it.
+
+With no USB stick in, the choice is greyed out and shows **Master Pace-Volt**: without a stick, everyone swims with the Master table.
 
 
 ### What to look for

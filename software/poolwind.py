@@ -1,60 +1,35 @@
 
 if True:  # keep this here as an  easy way to skip over all this
-    # poolwindAI_v15.11  -- PLAYBACK SWIM. Bill, 2026-11-16: "Such a major
-    #                       change deserves a new version. Let's archive V10
-    #                       in case." Starts as a copy of v15.10 (not
-    #                       published); PoolWindTest only until Bill
-    #                       publishes it, then the update notice offers it
-    #                       to v15.9 users (version_tuple: (15, 11) >
-    #                       (15, 9)).
-    #                       - PLAYBACK SWIM (Bill, 2026-11-16: "A portion
-    #                         of a previous swim is selected by vertical
-    #                         lines in the swimPlot. This selection will
-    #                         play back the jet speed moment by moment
-    #                         during the following swim."): the menu's
-    #                         Normal Swim / Recorded Swim...; the list
-    #                         (RecordedSwimsDialog, recorded_swims.txt in
-    #                         the CSV Vault: RecordedSwims) with View and
-    #                         Swim it, each swim done to it a new line;
-    #                         New: Swim Plot with "Start here" / "End
-    #                         here" and the swim type (the header,
-    #                         _recorded_header). PlaybackSwim gives the jet
-    #                         step: the recorded one while the swimmer
-    #                         swims (its clock stops when they're out, the
-    #                         jet winds down as always), inside the
-    #                         swimmer's zones; Hold / UP / DN do nothing;
-    #                         at the end the slowest zone until the swimmer
-    #                         leaves the swim zone, then Normal Swim.
-    #                         Then (Bill, 2026-11-16): each value named
-    #                         ("Nov 15, 2026  2:12 Avg Pace  0.077 mi  3:00
-    #                         swim time"); the list's buttons smaller, two
-    #                         by two; Repeat (over and over, the jet one
-    #                         step every 3 s at the turnover, "Repeat 2" on
-    #                         the pool screen); OK on the plot's header,
-    #                         Save greyed until the swim type changes;
-    #                         swims done under a playback shaded green in
-    #                         every Swim Plot; Delete.
-    #                         Speed zone offset (Bill, 2026-11-16): + / -
-    #                         and its box in the list, the whole recorded
-    #                         swim that many zones faster or slower, kept
-    #                         with it and with each swim done ("+2 zones").
-    #                         Menu names (Bill, 2026-11-16, after swimming
-    #                         it: "More like the ocean than the lake." ...
-    #                         "Rename them Lake Swim and Ocean Swim."):
-    #                         Normal Swim -> Lake Swim, Recorded Swim... ->
-    #                         Ocean Swim... (the list's title too).
-    #                         Datasets (Bill, 2026-11-17: "I'm not selecting
-    #                         between the two datasets but between two
-    #                         Pace-Voltage curves. Yet, for the Ocean Swim, I
-    #                         would like to select between the two datasets
-    #                         ..."): the date screen from Swim Plot says
-    #                         "Swimmer Pace-Volt" / "Master Pace-Volt"; from
-    #                         Ocean Swim's New, "Use:" really picks the CSV
-    #                         Vault (Master first), the recorded swim saved
-    #                         in that one's list. With a stick in, the list
-    #                         shows the Master's recorded swims too; swimming
-    #                         one copies it to the swimmer's list ("from
-    #                         Master"), whose swims stay on the stick.
+    # poolwindAI_v15.12  -- v15.10 WITH v15.11's FIXES, NO OCEAN SWIM. Bill,
+    #                       2026-11-18: "I'm leaning toward going back to
+    #                       V15.10 and leapfrogging to V15.12 with only the
+    #                       functional changes we made in V15.11 to correct
+    #                       faults. ... We can shelve v15.11 ... So, if
+    #                       necessary, we can pull V15.11 out of mothballs in
+    #                       the future." ... "Yes, go ahead with all of it".
+    #                       Starts as a copy of v15.10 (not published);
+    #                       v15.11 (Playback / Ocean Swim) is shelved in
+    #                       Archive/ with its notes
+    #                       (poolwindAI_v15.11_shelved_notes.txt; git tag
+    #                       v15.11-shelved). PoolWindTest only until Bill
+    #                       publishes it (version_tuple: (15, 12) > (15, 9)).
+    #                       From v15.11:
+    #                       - PUMP OFF (Bill, 2026-11-17: "When I shut down
+    #                         the pump after a swim, sometimes it shuts down
+    #                         and then turns back on. ... I think it's the
+    #                         second blink that is the problem"): the pump
+    #                         line watched up to PUMP_SETTLE_S (5 s) after
+    #                         letting go of On/Off before pressing again (it
+    #                         was read once, 0.5 s after; Bill's pump took
+    #                         0.5-0.8 s); how long it took kept in
+    #                         poolwind_pump_log.txt next to the program.
+    #                       - SWIM PLOT'S DATE SCREEN: "Use: Swimmer
+    #                         Pace-Volt / Master Pace-Volt" (was "dataset";
+    #                         Bill, 2026-11-17: "I'm not selecting between
+    #                         the two datasets but between two Pace-Voltage
+    #                         curves."), the plot's title too ("Using Master
+    #                         Pace-Volt"); with no stick, greyed, it shows
+    #                         Master (the table used then).
     #
     # poolwindAI_v15.10  -- THE NEXT VERSION. Bill, 2026-11-07: "archive
     #                       v15.8 and start v15.10" (v15.9 meant: published
@@ -180,7 +155,7 @@ if True:  # keep this here as an  easy way to skip over all this
     #                       2026-11-04; v15.9 for the next version (Bill:
     #                       "1) start v15.9").
     #
-    # poolwindAI_v15.7   -- A PACE TABLE PER SWIMMER. Bill,
+    # poolwindAI_v15.7  -- A PACE TABLE PER SWIMMER. Bill,
     #                       2026-10-29: "Such a major change, let's archive
     #                       v15.6 and go on to v15.7." The swimmer's own Pace
     #                       table on their USB stick (no stick: the Master
@@ -1371,7 +1346,6 @@ class App:
         self.view_mode = 1
         self.hold_mode = False
         self.frozen_CoM_h = 1
-        self.playback = None        # a PlaybackSwim while one runs (since v15.11)
 
         self.raw_voltage = 0.0      # unsmoothed 5-read average (pace trace)
 
@@ -1412,10 +1386,6 @@ class App:
         # Selected algorithm (defaults file) -> desired index + swim_pace
         # ------------------------------------------------------------
         self.desiredIndex, self.swim_pace = self.controller.runAlgorithm(CoM, now, self.pool_pace)
-        # Playback Swim (since v15.11): the recorded swim's jet step instead
-        # (the swimmer's own swim while out of the swim zone: wind-down)
-        if self.playback is not None:
-            self.desiredIndex = self.playback.desired(self.desiredIndex, now)
         self._update_pace_display(now)
         self._write_pace_trace(now, valveVoltage, raw_pace)
 
@@ -2664,7 +2634,7 @@ class App:
     def plot_pace_from_voltage(self):
         """volts -> Pace for Swim Plot and the calendar's averages: the
         table in use (the swimmer's, or the Master's with no stick), or with
-        "Master dataset (coach)" chosen on the date screen the pool's Master
+        "Master Pace-Volt" chosen on the date screen the pool's Master
         table, so swimmers and calibrations compare on one scale (Bill,
         2026-11-01: "There needs to be a comparison option that regardless
         of what the swimmers set their own Paces at, in the comparison
@@ -2674,25 +2644,6 @@ class App:
         rows = sorted((float(v), float(p)) for p, v in self.calibration["pace_voltage"])
         vs, ps = [v for v, _ in rows], [p for _, p in rows]
         return lambda v: float(np.interp(v, vs, ps))
-
-    def master_data_dir(self):
-        """The Master's CSV Vault (the Pi's own, next to the program), where
-        a coach's swims and recorded swims are with no stick in (Demo: its
-        own folder)."""
-        if self.REPdefaults["Demo"]:
-            return self.data_dir
-        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "CSV Vault")
-
-    def has_master_list(self):
-        """A swimmer's stick in, so the Master's CSV Vault is another one
-        (Ocean Swim's two datasets; Bill, 2026-11-17: "for the Ocean Swim,
-        I would like to select between the two datasets because the Master
-        Dataset would be the likely place a coach would put the programmed
-        swim.")."""
-        return self.swimmer_name() is not None and not self.REPdefaults["Demo"]
-
-    def is_master_dir(self, path):
-        return os.path.normpath(path) == os.path.normpath(self.master_data_dir())
 
     def swimmer_name(self):
         """The stick's name (its label), or None: Master data."""
@@ -2989,8 +2940,6 @@ class App:
         else: self.view_mode = 1
 
     def Hold_btn_press(self):
-        if self.playback is not None:
-            return          # Playback Swim: no speed control (Bill, 2026-11-16, "3)")
         self.hold_mode = not self.hold_mode
 
         if self.hold_mode:
@@ -3371,10 +3320,6 @@ class App:
 
         print("Shutting down system...")
         try:
-            self.end_playback()                 # a Playback Swim: added to its list
-        except Exception as e:
-            print("Playback Swim not saved:", e)
-        try:
             self.pump_switch.cancel()           # a press under way: let go of the button
             self._close_pump_warning()
         except Exception:
@@ -3688,7 +3633,6 @@ class App:
         wound down until Begin / Resume)."""
         if self.suspendButtonText == "Suspend":
             self.Suspend_btn_press()
-        self.end_playback()                     # (its list is on the stick going away)
         w = getattr(self, "window", None)
         for attr in ("pace_panel", "limits_panel"):
             panel = getattr(w, attr, None) if w is not None else None
@@ -3939,28 +3883,6 @@ class App:
 
     def toggle_zone_highlight(self):
         self._zone_highlight = not self.zone_highlight_on()
-
-    def start_playback(self, entry_id, repeat=False):
-        """Playback Swim of a recorded swim in the swimmer's list
-        (RecordedSwims, PlaybackSwim). One running is stopped first (and
-        added to its list as far as it went)."""
-        self.end_playback()
-        store = RecordedSwims(self.data_dir)
-        entry = store.get(entry_id)
-        if not entry or not entry.get("program"):
-            return False
-        self.hold_mode = False
-        self.playback = PlaybackSwim(self, store, entry, repeat)
-        return True
-
-    def end_playback(self):
-        """Back to a Normal Swim; a Playback Swim running is added to its
-        list as far as it went."""
-        pb, self.playback = getattr(self, "playback", None), None
-        if pb is not None:
-            if not pb.finished:
-                print("Playback Swim stopped: Lake Swim")
-            pb.finish()
 
     def leave_main_screen(self, to_swimmer=None):
         self.hold_mode = False                  # no held speed to come back to
@@ -5283,19 +5205,6 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             cv2.putText(frame, "DEMO", (10, 470), cv2.FONT_HERSHEY_COMPLEX,
                         1.2, (60, 60, 255), 3, cv2.LINE_AA)
 
-        # Playback Swim (since v15.11): say so, and how far it is, so
-        # nobody wonders why the jet doesn't follow the swimmer
-        playback = self.app.playback
-        if playback is not None:
-            text = playback.readout()
-            scale = 0.9
-            (tw, _), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, scale, 2)
-            if tw > w - 20:                     # (with "  Repeat 3": smaller, to fit)
-                scale *= (w - 20) / tw
-                (tw, _), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, scale, 2)
-            cv2.putText(frame, text, (w - tw - 10, 470), cv2.FONT_HERSHEY_COMPLEX,
-                        scale, (0, 200, 255), 2, cv2.LINE_AA)
-
         # ---------------------------------------------------------
         # 4. Buttons (all in 480×640 working space)
         # ---------------------------------------------------------
@@ -5371,9 +5280,6 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             else:
                 fill_color = (200, 200, 200)
                 label = name
-            # Playback Swim: Hold and UP / DN do nothing (no speed control)
-            if playback is not None and name in ("Hold", "UP", "DN"):
-                fill_color = (120, 120, 120)
 
             # Recessed look while touched (held at least 0.15 s so a quick
             # tap shorter than a frame still shows): darker fill, bevel
@@ -5511,7 +5417,7 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # swimmer's (Bill, 2026-10-31: "The swimmer shouldn't be able to
         # calibrate the Master files."); developerMode: a stick in too
         item2 = QAction("Calibrate pool...", self)
-        item2.triggered.connect(lambda _=False: self._normal_swim_then(self.openCalibration))
+        item2.triggered.connect(self.openCalibration)
         # developerMode: always, whatever the workplace, valve, camera or
         # stick (Bill, 2026-11-01: "The calibration routines are greyed out
         # now. That feature should depend only on: (developerMode': True).")
@@ -5522,29 +5428,13 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
 
         # Like Calibrate pool, it changes the pool's calibration: the real pool only
         item2b = QAction("Pace correction...", self)
-        item2b.triggered.connect(lambda _=False: self._normal_swim_then(self.openPaceCorrection))
+        item2b.triggered.connect(self.openPaceCorrection)
         item2b.setEnabled(dev or self.app.valveOption == "real")
         menu.addAction(item2b)
 
         item3 = QAction("Swimmer limits...", self)
-        item3.triggered.connect(lambda _=False: self._normal_swim_then(self.openSwimmerLimits))
+        item3.triggered.connect(self.openSwimmerLimits)
         menu.addAction(item3)
-
-        menu.addSeparator()
-
-        # Playback Swim (since v15.11; Bill, 2026-11-16: "The main screen
-        # menu will have two more items "Normal Swim" and "Recorded Swim"")
-        normal = QAction("Lake Swim", self)
-        normal.setCheckable(True)
-        normal.setChecked(self.app.playback is None)
-        normal.triggered.connect(lambda _=False: self.app.end_playback())
-        menu.addAction(normal)
-
-        recorded = QAction("Ocean Swim...", self)
-        recorded.setCheckable(True)
-        recorded.setChecked(self.app.playback is not None)
-        recorded.triggered.connect(lambda _=False: self.openRecordedSwims())
-        menu.addAction(recorded)
 
         menu.addSeparator()
 
@@ -5553,13 +5443,6 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         menu.addAction(item4)
 
         menu.exec_(self.menu_button.mapToGlobal(self.menu_button.rect().bottomLeft()))
-
-    def _normal_swim_then(self, open_it):
-        """A Playback Swim running stops first (added to its list as far
-        as it went): the pool's calibration, Pace correction and Swimmer
-        limits move the jet and change the zones."""
-        self.app.end_playback()
-        open_it()
 
     def _enter_submenu(self):
         self.menu_button.hide()
@@ -5823,61 +5706,6 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             self.app._setting_swim_area = False
 
     def openSwimPlot(self):
-        self._swim_screens(self._swim_plot_screens)
-
-    def openRecordedSwims(self):
-        """Playback Swim's list (since v15.11; Bill, 2026-11-16: ""Recorded
-        Swim" will have show the list and a "New" button that will openup
-        the swimPlot with the extra provisions."): the list, and from it
-        Swim Plot (New, View); "Swim it" starts the Playback Swim back on
-        the pool screen."""
-        chosen = self._swim_screens(self._recorded_swims_screens)
-        if chosen is not None:
-            self.app.start_playback(*chosen)
-
-    def _recorded_swims_screens(self, ss):
-        while not ss["pulled"] and not ss["leave"]:
-            dlg = RecordedSwimsDialog(self.app, self)
-            ss["showing"] = dlg
-            dlg.exec()
-            ss["showing"] = None
-            act = dlg.action
-            # View of a recorded swim in the other CSV Vault (the Master's)
-            # read it there: back to the swimmer's once the plot is closed
-            restore = getattr(dlg, "restore", None)
-            try:
-                if act is None or ss["pulled"] or ss["leave"]:
-                    return None
-                if act[0] in ("swim", "repeat"):
-                    entry_id = act[1]
-                    if len(act) > 2 and act[2] == "master":
-                        try:
-                            entry_id = RecordedSwims(self.app.data_dir).copy_from(
-                                RecordedSwims(self.app.master_data_dir()), act[1])
-                        except Exception as e:
-                            QMessageBox.warning(self, "Ocean Swim", f"Couldn't copy it to your list:\n({e})")
-                            continue
-                        if entry_id is None:
-                            continue
-                    return entry_id, act[0] == "repeat"
-                if act[0] == "delete":
-                    try:
-                        RecordedSwims(self.app.data_dir).remove(act[1], act[2])
-                    except Exception as e:
-                        QMessageBox.warning(self, "Ocean Swim", f"Couldn't delete it:\n({e})")
-                    continue                        # the list again
-                self._swim_plot_screens(ss, recorded=act, plot=getattr(dlg, "plot", None))
-            finally:
-                if restore is not None:
-                    self.app.data_dir, self.app.plot_master = restore
-        return None
-
-    def _swim_screens(self, body):
-        """Swim Plot's screens and Recorded Swim's, off the pool screen:
-        the jet to the swimmer's slowest zone and the pool screen paused
-        while they're open; body(ss) shows them (ss: 'showing', the screen
-        showing; 'pulled', the stick pulled; 'leave', the window's x).
-        Returns what body returns."""
         self.app.pause_update_loop = True
         self.app.leave_main_screen(to_swimmer=True)    # the swimmer's slowest zone, not the bottom
         self._enter_submenu()
@@ -5892,6 +5720,13 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # already done before we ever call clear().
         QApplication.processEvents()
 
+        # Closing SwimPlotWindow returns to the date-range calendar (not
+        # straight back to the main program) so a new date can be picked
+        # without reopening SwimPlot from the menu. Only closing the
+        # calendar itself exits the loop. The calendar remembers the last
+        # picked range so it reappears with the same dates highlighted
+        # instead of resetting to today.
+        from_date, to_date = None, None
         # The dataset chosen on the date screen (Swimmer, or Master for a
         # coach) is kept until PoolWind restarts, through stick swaps (Bill,
         # 2026-11-01: "Yes, keep Master until PoolWind restarts")
@@ -5902,15 +5737,15 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # where the stick watcher goes on to the Master data (Bill,
         # 2026-11-01: "As long as it doesn't crash the program. Maybe if the
         # stick is pulled, PoolWind can close the plot window.")
-        ss = {"showing": None, "pulled": False, "leave": False}
+        showing, pulled = [None], [False]
         root = self.app._stick_root
 
         def look_for_stick():
-            if ss["pulled"] or not root or os.path.isfile(os.path.join(root, "poolwind_ind_defaults.txt")):
+            if pulled[0] or not root or os.path.isfile(os.path.join(root, "poolwind_ind_defaults.txt")):
                 return
-            ss["pulled"] = True
+            pulled[0] = True
             print("USB stick pulled during Swim Plot: closed")
-            w = ss["showing"]
+            w = showing[0]
             if w is not None and w.isVisible():
                 (w.on_close if hasattr(w, "on_close") else w.reject)()
 
@@ -5923,74 +5758,15 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
         # 2026-11-01: "There is the standard window expand and exit buttons
         # on the plot window that shouldn't be there. Using it to exit loads
         # to a USB stick warning box and the wqhole program exits.")
+        leave = [False]
+
         def close_swim_plot():
-            ss["leave"] = True
-            w = ss["showing"]
+            leave[0] = True
+            w = showing[0]
             if w is not None and w.isVisible():
                 (w.on_close if hasattr(w, "on_close") else w.reject)()
 
         self._swim_plot_close = close_swim_plot
-        try:
-            result = body(ss)
-        finally:
-            stick_timer.stop()
-            stick_timer.deleteLater()
-            self._swim_plot_close = None
-        if ss["pulled"]:
-            QMessageBox.information(self, "Swim Plot", "The USB stick was pulled, so Swim Plot was "
-                                    "closed. Plug it in again to see its swims.")
-            result = None
-        self._exit_submenu()
-        self.app.return_to_main_screen()
-        self.app.pause_update_loop = False
-        QTimer.singleShot(0, self.qt_update_loop)   # <-- restart
-        # The pool screen given the focus back: after the date screen and
-        # the plot, nothing had it, and the Pi's header bar came up over
-        # its top (Bill, 2026-11-07: "on return to main screen, the Pi menu
-        # header comes up overwriting the top of Poolwind. Of all the
-        # screens, that's the only one that does that."); again a moment
-        # later, once the window manager has taken the plot away
-        self.take_screen_back()
-        QTimer.singleShot(300, self.take_screen_back)
-        return result
-
-    def _swim_plot_screens(self, ss, recorded=None, plot=None):
-        """The date screen and the plot. Closing the plot returns to the
-        date screen (not straight back to the main program) so a new date
-        can be picked without reopening Swim Plot from the menu. Only
-        closing the calendar itself exits the loop. The calendar remembers
-        the last picked range so it reappears with the same dates
-        highlighted instead of resetting to today.
-        recorded (Recorded Swim, since v15.11): ('new',) the date screen,
-        then the plot with the selection lines, back to the list when the
-        plot closes; ('view', id, swim number or None) straight to the plot
-        of that recorded swim (or the swim done to it), back to the list."""
-        if recorded is not None and recorded[0] == "view":
-            entry = RecordedSwims(recorded[3] if len(recorded) > 3 else self.app.data_dir).get(recorded[1])
-            if entry is None:
-                return
-            part = entry if recorded[2] is None else entry["swims"][recorded[2]]
-            day = date.fromisoformat(part["date"])
-            self._show_plot(ss, plot or SwimPlotWindow(self.app, self, day, day), recorded)
-            return
-        # New (Ocean Swim): the date screen's Use: picks the dataset, the
-        # Master's first (Bill, 2026-11-17: "Keep the words the same as it is
-        # now for "Use:..." but actually switch the datasets with Master as
-        # default."); back to the swimmer's when the screens close
-        datasets = None
-        own = (self.app.data_dir, self.app.plot_master)
-        if recorded is not None and recorded[0] == "new" and self.app.has_master_list():
-            datasets = (self.app.data_dir, self.app.master_data_dir())
-            self.app.data_dir, self.app.plot_master = datasets[1], True
-        try:
-            self._date_and_plot_loop(ss, recorded, datasets)
-        finally:
-            if datasets is not None:
-                self.app.data_dir, self.app.plot_master = own
-        ss["showing"] = None
-
-    def _date_and_plot_loop(self, ss, recorded, datasets):
-        from_date, to_date = None, None
         while True:
             # Even though the calendar is now a full-screen frameless
             # dialog covering the same geometry as this window, blank the
@@ -6005,39 +5781,50 @@ class QtMainWindow(QMainWindow):  # Version 4.0 original
             # happened to sit on top of that exact spot.
             self.display_canvas.clear()
             QApplication.processEvents()
-            range_dlg = SwimDateRangeDialog(self.app, self, from_date, to_date, datasets)
-            ss["showing"] = range_dlg
-            if range_dlg.exec() != QDialog.Accepted or ss["pulled"] or ss["leave"]:
+            range_dlg = SwimDateRangeDialog(self.app, self, from_date, to_date)
+            showing[0] = range_dlg
+            if range_dlg.exec() != QDialog.Accepted or pulled[0] or leave[0]:
                 break
             from_date, to_date = range_dlg.get_range()
-            dlg = getattr(range_dlg, "plot", None) or SwimPlotWindow(self.app, self, from_date, to_date)
-            self._show_plot(ss, dlg, recorded)
-            if ss["pulled"] or ss["leave"] or recorded is not None:
-                break
-
-    def _show_plot(self, ss, dlg, recorded):
-        # The header says which table the plot reads the swims in, in
-        # place of the program's name (Bill, 2026-11-01: "Can you place
-        # it in the header instead of the 'poolwindAI_v15.7.py' that
-        # shows now?")
-        title = self.windowTitle()
-        # Swim Plot: the Pace-Volt curve (Bill, 2026-11-17: "change the
-        # "Use:..." words to "Swimmer Pace-Volt" and "Master Pace-Volt"");
-        # Ocean Swim: the dataset read
-        if recorded is None:
+            # The header says which table the plot reads the swims in, in
+            # place of the program's name (Bill, 2026-11-01: "Can you place
+            # it in the header instead of the 'poolwindAI_v15.7.py' that
+            # shows now?")
+            title = self.windowTitle()
+            # the Pace-Volt curve (Bill, 2026-11-17: "change the "Use:..."
+            # words to "Swimmer Pace-Volt" and "Master Pace-Volt""); with no
+            # stick the swimmer's table is the Master's (_load_swimmer)
             master = self.app.plot_master or self.app.swimmer_name() is None
             self.setWindowTitle("Using Master Pace-Volt" if master else "Using Swimmer Pace-Volt")
-        else:
-            self.setWindowTitle("Using Master dataset" if self.app.is_master_dir(self.app.data_dir)
-                                else "Using Swimmer dataset")
-        try:
-            dlg.recorded = recorded
-            ss["showing"] = dlg
-            if not ss["pulled"] and not ss["leave"]:  # (pulled while the plot loaded)
-                dlg.exec()
-        finally:
-            self.setWindowTitle(title)
-            ss["showing"] = None
+            try:
+                dlg = getattr(range_dlg, "plot", None) or SwimPlotWindow(self.app, self, from_date, to_date)
+                showing[0] = dlg
+                if not pulled[0] and not leave[0]:  # (pulled while the plot loaded)
+                    dlg.exec()
+            finally:
+                self.setWindowTitle(title)
+                showing[0] = None
+            if pulled[0] or leave[0]:
+                break
+
+        stick_timer.stop()
+        stick_timer.deleteLater()
+        self._swim_plot_close = None
+        if pulled[0]:
+            QMessageBox.information(self, "Swim Plot", "The USB stick was pulled, so Swim Plot was "
+                                    "closed. Plug it in again to see its swims.")
+        self._exit_submenu()
+        self.app.return_to_main_screen()
+        self.app.pause_update_loop = False
+        QTimer.singleShot(0, self.qt_update_loop)   # <-- restart
+        # The pool screen given the focus back: after the date screen and
+        # the plot, nothing had it, and the Pi's header bar came up over
+        # its top (Bill, 2026-11-07: "on return to main screen, the Pi menu
+        # header comes up overwriting the top of Poolwind. Of all the
+        # screens, that's the only one that does that."); again a moment
+        # later, once the window manager has taken the plot away
+        self.take_screen_back()
+        QTimer.singleShot(300, self.take_screen_back)
 
     def take_screen_back(self):
         """The pool screen on top with the focus, full screen again, so
@@ -6977,7 +6764,7 @@ PUMP_SENSE_PIN = 23
 PUMP_PRESS_MS = 2000          # On/Off held this long
 PUMP_CHECK_MS = 500           # after letting go, before the pump line is read
 PUMP_SETTLE_S = 5.0           # ...and watched this long (every PUMP_POLL_MS) for it
-PUMP_POLL_MS = 100            # to follow before On/Off is pressed again (v15.11; Bill,
+PUMP_POLL_MS = 100            # to follow before On/Off is pressed again (v15.12; Bill,
                               # 2026-11-17: "sometimes it shuts down and then turns back
                               # on. ... I think it's the second blink that is the
                               # problem": the line read once, 0.5 s after letting go,
@@ -7023,351 +6810,6 @@ def pump_pin_check(lgpio, chip, pin=PUMP_SENSE_PIN):
     if up <= 2 and down <= 2:
         return "off"
     return "not fitted"
-
-
-class RecordedSwims:
-    """Playback Swim's list (since v15.11; Bill, 2026-11-16: "Each selected
-    swim will be saved in a list indicating date, avg Pace, distnce, and a
-    button to view the plot video in the swimPlot screen"). One file in the
-    swimmer's CSV Vault (on their stick; no stick: the Master folder's), a
-    Python list of the recorded swims, newest last:
-        {'id', 'date' (YYYY-MM-DD), 'start', 'end' (epoch seconds),
-         'minutes', 'miles', 'pace' (min/100 yd), 'text' (the swim type),
-         'program': [(seconds into the swim, jet volts), ...] at every step
-                    change, the swim's own time (time out of the swim zone
-                    left out),
-         'seconds': the program's length,
-         'swims': [{'date', 'start', 'end', 'minutes', 'miles', 'pace',
-                    'done' (share of the program swum)}, ...] (each swim done
-                    to it, a new line each time: Bill, "4) a new line each
-                    time")}
-    The jet steps are kept as volts, so a later Pace table or calibration
-    doesn't change them (the nearest step of the day's table is played)."""
-    FILE = "recorded_swims.txt"
-    MAX_ROW_GAP_S = 1.0           # rows further apart: the swimmer was out (not swim time)
-    MIN_STEP_S = 1.0              # a new step counts once the volts stay near it this long
-                                  # (the volts' noise halfway between two steps flickers)
-
-    def __init__(self, data_dir):
-        self.path = os.path.join(data_dir, self.FILE)
-
-    def load(self, strict=False):
-        """The list; strict (before writing it): a file that can't be read
-        raises, so it's never written over with an empty list."""
-        try:
-            with open(self.path) as f:
-                entries = ast.literal_eval(f.read())
-            if not isinstance(entries, list):
-                raise ValueError("not a list")
-            return entries
-        except FileNotFoundError:
-            return []
-        except Exception as e:
-            print(f"Couldn't read {self.path} ({e})")
-            if strict:
-                raise
-            return []
-
-    @classmethod
-    def _plain(cls, v):
-        """Plain Python values (numpy's numbers read back as calls)."""
-        if isinstance(v, dict):
-            return {k: cls._plain(x) for k, x in v.items()}
-        if isinstance(v, (list, tuple)):
-            return type(v)(cls._plain(x) for x in v)
-        if isinstance(v, np.generic):
-            return v.item()
-        return v
-
-    def save(self, entries):
-        entries = self._plain(entries)
-        tmp = self.path + ".new"
-        with open(tmp, "w") as f:
-            f.write("# PoolWind's Recorded Swims (Playback Swim). Written by PoolWind: "
-                    "the menu's Ocean Swim.\n")
-            f.write(repr(entries) + "\n")
-        os.replace(tmp, self.path)
-
-    def get(self, entry_id):
-        return next((e for e in self.load() if e.get("id") == entry_id), None)
-
-    def add(self, entry):
-        entries = self.load(strict=True)
-        entry["id"] = max([e.get("id", 0) for e in entries] + [0]) + 1
-        entry.setdefault("swims", [])
-        entries.append(entry)
-        self.save(entries)
-        return entry["id"]
-
-    def copy_from(self, master, master_id):
-        """The swimmer's own copy of the Master's recorded swim master_id
-        (made the first time they swim it; Bill, 2026-11-17: "But the next
-        actual swim still goes to the stick if plugged in."), so their swims
-        to it, its Speed zone offset and the green areas stay with their
-        swims. Its id; None if the Master's is gone."""
-        for e in self.load(strict=True):
-            if e.get("from_master") == master_id:
-                return e["id"]
-        m = master.get(master_id)
-        if m is None:
-            return None
-        copy = {k: m[k] for k in ("date", "start", "end", "minutes", "miles", "pace", "text",
-                                  "program", "seconds") if k in m}
-        copy["from_master"] = master_id
-        return self.add(copy)
-
-    def change(self, entry_id, **values):
-        entries = self.load(strict=True)
-        for e in entries:
-            if e.get("id") == entry_id:
-                e.update(values)
-        self.save(entries)
-
-    def remove(self, entry_id, swim=None):
-        """A recorded swim (with the swims done to it) taken off the list,
-        or only one swim done to it (its number). The swim logs and videos
-        stay as they are."""
-        entries = self.load(strict=True)
-        if swim is None:
-            entries = [e for e in entries if e.get("id") != entry_id]
-        else:
-            for e in entries:
-                if e.get("id") == entry_id and 0 <= swim < len(e.get("swims", [])):
-                    del e["swims"][swim]
-        self.save(entries)
-
-    def add_swim(self, entry_id, swim):
-        entries = self.load(strict=True)
-        for e in entries:
-            if e.get("id") == entry_id:
-                e.setdefault("swims", []).append(swim)
-        self.save(entries)
-
-    @staticmethod
-    def offset_limits(entry, app):
-        """The Speed zone offset's range for a recorded swim (Bill,
-        2026-11-16: "The amount of offset possible would be limited by
-        swimmer limits and then number of zones from pool calibration"):
-        + until its slowest step would be the swimmer's fastest zone, -
-        until its fastest would be their slowest. (lowest, highest)."""
-        steps = app.controller._zone_steps()
-        lo, hi = min(steps), max(steps)
-        V = np.asarray(app.plateau_voltages, float)
-        ks = [max(lo, min(hi, int(np.argmin(np.abs(V - v))))) for _, v in entry.get("program", [])]
-        if not ks:
-            return 0, 0
-        return min(0, lo - max(ks)), max(0, hi - min(ks))
-
-    @classmethod
-    def program_from_log(cls, csv_path, t_start, t_end, plateau_voltages):
-        """The jet's steps between t_start and t_end in a swim log:
-        ([(swim seconds, volts) at each step change], swim seconds), or
-        (None, 0) if those rows have no jet volts (logs before v15.7)."""
-        V = np.asarray(plateau_voltages, float)
-        program, swim_s, prev_t, last_k, new = [], 0.0, None, None, None
-        try:
-            with open(csv_path) as f:
-                for line in f:
-                    c = line.split(",")
-                    try:
-                        t = float(c[0])
-                    except (ValueError, IndexError):
-                        continue
-                    if t < t_start or t > t_end:
-                        continue
-                    if prev_t is not None and t - prev_t <= cls.MAX_ROW_GAP_S:
-                        swim_s += t - prev_t
-                    prev_t = t
-                    try:
-                        volts = float(c[9])
-                    except (ValueError, IndexError):
-                        continue
-                    if volts <= 0:
-                        continue
-                    k = int(np.argmin(np.abs(V - volts)))
-                    if last_k is None:
-                        program.append((round(swim_s, 2), round(volts, 3)))
-                        last_k = k
-                    elif k == last_k:
-                        new = None
-                    elif new is None or new[0] != k:
-                        new = (k, swim_s, volts)        # (from when it started)
-                    elif swim_s - new[1] >= cls.MIN_STEP_S:
-                        program.append((round(new[1], 2), round(new[2], 3)))
-                        last_k, new = k, None
-        except OSError as e:
-            print(f"Couldn't read {csv_path} ({e})")
-        return (program, round(swim_s, 2)) if program else (None, 0)
-
-
-def recorded_line(d, gap="   "):
-    """A recorded swim's (or a swim done to it) line in the list: date,
-    average Pace, distance, swim time (gap between them: "&nbsp;" x 3 in a
-    rich-text label, where spaces run together)."""
-    # Each value named (Bill, 2026-11-16: "Nov 15, 2026   3:12 Avg Pace
-    # 0.129 mi  7:16 ??.  Is "??" the time for the clip?")
-    try:
-        day = date.fromisoformat(d["date"]).strftime("%b %d, %Y").replace(" 0", " ")
-    except (KeyError, ValueError):
-        day = "?"
-    secs = int(round(float(d.get("minutes", 0.0)) * 60))
-    return gap.join((day, (Utils.DecimalToTime(d["pace"]) if d.get("pace") else "--:--") + " Avg Pace",
-                     f"{float(d.get('miles', 0.0)):.3f} mi", f"{secs // 60}:{secs % 60:02d} swim time"))
-
-
-HTML_GAP = "&nbsp;" * 4
-
-
-def done_note(swim, entry):
-    """How far a swim done to a recorded swim went, if not just once to the
-    end: "  (18:20 of 25:00)" stopped early; Repeat: "  (Repeat 2, 1:20 of
-    3:00)" (the third time through, stopped at 1:20)."""
-    done = float(swim.get("done", 1.0))
-    n = float(entry.get("seconds", 0.0))
-    a, b = int(round(done * n)), int(round(n))      # (as recorded_line rounds the swim time)
-    notes = []
-    off = int(swim.get("offset", 0))
-    if off:                                         # its Speed zone offset
-        notes.append(f"{off:+d} zone{'s' if abs(off) != 1 else ''}")
-    if "repeats" in swim:
-        notes.append(f"Repeat {swim['repeats']}, {a // 60}:{a % 60:02d} of {b // 60}:{b % 60:02d}")
-    elif done < 0.99:
-        notes.append(f"{a // 60}:{a % 60:02d} of {b // 60}:{b % 60:02d}")
-    return f"  ({', '.join(notes)})" if notes else ""
-
-
-class PlaybackSwim:
-    """Playback Swim (since v15.11; Bill, 2026-11-16: "This selection will
-    play back the jet speed moment by moment during the following swim.
-    Like in 'hold' mode' only the jet speed changes. ... The swimmer has no
-    further control of speed during the swim."). App.UpdateLoop asks
-    desired() for the jet step each pass:
-      - the swimmer in the swim zone: the recorded step at the playback's
-        clock, which runs only while they swim (Suspend showing), so a
-        breather at the wall doesn't skip part of the swim;
-      - out of the swim zone, suspended: what the swimmer's own swim would
-        do (the jet winds down to the slowest zone), the clock stopped;
-        back in, the swim carries on where it was;
-      - every step kept inside the swimmer's zones (Swimmer limits) and so
-        inside the pool's safety limits;
-      - the end: the swimmer's slowest zone until they leave the swim zone,
-        then a Normal Swim again. The swim is added to the list then (or
-        when it's stopped before the end: Normal Swim, a stick change,
-        closing PoolWind);
-      - the Speed zone offset (the list's + / -; Bill, 2026-11-16: "the
-        swimmer could take the same recorded swim but challange themselves
-        to beat it."): every step that many zones faster (+) or slower (-),
-        still inside the swimmer's zones;
-      - repeat (the list's Repeat; Bill, 2026-11-16: "a "Repeat" button,
-        when pressed would play the recording over. Problem with this is
-        that may be too abrupt a change from the end to the next beginning
-        so it should ramp slower than usual."): at the end it starts over,
-        the jet moving to the first step one step every RAMP_STEP_S; until
-        Normal Swim. One line in the list for all of it.
-    The swim's start and end in the list are when its clock first and last
-    ran (the swimming itself), for Swim Plot's green areas."""
-    LEAD_S = 1.0          # play this far ahead: the jet takes about a second a step
-    MAX_DT_S = 0.5        # a pass longer than this (a menu, a stall) counts this much
-    RAMP_STEP_S = 3.0     # Repeat, end -> beginning: one jet step this often (usually ~1 s)
-
-    def __init__(self, app, store, entry, repeat=False):
-        self.app, self.store, self.entry = app, store, entry
-        prog = entry["program"]
-        self.times = np.array([t for t, _ in prog], float)
-        self.volts = [v for _, v in prog]
-        self.length = float(entry.get("seconds") or self.times[-1])
-        self.repeat, self.repeats = bool(repeat), 0
-        self.offset = int(entry.get("offset", 0))   # Speed zone offset (the list's + / -)
-        self.clock = 0.0
-        self._last_t = None
-        self._last_k = None          # the step asked for last
-        self._ramp = None            # Repeat's turnover: the step on the way, and when it moves next
-        self.finished = self.saved = False
-        self.first_t = self.last_t = None
-        self.start_miles = app.total_distance
-        self.start_minutes = app.total_swimtime
-        print(f"Playback Swim{' (Repeat)' if repeat else ''}: recorded swim {entry['id']} "
-              f"({recorded_line(entry)}), {self.length / 60:.1f} min")
-
-    def desired(self, algo_index, now):
-        app, win = self.app, self.app.window
-        dt = 0.0 if self._last_t is None else min(now - self._last_t, self.MAX_DT_S)
-        self._last_t = now
-        if getattr(win, "_com_h_decaying", True):
-            if self.finished:
-                app.playback = None             # left the swim zone after the end: Normal Swim
-                print("Playback Swim done: Lake Swim")
-            self._ramp = None
-            self._last_k = None
-            return algo_index                    # winding down, as in any swim
-        steps = app.controller._zone_steps()
-        lo, hi = min(steps), max(steps)
-        if self.finished:
-            return lo
-        if win.swimmerFound and app.suspendButtonText == "Suspend":
-            self.clock += dt
-            if self.first_t is None:
-                self.first_t = now
-            self.last_t = now
-        if self.clock >= self.length:
-            if not self.repeat:
-                self.finish()
-                return lo
-            self.clock -= self.length
-            self.repeats += 1
-            print(f"Playback Swim: Repeat {self.repeats}")
-            if self._last_k is not None:
-                self._ramp = [self._last_k, now + self.RAMP_STEP_S]
-        i = max(0, int(np.searchsorted(self.times, self.clock + self.LEAD_S, side="right")) - 1)
-        V = np.asarray(app.plateau_voltages, float)
-        k = max(lo, min(hi, int(np.argmin(np.abs(V - self.volts[i]))) + self.offset))
-        if self._ramp is not None:
-            if self._ramp[0] == k:
-                self._ramp = None
-            else:
-                if now >= self._ramp[1]:
-                    self._ramp[0] += 1 if k > self._ramp[0] else -1
-                    self._ramp[1] = now + self.RAMP_STEP_S
-                k = max(lo, min(hi, self._ramp[0]))
-        self._last_k = k
-        return k
-
-    def readout(self):
-        """The pool screen's line (Bill, 2026-11-16: "after where you
-        brilliantly put "Playback ...", put "  Repeat 0" (or 1,2,3...)")."""
-        if self.finished:
-            return "Playback done"
-        c, n = int(self.clock), int(round(self.length))
-        text = f"Playback {c // 60}:{c % 60:02d} / {n // 60}:{n % 60:02d}"
-        if self.offset:
-            text += f" {self.offset:+d}"
-        return text + f"  Repeat {self.repeats}" if self.repeat else text
-
-    def finish(self):
-        """The swim done to the recorded swim added to its list (once)."""
-        self.finished = True
-        if self.saved:
-            return
-        self.saved = True
-        app = self.app
-        miles = app.total_distance - self.start_miles
-        minutes = app.total_swimtime - self.start_minutes
-        if minutes < 0.1 or miles <= 0 or self.first_t is None:
-            print("Playback Swim: nothing swum, not added to the list")
-            return
-        swim = {"date": date.today().isoformat(), "start": round(self.first_t, 2),
-                "end": round(self.last_t, 2), "minutes": round(minutes, 2), "miles": round(miles, 4),
-                "pace": round(minutes / (miles * 17.6), 4),
-                "done": round(min(1.0, self.clock / self.length), 3) if self.length else 1.0}
-        if self.repeat:
-            swim["repeats"] = self.repeats
-        if self.offset:
-            swim["offset"] = self.offset
-        try:
-            self.store.add_swim(self.entry["id"], swim)
-            print(f"Playback Swim added to the list: {recorded_line(swim)}")
-        except Exception as e:
-            print(f"Playback Swim: couldn't write {self.store.path} ({e})")
 
 
 class PumpSwitch:
@@ -10389,13 +9831,9 @@ class SwimDateRangeDialog(QDialog):
     is closed, so a new date can be picked without reopening SwimPlot
     from the menu.
     """
-    def __init__(self, app, parent=None, initial_from=None, initial_to=None, datasets=None):
+    def __init__(self, app, parent=None, initial_from=None, initial_to=None):
         super().__init__(parent)
         self.app = app
-        # datasets: (the swimmer's CSV Vault, the Master's) when Ocean
-        # Swim's New opened it: Use: picks the dataset; None (Swim Plot):
-        # Use: picks the Pace-Volt curve
-        self.datasets = datasets
         self.setWindowTitle("Select Swim Date(s)")
         self.setModal(True)
 
@@ -10487,18 +9925,16 @@ class SwimDateRangeDialog(QDialog):
                 group.addButton(dot, row)
                 grid.addWidget(dot, row, 1)
             return box, group
-        # The words say what it picks (Bill, 2026-11-17: "I'm not selecting
-        # between the two datasets but between two Pace-Voltage curves.")
-        if datasets is not None:
-            self.dataset_box, self.dataset_btns = stack("Use:", ("Swimmer dataset", "Master dataset (coach)"))
-            self.dataset_btns.button(1 if self.app.is_master_dir(self.app.data_dir) else 0).setChecked(True)
-        else:
-            self.dataset_box, self.dataset_btns = stack("Use:", ("Swimmer Pace-Volt", "Master Pace-Volt"))
-            # with no stick the swimmer's table is the Master's (_load_swimmer):
-            # say so (Bill, 2026-11-17: "With stick pulled out ... default
-            # shows "Swimmer Pace-Volt" instead of "Master Pace-Volt".")
-            master = getattr(self.app, "plot_master", False) or self.app.swimmer_name() is None
-            self.dataset_btns.button(1 if master else 0).setChecked(True)
+        # The words say what it picks (since v15.12; Bill, 2026-11-17: "I'm
+        # not selecting between the two datasets but between two
+        # Pace-Voltage curves." ... "change the "Use:..." words to "Swimmer
+        # Pace-Volt" and "Master Pace-Volt""); with no stick the swimmer's
+        # table is the Master's: say so (Bill, 2026-11-17: "With stick pulled
+        # out ... default shows "Swimmer Pace-Volt" instead of "Master
+        # Pace-Volt".")
+        self.dataset_box, self.dataset_btns = stack("Use:", ("Swimmer Pace-Volt", "Master Pace-Volt"))
+        master = getattr(self.app, "plot_master", False) or self.app.swimmer_name() is None
+        self.dataset_btns.button(1 if master else 0).setChecked(True)
         self.dataset_btns.idToggled.connect(self._dataset_chosen)
         self.dataset_box.setEnabled(self.app.swimmer_name() is not None)
         self.show_box, self.show_btns = stack("Show:", ("Avg Pace", "Distance (mi)"),
@@ -10606,24 +10042,10 @@ class SwimDateRangeDialog(QDialog):
         if not checked:
             return
         self.app.plot_master = which == 1
-        if self.datasets is not None:
-            # Ocean Swim's New: the other CSV Vault, its swim days and its
-            # curve (the plot that follows reads app.data_dir too)
-            self.app.data_dir = self.datasets[which]
-            data_dates = self._find_data_dates()
-            self._data_dates = set(data_dates)
-            self._avg_pace_months_loaded = set()
-            for cal in (self.from_cal, self.to_cal):
-                cal.setDateTextFormat(QDate(), QTextCharFormat())   # (the other's green days off)
-                cal.setDataDates(data_dates)
-                self._style_calendar_dates(cal, data_dates)
         # the other dataset's own store (kept too: switching back is quick)
         self._avg_pace_cache, self._avg_read_times = self.app.avg_pace_store()
         today = self.app.plot_pace_from_voltage()
         for cal in (self.from_cal, self.to_cal):
-            if self.datasets is not None:
-                cal._pace_data_dir = self.app.data_dir
-                cal._avg_pace_months_loaded = self._avg_pace_months_loaded
             cal._today = today
             cal._avg_pace_cache, cal._avg_read_times = self._avg_pace_cache, self._avg_read_times
             cal._on_page_changed(cal.yearShown(), cal.monthShown())
@@ -10636,7 +10058,31 @@ class SwimDateRangeDialog(QDialog):
             self.no_data_lbl.setText("")
             # The plot made here, the calendar staying on screen with the
             # progress box (as the averages'); openSwimPlot shows it ready
-            self.plot = SwimPlotWindow.made_with_wait_box(self, self.app, self.parent(), from_date, to_date)
+            days = (to_date - from_date).days + 1
+            box = QtWidgets.QProgressDialog("Please wait: reading your swims...", None, 0, days + 1, self)
+            box.setWindowTitle("Swim Plot")
+            box.setWindowModality(Qt.ApplicationModal)
+            box.setMinimumDuration(0)
+            box.setAutoClose(False)
+            box.setMinimumWidth(320)
+            box.setValue(0)
+            box.show()
+            QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+
+            def progress(k, n, d):
+                box.setLabelText(f"Please wait: reading your swims...\n(day {k} of {n})")
+                box.setValue(k)
+                QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+                if k == n:
+                    box.setLabelText("Please wait: preparing the plot...")
+                    QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
+
+            self.plot = SwimPlotWindow(self.app, self.parent(), from_date, to_date)
+            try:
+                self.plot.prepare(progress)
+            finally:
+                box.close()
+                box.deleteLater()
             if self.isVisible():                # (not closed meanwhile: the stick pulled)
                 self.accept()
         else:
@@ -10722,304 +10168,6 @@ class SwimDateRangeDialog(QDialog):
         to_date = date(to_qdate.year(), to_qdate.month(), to_qdate.day())
         return from_date, to_date
 
-class RecordedSwimsDialog(QDialog):
-    """Recorded Swim's list (since v15.11; Bill, 2026-11-16): each recorded
-    swim on a line (date, average Pace, distance, swim time) with View and
-    Swim it, its swim type below; under it each swim done to it, a new line
-    each time, with View. New: a new recorded swim, chosen in Swim Plot.
-    action, when it closes: None (Close), ('new',), ('view', id, swim
-    number or None, the list's CSV Vault), ('swim', id), ('repeat', id),
-    ('delete', id, swim number or None); one of the Master's: ('swim', id,
-    'master'), ('repeat', id, 'master')."""
-
-    def __init__(self, app, parent=None):
-        super().__init__(parent)
-        self.app = app
-        self.action = None
-        self.setModal(True)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setFixedSize(app.window_w, app.window_h)
-        self.move(0, 0)
-        pool_fullscreen(self, app)
-        self.setStyleSheet("QDialog { background-color: #f4f4f4; }"
-                           " QLabel { font-size: 18px; }"
-                           " QPushButton { font-size: 17px; padding: 6px 14px; }")
-
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(20, 20, 20, 20)
-        lay.setSpacing(12)
-        title = QLabel("Ocean Swim")
-        title.setStyleSheet("font-size: 28px; font-weight: bold;")
-        lay.addWidget(title)
-        who = app.swimmer_name() or "Master"
-        sub = QLabel(f"{who}: a recorded swim plays its jet speeds back, moment by moment, while you "
-                     "swim. Swim it, then swim; the jet doesn't follow you until it's done. Repeat "
-                     "plays it over and over, until Lake Swim in the menu. + and \u2212: the Speed "
-                     "zone offset, the whole swim faster or slower by that many zones.")
-        sub.setWordWrap(True)
-        sub.setStyleSheet("font-size: 15px; color: #444;")
-        lay.addWidget(sub)
-
-        area = QtWidgets.QScrollArea()
-        area.setWidgetResizable(True)
-        inner = QWidget()
-        rows = QVBoxLayout(inner)
-        rows.setContentsMargins(0, 0, 0, 0)
-        rows.setSpacing(4)
-        entries = RecordedSwims(app.data_dir).load()
-        playing = app.playback.entry["id"] if app.playback is not None else None
-        # With a swimmer's stick in, the Master's recorded swims too, under
-        # their own heading (where a coach puts them; Bill, 2026-11-17)
-        master = RecordedSwims(app.master_data_dir()).load() if app.has_master_list() else []
-
-        def heading(text):
-            h = QLabel(text)
-            h.setStyleSheet("font-size: 20px; font-weight: bold; margin-top: 6px;")
-            rows.addWidget(h)
-
-        if master:
-            heading(who)
-        if not entries:
-            empty = QLabel("No recorded swims yet. Press New, then choose a part of a swim in Swim Plot "
-                           "with its Start here and End here."
-                           + (" Or swim one of the Master's below." if master else ""))
-            empty.setWordWrap(True)
-            rows.addWidget(empty)
-        for e in reversed(entries):             # newest first
-            rows.addWidget(self._entry_box(e, playing))
-        if master:
-            heading("Master (coach)")
-            for e in reversed(master):
-                rows.addWidget(self._entry_box(e, None, from_master=True))
-        rows.addStretch()
-        area.setWidget(inner)
-        lay.addWidget(area, 1)
-
-        bottom = QHBoxLayout()
-        bottom.addWidget(self._button("New", ("new",)))
-        bottom.addStretch()
-        close = QPushButton("Close")
-        close.clicked.connect(self.reject)
-        bottom.addWidget(close)
-        lay.addLayout(bottom)
-
-    def _entry_box(self, e, playing, from_master=False):
-        """One recorded swim with its buttons; the swimmer's own with the
-        swims done to it. One of the Master's (from_master): View, Swim it
-        and Repeat only; swimming it copies it to the swimmer's list."""
-        box = QFrame()
-        box.setStyleSheet("QFrame { background-color: white; border: 1px solid #bbb; }"
-                          " QLabel { border: none; }")
-        bl = QVBoxLayout(box)
-        bl.setContentsMargins(10, 6, 10, 6)
-        bl.setSpacing(2)
-        # The buttons smaller and stacked two by two, so the line has
-        # room (Bill, 2026-11-16: "Smaller buttons, stacked?")
-        top = QHBoxLayout()
-        left = QVBoxLayout()
-        notes = ("&nbsp;&nbsp;(playing now)" if e["id"] == playing else "") \
-            + ("&nbsp;&nbsp;<span style='font-weight:normal'>(from Master)</span>"
-               if e.get("from_master") is not None else "")
-        line = QLabel(f"<b>{recorded_line(e, HTML_GAP)}</b>" + notes)
-        line.setWordWrap(True)
-        left.addWidget(line)
-        if from_master:
-            desc = QLabel(html.escape(e.get("text") or "(no swim type)"))
-            desc.setTextFormat(Qt.RichText)
-            desc.setWordWrap(True)
-            desc.setStyleSheet("font-size: 16px; font-style: italic; color: #333;")
-            left.addWidget(desc)
-        else:
-            left.addWidget(self._swim_type_label(e))
-        top.addLayout(left, 1)
-        grid = QtWidgets.QGridLayout()
-        grid.setSpacing(4)
-        if from_master:
-            grid.addWidget(self._button("View", ("view", e["id"], None, "master")), 0, 0)
-            grid.addWidget(self._button("Swim it", ("swim", e["id"], "master")), 0, 1)
-            grid.addWidget(self._button("Repeat", ("repeat", e["id"], "master")), 1, 0)
-            grid.addWidget(QWidget(), 1, 1)     # (Delete's room: in line with the rows above)
-            top.addLayout(grid)
-            top.addSpacing(44 + max(0, top.spacing()))   # (and the offset column's)
-            bl.addLayout(top)
-            return box
-        grid.addWidget(self._button("View", ("view", e["id"], None)), 0, 0)
-        grid.addWidget(self._button("Swim it", ("swim", e["id"])), 0, 1)
-        grid.addWidget(self._button("Repeat", ("repeat", e["id"])), 1, 0)
-        grid.addWidget(self._delete_button(e, None, e["id"] == playing), 1, 1)
-        top.addLayout(grid)
-        top.addLayout(self._offset_column(e))
-        bl.addLayout(top)
-        for k, swim in enumerate(e.get("swims", [])):
-            r = QHBoxLayout()
-            r.addSpacing(30)
-            sl = QLabel(recorded_line(swim, HTML_GAP) + done_note(swim, e))
-            sl.setTextFormat(Qt.RichText)
-            sl.setWordWrap(True)
-            sl.setStyleSheet("font-size: 15px;")
-            r.addWidget(sl, 1)
-            r.addWidget(self._button("View", ("view", e["id"], k)))
-            r.addWidget(self._delete_button(e, k, False))
-            bl.addLayout(r)
-        return box
-
-    def _swim_type_label(self, entry):
-        """The swim type, changed by tapping it (Bill, 2026-11-17: "Yes,
-        make the swim type editable in the list."; View has no header box
-        any more to change it in)."""
-        desc = QLabel()
-        desc.setWordWrap(True)
-        desc.setTextFormat(Qt.RichText)
-        desc.setCursor(Qt.PointingHandCursor)
-        desc.setToolTip("Tap to change the swim type")
-        desc.setStyleSheet("font-size: 16px; font-style: italic; color: #333;")
-
-        def show(text):
-            shown = html.escape(text) if text else "(no swim type: tap here to write one)"
-            desc.setText(f"{shown}&nbsp;&nbsp;<span style='color:#888; font-style:normal'>\u270e</span>")
-
-        def edit(_event=None):
-            dlg = QtWidgets.QInputDialog(self)
-            dlg.setWindowTitle("Ocean Swim")
-            dlg.setLabelText("Swim type:")
-            dlg.setTextValue(entry.get("text", ""))
-            dlg.resize(min(600, self.app.window_w - 40), dlg.sizeHint().height())
-            if dlg.exec() != QDialog.Accepted:
-                return
-            text = dlg.textValue().strip()
-            if text == entry.get("text", ""):
-                return
-            try:
-                RecordedSwims(self.app.data_dir).change(entry["id"], text=text)
-            except Exception as e:
-                QMessageBox.warning(self, "Ocean Swim", f"Couldn't save the swim type:\n({e})")
-                return
-            entry["text"] = text
-            show(text)
-
-        desc.mousePressEvent = edit
-        show(entry.get("text", ""))
-        return desc
-
-    def _button(self, label, action):
-        b = QPushButton(label)
-        if action[0] != "new":
-            b.setStyleSheet("QPushButton { font-size: 14px; padding: 4px 8px; }")
-        b.clicked.connect(lambda _=False: self._choose(action))
-        return b
-
-    def _offset_column(self, entry):
-        """Speed zone offset (Bill, 2026-11-16: "a "+" and a "-" button with
-        a little box in between(vertical). The "+" key would make the jet
-        flow faster by one zone, "-" opposite, and the box would show the
-        offset +x or -x."): kept with the recorded swim at once; a playback
-        of it running takes it too."""
-        col = QVBoxLayout()
-        col.setSpacing(2)
-        plus, minus = QPushButton("+"), QPushButton("\u2212")
-        box = QLabel()
-        box.setAlignment(Qt.AlignCenter)
-        box.setToolTip("Speed zone offset")
-        box.setStyleSheet("font-size: 15px; font-weight: bold; border: 1px solid #888; background: #fffbe6;")
-        for w in (plus, box, minus):
-            w.setFixedSize(44, 26)
-            col.addWidget(w, 0, Qt.AlignHCenter)
-        for b in (plus, minus):
-            b.setStyleSheet("QPushButton { font-size: 16px; font-weight: bold; padding: 0px; }")
-        lo, hi = RecordedSwims.offset_limits(entry, self.app)
-        state = {"off": max(lo, min(hi, int(entry.get("offset", 0))))}
-
-        def show():
-            o = state["off"]
-            box.setText(f"{o:+d}" if o else "0")
-            plus.setEnabled(o < hi)
-            minus.setEnabled(o > lo)
-
-        def bump(d):
-            o = max(lo, min(hi, state["off"] + d))
-            if o == state["off"]:
-                return
-            try:
-                RecordedSwims(self.app.data_dir).change(entry["id"], offset=o)
-            except Exception as e:
-                QMessageBox.warning(self, "Ocean Swim", f"Couldn't save the offset:\n({e})")
-                return
-            state["off"] = o
-            pb = self.app.playback
-            if pb is not None and pb.entry.get("id") == entry["id"]:
-                pb.offset = o
-            show()
-        plus.clicked.connect(lambda: bump(+1))
-        minus.clicked.connect(lambda: bump(-1))
-        show()
-        return col
-
-    def _delete_button(self, entry, swim, playing):
-        """Delete (Bill, 2026-11-16: "Yes, a delete button is needed"): the
-        recorded swim (swim None) with the swims done to it, or one swim
-        done to it; asked first."""
-        b = QPushButton("Delete")
-        b.setStyleSheet("QPushButton { font-size: 14px; padding: 4px 8px; color: #a00000; }")
-
-        def ask():
-            if playing:
-                QMessageBox.information(self, "Ocean Swim", "This recorded swim is playing now. "
-                                        "Choose Lake Swim in the menu first, then delete it.")
-                return
-            if swim is None:
-                n = len(entry.get("swims", []))
-                what = (f"Delete this recorded swim ({recorded_line(entry)})"
-                        + (f" and the {n} swim{'s' if n != 1 else ''} done to it" if n else "") + "?")
-            else:
-                what = f"Delete this swim ({recorded_line(entry['swims'][swim])}) from the list?"
-            box = QMessageBox(QMessageBox.Question, "Ocean Swim",
-                              what + "\n\nThe swim logs and videos themselves stay.", parent=self)
-            yes = box.addButton("Delete", QMessageBox.DestructiveRole)
-            box.addButton("Keep", QMessageBox.RejectRole)
-            box.exec()
-            if box.clickedButton() is yes:
-                self._choose(("delete", entry["id"], swim))
-        b.clicked.connect(ask)
-        return b
-
-    def _choose(self, action):
-        self.action = action
-        # View: the plot made here, the list staying on screen with the
-        # "Please wait" box, not the pool screen (Bill, 2026-11-17: "when
-        # clicking the "View" button, the screen goes to the main screen and
-        # sits there until all the data is processed ... a "Please Wait"
-        # should popup until the SwimPlot screen is ready.")
-        if action[0] == "view":
-            # The list it's in, and the CSV Vault its swim is in: the
-            # Master's for one of the Master's recorded swims and for the
-            # recorded part of the swimmer's copy of one; the swimmer's for
-            # their own and for every swim done (Bill, 2026-11-17)
-            own, master = self.app.data_dir, self.app.master_data_dir()
-            list_dir = master if action[3:] == ("master",) else own
-            entry = RecordedSwims(list_dir).get(action[1])
-            if entry is None:
-                return
-            part = entry if action[2] is None else entry["swims"][action[2]]
-            data_dir = master if list_dir == master or (entry.get("from_master") is not None
-                                                        and action[2] is None) else own
-            self.action = ("view", action[1], action[2], list_dir)
-            if self.app.has_master_list() and data_dir != self.app.data_dir:
-                self.restore = (self.app.data_dir, self.app.plot_master)
-                self.app.data_dir, self.app.plot_master = data_dir, True
-            day = date.fromisoformat(part["date"])
-            self.plot = SwimPlotWindow.made_with_wait_box(self, self.app, self.parent(), day, day)
-            if not self.isVisible():            # (closed meanwhile: the stick pulled)
-                return
-        self.accept()
-
-    def reject(self):
-        self.action = None                  # (Close, or the stick pulled: nothing chosen)
-        super().reject()
-
-    def on_close(self):
-        self.reject()
-
-
 class SwimPlotWindow(QDialog):
     def __init__(self, app, parent=None, from_date=None, to_date=None):
         super().__init__(parent)
@@ -11067,48 +10215,12 @@ class SwimPlotWindow(QDialog):
         # window is shown (showEvent): it may be prepared first, out of
         # sight, while the calendar shows the progress (prepare)
         self._opened = False
-        # Recorded Swim (since v15.11): ('new',) or ('view', id, swim number
-        # or None), set by openSwimPlot before the window shows: the header
-        # with the recorded swim's lines and the selection lines
-        self.recorded = None
 
     def showEvent(self, event):
         super().showEvent(event)
         if not self._opened:
             self._opened = True
             QTimer.singleShot(0, self.on_open)
-
-    @staticmethod
-    def made_with_wait_box(over, app, parent, from_date, to_date):
-        """The plot made and prepared with the "Please wait" box over the
-        screen showing (`over`: the calendar, or Ocean Swim's list), which
-        stays on screen until the plot is ready."""
-        days = (to_date - from_date).days + 1
-        box = QtWidgets.QProgressDialog("Please wait: reading your swims...", None, 0, days + 1, over)
-        box.setWindowTitle("Swim Plot")
-        box.setWindowModality(Qt.ApplicationModal)
-        box.setMinimumDuration(0)
-        box.setAutoClose(False)
-        box.setMinimumWidth(320)
-        box.setValue(0)
-        box.show()
-        QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
-
-        def progress(k, n, d):
-            box.setLabelText(f"Please wait: reading your swims...\n(day {k} of {n})")
-            box.setValue(k)
-            QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
-            if k == n:
-                box.setLabelText("Please wait: preparing the plot...")
-                QApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
-
-        plot = SwimPlotWindow(app, parent, from_date, to_date)
-        try:
-            plot.prepare(progress)
-        finally:
-            box.close()
-            box.deleteLater()
-        return plot
 
     def prepare(self, progress=None):
         """The swims read and the plot's arrays made before the window is
@@ -11150,7 +10262,7 @@ class SwimPlotWindow(QDialog):
             if ok:
                 names = ("derived_dt", "short_gap_array", "full_gap_array", "avg_pace", "total_dist",
                          "X_idx", "X_time", "X_rtime", "X_src", "X_pace", "X_dist", "X_seg", "X_frame", "X_date",
-                         "X_comh", "X_comw", "X_zone", "X_zones", "t0_epoch")
+                         "X_comh", "X_comw", "X_zone", "X_zones")
                 while len(store) >= 3:              # the last three kept (a month is a few MB)
                     store.pop(next(iter(store)))
                 store[key] = {n: (getattr(self, n).copy() if isinstance(getattr(self, n), np.ndarray)
@@ -11200,7 +10312,6 @@ class SwimPlotWindow(QDialog):
 
         # Convert epoch timestamps → relative seconds
         t0 = time_raw[0]
-        self.t0_epoch = float(t0)        # (Recorded Swim: a row's real time = t0 + X_rtime)
         real_times = [t - t0 for t in time_raw]
 
         # Derive recording interval from the data itself so playback and gap
@@ -11498,273 +10609,7 @@ class SwimPlotWindow(QDialog):
 
         # Default to the most recent data point in the range so opening a
         # multi-day range lands on the latest swim, not the oldest.
-        start_idx = len(self.X_idx) - 1
-        # Recorded Swim's View: the cursor at the swim's start, the plot
-        # showing the swim (it plays from there)
-        if self.recorded is not None and self.recorded[0] == "view":
-            part = self._recorded_part()
-            if part is not None:
-                s_i, e_i = self._idx_at(part["start"] - self.t0_epoch), self._idx_at(part["end"] - self.t0_epoch)
-                pad = max(10.0, 0.05 * (self.X_idx[e_i] - self.X_idx[s_i]))
-                self._shared_xlim = (self.X_idx[s_i] - pad, self.X_idx[e_i] + pad)
-                start_idx = s_i
-        self._build_video_overlay(start_idx=start_idx)
-
-    def _shade_playbacks(self, axes, canvases):
-        """Every swim done under a Playback Swim in the plot's days shaded
-        green, as the recorded part is (Bill, 2026-11-16: "show in either
-        SwimPlot version, the same green area that was swum under
-        playback.. in the review of the swim that used the "playback"
-        feature"). Its times: the list's (RecordedSwims), when the
-        playback's clock ran. (Recorded Swim's View of one: shaded already,
-        with its lines.)"""
-        t0 = getattr(self, "t0_epoch", None)
-        if t0 is None or not len(self.X_rtime):
-            return
-        t_lo, t_hi = t0 + float(self.X_rtime[0]), t0 + float(self.X_rtime[-1])
-        rec = self.recorded
-        skip = (rec[1], rec[2]) if rec is not None and rec[0] == "view" and rec[2] is not None else None
-        shaded = 0
-        for e in RecordedSwims(self.app.data_dir).load():
-            for k, sw in enumerate(e.get("swims", [])):
-                try:
-                    start, end = float(sw["start"]), float(sw["end"])
-                except (KeyError, TypeError, ValueError):
-                    continue
-                if (e.get("id"), k) == skip or end < t_lo or start > t_hi:
-                    continue
-                s_i, e_i = self._idx_at(start - t0), self._idx_at(end - t0)
-                for ax in axes:
-                    ax.axvspan(self.X_idx[s_i], self.X_idx[e_i], color="#00c000", alpha=0.12)
-                shaded += 1
-        if shaded:
-            for c in canvases:
-                c.draw_idle()
-
-    def _recorded_part(self):
-        """Recorded Swim's View: the recorded swim, or the swim done to it."""
-        rec = self.recorded
-        entry = RecordedSwims(rec[3] if len(rec) > 3 else self.app.data_dir).get(rec[1])
-        if entry is None:
-            return None
-        return entry if rec[2] is None else entry["swims"][rec[2]]
-
-    def _idx_at(self, rtime):
-        """The plot's row at a real time (seconds after the range's first row)."""
-        return int(np.clip(np.searchsorted(self.X_rtime, rtime), 0, len(self.X_rtime) - 1))
-
-    def _part_stats(self, s_i, e_i):
-        """Miles and swim minutes between two of the plot's rows (time out
-        of the swim zone left out), as the list shows them."""
-        miles = float(self.X_dist[e_i] - self.X_dist[s_i])
-        seg = slice(s_i, e_i + 1)
-        rt = self.X_rtime[seg][self.X_pace[seg] < 7.0]
-        d = np.diff(rt)
-        minutes = float(d[d <= RecordedSwims.MAX_ROW_GAP_S].sum()) / 60.0 if len(d) else 0.0
-        return miles, minutes
-
-    def _recorded_header(self, axes, canvases, cursor_idx):
-        """Recorded Swim (since v15.11; Bill, 2026-11-16: "The current lists
-        line for the selection will be the header in the screen and under
-        will be the text description and the place where it is entered. If
-        the selection hadn't yet been made, the two header lines will be
-        created as data is established."). At the top of the screen: the
-        list's line, then the swim type with Save. New: "Start here" and
-        "End here" put the selection's lines at the cursor, Save saves it to
-        the list. Kept through Compress / Expand Gaps (_rec_state)."""
-        rec = self.recorded
-        store = RecordedSwims(self.app.data_dir)
-        if getattr(self, "_rec_state", None) is None:
-            st = {"id": None, "sel": [None, None]}
-            if rec[0] == "view":
-                st["id"] = rec[1]
-                part = self._recorded_part()
-                if part is not None:
-                    st["sel"] = [part["start"] - self.t0_epoch, part["end"] - self.t0_epoch]
-            self._rec_state = st
-        st = self._rec_state
-
-        # View: no header, the plot left the whole screen; the green lines
-        # still show the part, and the plot's Close goes back to the list
-        # (Bill, 2026-11-17: "here I need the screen to show the swim as
-        # much as possible. So just eliminat that box and the user can close
-        # the screen with the usual "Close" button on the plot box.")
-        if rec[0] == "view":
-            a, b = st["sel"]
-            if a is not None and b is not None:
-                s_i, e_i = self._idx_at(a), self._idx_at(b)
-                for ax in axes:
-                    for i in (s_i, e_i):
-                        ax.axvline(self.X_idx[i], color="#00a000", linewidth=1.6)
-                    ax.axvspan(self.X_idx[s_i], self.X_idx[e_i], color="#00c000", alpha=0.12)
-                for c in canvases:
-                    c.draw_idle()
-            return
-
-        hdr = QFrame(self.app.window)
-        hdr.setObjectName("recHdr")
-        hdr.setStyleSheet("QFrame#recHdr { background-color: rgba(255,255,255,215); border: 1px solid #444; }"
-                          " QLabel { background: transparent; font-size: 16px; }"
-                          " QPushButton { font-size: 15px; padding: 3px 10px; }"
-                          " QLineEdit { font-size: 16px; }")
-        lay = QVBoxLayout(hdr)
-        lay.setContentsMargins(10, 6, 10, 6)
-        lay.setSpacing(6)
-        line1 = QLabel()
-        line1.setWordWrap(True)
-        lay.addWidget(line1)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Swim type:"))
-        text = QtWidgets.QLineEdit()
-        text.setPlaceholderText("e.g. Intervals: 2 hard, 1 easy")
-        row.addWidget(text, 1)
-        save_btn = QPushButton("Save")
-        row.addWidget(save_btn)
-        # OK closes the plot, as its Close does (Bill, 2026-11-16: "how about
-        # a "OK" button on the header as well? Same response as the normal
-        # "close" button.")
-        ok_btn = QPushButton("OK")
-        ok_btn.clicked.connect(self.on_close)
-        row.addWidget(ok_btn)
-        lay.addLayout(row)
-        picks = QHBoxLayout()
-        start_btn, end_btn = QPushButton("Start here"), QPushButton("End here")
-        hint = QLabel("Move the cursor, then put the lines.")
-        hint.setStyleSheet("font-size: 13px; color: #444;")
-        picks.addWidget(start_btn)
-        picks.addWidget(end_btn)
-        picks.addWidget(hint, 1)
-        lay.addLayout(picks)
-        entry = store.get(st["id"]) if st["id"] is not None else None
-        if entry is not None:
-            text.setText(entry.get("text", ""))
-
-        marks = []
-
-        def sel_idx():
-            a, b = st["sel"]
-            return (None if a is None else self._idx_at(a)), (None if b is None else self._idx_at(b))
-
-        def draw_lines():
-            for m in marks:
-                m.remove()
-            marks.clear()
-            s_i, e_i = sel_idx()
-            for ax in axes:
-                for i in (s_i, e_i):
-                    if i is not None:
-                        marks.append(ax.axvline(self.X_idx[i], color="#00a000", linewidth=1.6))
-                if s_i is not None and e_i is not None:
-                    marks.append(ax.axvspan(self.X_idx[s_i], self.X_idx[e_i], color="#00c000", alpha=0.12))
-            for c in canvases:
-                c.draw_idle()
-
-        def refresh_save():
-            # Saved: greyed out until the swim type is changed (Bill,
-            # 2026-11-16: "The "Save" button could be greyed out unless a
-            # change was made to the text."); new: once both lines are put
-            if save_btn.text() == "Saved":
-                return
-            if st["id"] is not None:
-                entry = store.get(st["id"]) or {}
-                save_btn.setEnabled(text.text().strip() != entry.get("text", ""))
-            else:
-                save_btn.setEnabled(None not in st["sel"])
-
-        def show():
-            entry = store.get(st["id"]) if st["id"] is not None else None
-            s_i, e_i = sel_idx()
-            if entry is not None:
-                t = recorded_line(entry, HTML_GAP)
-                if rec[0] == "view" and rec[2] is not None and rec[2] < len(entry.get("swims", [])):
-                    swim = entry["swims"][rec[2]]
-                    t += ("<br><span style='font-weight:normal'>This swim:" + HTML_GAP
-                          + recorded_line(swim, HTML_GAP) + done_note(swim, entry) + "</span>")
-                line1.setText(f"<b>{t}</b>")
-            elif s_i is not None and e_i is not None:
-                miles, minutes = self._part_stats(s_i, e_i)
-                day = date.fromordinal(int(self.X_date[s_i])).isoformat()
-                pace = minutes / (miles * 17.6) if miles > 0 else 0
-                line1.setText(f"<b>{recorded_line({'date': day, 'minutes': minutes, 'miles': miles, 'pace': pace}, HTML_GAP)}</b>"
-                              "&nbsp;&nbsp;(not saved yet)")
-            else:
-                line1.setText("<b>New recorded swim</b>: put the start and end lines")
-            new = entry is None
-            for wdg in (start_btn, end_btn, hint):
-                wdg.setVisible(new)
-            refresh_save()
-            hdr.setFixedWidth(self.app.window_w - 50)
-            hdr.adjustSize()
-            hdr.move(25, 10)
-
-        def put(which):
-            rt = float(self.X_rtime[cursor_idx()])
-            st["sel"][which] = rt
-            a, b = st["sel"]
-            if a is not None and b is not None and b < a:
-                st["sel"] = [b, a]
-            draw_lines()
-            show()
-
-        def saved():
-            save_btn.setText("Saved")
-            save_btn.setEnabled(False)
-
-            def back():
-                try:
-                    save_btn.setText("Save")
-                    refresh_save()
-                except RuntimeError:
-                    pass            # (the header rebuilt meanwhile: Compress / Expand Gaps)
-            QTimer.singleShot(1500, back)
-
-        def save():
-            try:
-                write()
-            except Exception as e:
-                QMessageBox.warning(hdr, "Ocean Swim", f"Couldn't save the recorded swim:\n{store.path}\n({e})")
-
-        def write():
-            if st["id"] is not None:
-                store.change(st["id"], text=text.text().strip())
-                saved()
-                show()
-                return
-            s_i, e_i = sel_idx()
-            if self.X_date[s_i] != self.X_date[e_i]:
-                QMessageBox.information(hdr, "Ocean Swim", "Put both lines on the same day's swim.")
-                return
-            day = date.fromordinal(int(self.X_date[s_i])).isoformat()
-            t_start, t_end = self.t0_epoch + self.X_rtime[s_i], self.t0_epoch + self.X_rtime[e_i]
-            program, seconds = RecordedSwims.program_from_log(
-                os.path.join(self.app.data_dir, f"{day}.csv"), t_start, t_end, self.app.plateau_voltages)
-            if program is None:
-                QMessageBox.information(hdr, "Ocean Swim", "This part of the swim has no jet speeds in "
-                                        "its log (swims before PoolWind v15.7). Choose a newer swim.")
-                return
-            if seconds < 30:
-                QMessageBox.information(hdr, "Ocean Swim", "Choose at least half a minute of swimming.")
-                return
-            miles, _ = self._part_stats(s_i, e_i)
-            minutes = seconds / 60.0
-            st["id"] = store.add({"date": day, "start": round(t_start, 2), "end": round(t_end, 2),
-                                  "minutes": round(minutes, 2), "miles": round(miles, 4),
-                                  "pace": round(minutes / (miles * 17.6), 4) if miles > 0 else 0.0,
-                                  "text": text.text().strip(), "program": program, "seconds": seconds})
-            print(f"Recorded Swim {st['id']} saved: {day}, {minutes:.1f} min, {len(program)} jet steps")
-            saved()
-            show()
-
-        start_btn.clicked.connect(lambda: put(0))
-        end_btn.clicked.connect(lambda: put(1))
-        save_btn.clicked.connect(save)
-        text.returnPressed.connect(lambda: save_btn.isEnabled() and save())
-        text.textChanged.connect(lambda _t: refresh_save())
-        draw_lines()
-        show()
-        hdr.show()
-        hdr.raise_()
-        self._rec_hdr = hdr
+        self._build_video_overlay(start_idx=len(self.X_idx) - 1)
 
     def _repair_avi_if_needed(self, avi_path, seg, date_ord):
         # A power failure (or any hard interruption) leaves that segment's
@@ -12198,8 +11043,7 @@ class SwimPlotWindow(QDialog):
         self._replay_ni = None
         self._bar_filter = _LeftClickFilter(
             _toggle_replay_bar,
-            exclude=lambda pos: (overlay.isVisible() and overlay.geometry().contains(pos))
-            or (getattr(self, "_rec_hdr", None) is not None and self._rec_hdr.geometry().contains(pos)))
+            exclude=lambda pos: overlay.isVisible() and overlay.geometry().contains(pos))
         self.app.window.installEventFilter(self._bar_filter)
 
         # Load initial frame
@@ -12444,16 +11288,9 @@ class SwimPlotWindow(QDialog):
 
         self.active_idx = start_idx
         self.video_overlay = overlay
-        self._shade_playbacks((ax_pace, ax_mph), (mini_canvas_pace, mini_canvas_mph))
-        if self.recorded is not None:
-            self._recorded_header((ax_pace, ax_mph), (mini_canvas_pace, mini_canvas_mph), lambda: _ps['idx'])
 
     def _teardown_video_overlay(self):
         plt.close('all')
-        if getattr(self, "_rec_hdr", None) is not None:
-            self._rec_hdr.close()
-            self._rec_hdr.deleteLater()
-            self._rec_hdr = None
         if hasattr(self, '_play_timer') and self._play_timer is not None:
             self._play_timer.stop()
             self._play_timer = None
@@ -12671,7 +11508,6 @@ import os
 import sys
 import ast
 import csv
-import html
 import time
 import math
 import random
